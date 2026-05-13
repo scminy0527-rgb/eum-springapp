@@ -9,7 +9,6 @@
     <typeAliases>
         <!-- DTO Alias -->
         <typeAlias type="com.app.springapp.domain.dto.UserDTO" alias="UserDTO"/>
-        <typeAlias type="com.app.springapp.domain.dto.MemberDTO" alias="MemberDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.ManagerDTO" alias="ManagerDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.SocialUserDTO" alias="SocialUserDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.FollowDTO" alias="FollowDTO"/>
@@ -26,7 +25,7 @@
         <typeAlias type="com.app.springapp.domain.dto.CommentReportDTO" alias="CommentReportDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.ChatDTO" alias="ChatDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.ChatRoomDTO" alias="ChatRoomDTO"/>
-        <typeAlias type="com.app.springapp.domain.dto.ChatMemberDTO" alias="ChatMemberDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.ChatUserDTO" alias="ChatUserDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.ChatRoomReportDTO" alias="ChatRoomReportDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.QuizDTO" alias="QuizDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.QuizChoiceDTO" alias="QuizChoiceDTO"/>
@@ -77,7 +76,7 @@
         <typeAlias type="com.app.springapp.domain.dto.request.CommentReportRequestDTO" alias="CommentReportRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.ChatRequestDTO" alias="ChatRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.ChatRoomRequestDTO" alias="ChatRoomRequestDTO"/>
-        <typeAlias type="com.app.springapp.domain.dto.request.ChatMemberRequestDTO" alias="ChatMemberRequestDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.request.ChatUserRequestDTO" alias="ChatUserRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.ChatRoomReportRequestDTO" alias="ChatRoomReportRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.QuizRequestDTO" alias="QuizRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.QuizChoiceRequestDTO" alias="QuizChoiceRequestDTO"/>
@@ -114,7 +113,6 @@
         <typeAlias type="com.app.springapp.domain.dto.response.UserBlockResponseDTO" alias="UserBlockResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.UserAttendanceResponseDTO" alias="UserAttendanceResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.UserReportResponseDTO" alias="UserReportResponseDTO"/>
-        <typeAlias type="com.app.springapp.domain.dto.response.MemberResponseDTO" alias="MemberResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.ManagerResponseDTO" alias="ManagerResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.SocialUserResponseDTO" alias="SocialUserResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.FollowResponseDTO" alias="FollowResponseDTO"/>
@@ -128,7 +126,7 @@
         <typeAlias type="com.app.springapp.domain.dto.response.CommentReportResponseDTO" alias="CommentReportResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.ChatResponseDTO" alias="ChatResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.ChatRoomResponseDTO" alias="ChatRoomResponseDTO"/>
-        <typeAlias type="com.app.springapp.domain.dto.response.ChatMemberResponseDTO" alias="ChatMemberResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.ChatUserResponseDTO" alias="ChatUserResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.ChatRoomReportResponseDTO" alias="ChatRoomReportResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.QuizResponseDTO" alias="QuizResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.QuizChoiceResponseDTO" alias="QuizChoiceResponseDTO"/>
@@ -162,9 +160,7 @@
 
         <!-- VO Alias -->
         <typeAlias type="com.app.springapp.domain.vo.UserVO" alias="UserVO"/>
-        <typeAlias type="com.app.springapp.domain.vo.MemberVO" alias="MemberVO"/>
         <typeAlias type="com.app.springapp.domain.vo.SocialUserVO" alias="SocialUserVO"/>
-        <typeAlias type="com.app.springapp.domain.vo.SocialMemberVO" alias="SocialMemberVO"/>
         <typeAlias type="com.app.springapp.domain.vo.ManagerVO" alias="ManagerVO"/>
         <typeAlias type="com.app.springapp.domain.vo.FollowVO" alias="FollowVO"/>
         <typeAlias type="com.app.springapp.domain.vo.FollowTypeVO" alias="FollowTypeVO"/>
@@ -181,7 +177,7 @@
         <typeAlias type="com.app.springapp.domain.vo.CommentReportVO" alias="CommentReportVO"/>
         <typeAlias type="com.app.springapp.domain.vo.ChatVO" alias="ChatVO"/>
         <typeAlias type="com.app.springapp.domain.vo.ChatRoomVO" alias="ChatRoomVO"/>
-        <typeAlias type="com.app.springapp.domain.vo.ChatMemberVO" alias="ChatMemberVO"/>
+        <typeAlias type="com.app.springapp.domain.vo.ChatUserVO" alias="ChatUserVO"/>
         <typeAlias type="com.app.springapp.domain.vo.ChatRoomReportVO" alias="ChatRoomReportVO"/>
         <typeAlias type="com.app.springapp.domain.vo.QuizVO" alias="QuizVO"/>
         <typeAlias type="com.app.springapp.domain.vo.QuizChoiceVO" alias="QuizChoiceVO"/>

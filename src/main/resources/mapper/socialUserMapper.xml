@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.SocialUserMapper">
+
+    <!-- 소셜 유저 추가 -->
+    <insert id="insert" parameterType="SocialUserVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_SOCIAL_USER.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_SOCIAL_USER (ID, SOCIAL_USER_PROVIDER_ID, SOCIAL_USER_PROVIDER, USER_ID)
+        VALUES (#{id}, #{socialUserProviderId}, #{socialUserProvider}, #{userId})
+    </insert>
+
+</mapper>

@@ -1,9 +1,9 @@
 package com.app.springapp.filter;
 
-import com.app.springapp.domain.dto.MemberDTO;
+import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
-import com.app.springapp.exception.MemberException;
-import com.app.springapp.repository.MemberDAO;
+import com.app.springapp.exception.UserException;
+import com.app.springapp.repository.UserDAO;
 import com.app.springapp.util.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -29,25 +29,20 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-    private final MemberDAO memberDAO;
+    private final UserDAO userDAO;
     private final ObjectMapper objectMapper;
 
-    // /private으로 시작하는 모든 경로는 검사
+    // /private으로 시작하는 모든 경로 검사
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         return !path.startsWith("/private");
     }
 
-    private String getAccessTokenFromCookie(HttpServletRequest request){
-        if(request.getCookies() == null){
-            return null;
-        }
-
-        for(Cookie cookie : request.getCookies()){
-            if("accessToken".equals(cookie.getName())){
-                return cookie.getValue();
-            }
+    private String getAccessTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if ("accessToken".equals(cookie.getName())) return cookie.getValue();
         }
         return null;
     }
@@ -58,33 +53,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = getAccessTokenFromCookie(request);
-        String memberEmail = null;
-        String socialMemberProvider = null;
+        String userEmail = null;
+        String socialUserProvider = null;
 
-        if(accessToken == null){
+        if (accessToken == null) {
             sendErrorResponse(response, "토큰 없음");
             return;
         }
 
         try {
-            if(accessToken != null){
-                Claims claims = jwtTokenUtil.parseToken(accessToken);
-                memberEmail = (String)claims.get("memberEmail");
-                socialMemberProvider = (String)claims.get("socialMemberProvider");
-            }
+            Claims claims = jwtTokenUtil.parseToken(accessToken);
+            userEmail = (String) claims.get("userEmail");
+            socialUserProvider = (String) claims.get("socialUserProvider");
 
-            if(memberEmail != null && socialMemberProvider != null){
-                MemberDTO memberDTO = new MemberDTO();
-                memberDTO.setMemberEmail(memberEmail);
-                memberDTO.setSocialMemberProvider(socialMemberProvider);
-                MemberDTO foundMember = memberDAO.findMemberByMemberEmailAndSocialMemberProvider(memberDTO)
-                        .orElseThrow(() -> {throw new MemberException("doFilterInternal 회원 조회 실패", HttpStatus.BAD_REQUEST);});
+            if (userEmail != null && socialUserProvider != null) {
+                UserDTO userDTO = new UserDTO();
+                userDTO.setUserEmail(userEmail);
+                userDTO.setSocialUserProvider(socialUserProvider);
+                UserDTO foundUser = userDAO.findUserByUserEmailAndSocialUserProvider(userDTO)
+                        .orElseThrow(() -> new UserException("유저 조회 실패", HttpStatus.BAD_REQUEST));
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(foundMember, null, List.of());
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(foundUser, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
-            // 토큰 형식이 잘못 되었을 때
             SecurityContextHolder.clearContext();
             sendErrorResponse(response, "토큰 만료");
             return;
@@ -97,17 +90,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
         ApiResponseDTO apiResponseDTO = ApiResponseDTO.of(false, message);
         String json = objectMapper.writeValueAsString(apiResponseDTO);
         response.getWriter().write(json);
         response.getWriter().flush();
     }
-
-
-
-
 }
-
 
 

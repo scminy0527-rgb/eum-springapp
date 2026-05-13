@@ -1,12 +1,10 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.ChatMemberRequestDTO;
-import com.app.springapp.domain.dto.request.ChatRequestDTO;
 import com.app.springapp.domain.dto.request.ChatRoomRequestDTO;
-import com.app.springapp.domain.vo.ChatMemberVO;
+import com.app.springapp.domain.vo.ChatUserVO;
 import com.app.springapp.domain.vo.ChatRoomVO;
 import com.app.springapp.exception.ChatException;
-import com.app.springapp.repository.ChatMemberDAO;
+import com.app.springapp.repository.ChatUserDAO;
 import com.app.springapp.repository.ChatRoomDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = {Exception.class})
 @RequiredArgsConstructor
 public class ChatRoomServiceImpl implements ChatRoomService {
-    private final ChatMemberDAO chatMemberDAO;
+    private final ChatUserDAO chatMemberDAO;
     private final ChatRoomDAO chatRoomDAO;
     private final CommunityAuthService communityAuthService;
 
@@ -39,7 +37,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     public void joinChatRoom(Long chatRoomId) {
         Long userId = communityAuthService.getUserId();
-        ChatMemberVO chatMemberVO = new ChatMemberVO();
+        ChatUserVO chatMemberVO = new ChatUserVO();
         chatMemberVO.setChatRoomId(chatRoomId);
         chatMemberVO.setUserId(userId);
 

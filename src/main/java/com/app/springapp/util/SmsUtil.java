@@ -44,13 +44,21 @@ public class SmsUtil {
         // "01012341234" <- 형태로 전송해야 함.
         String toPhoneNumber = to.replaceAll("-", "");
 
+        log.info("SMS 발송 시도 - to: {}, from: 01056038560", toPhoneNumber);
+
         message.setTo(toPhoneNumber);
-        message.setFrom("01047099813");
+        message.setFrom("01056038560");
         message.setText(content);
 
         SingleMessageSentResponse response = this
                 .messageService
                 .sendOne(new SingleMessageSendingRequest(message));
+
+        log.info("SMS 발송 응답 - statusCode: {}, statusMessage: {}, to: {}",
+                response.getStatusCode(),
+                response.getStatusMessage(),
+                response.getTo());
+
         return response;
     }
 
@@ -63,7 +71,7 @@ public class SmsUtil {
             helper.setTo(to);
             helper.setSubject(subject); // 제목
             helper.setText(content); // 내용
-            helper.setFrom("codefuling@gmail.com", "잠자다만 고양이"); // 보낸 이메일 , 보낸 사람 이름
+            helper.setFrom("gyuho1102@gmail.com", "이음"); // 보낸 이메일 , 보낸 사람 이름
 
             mailSender.send(mineMessage);
 

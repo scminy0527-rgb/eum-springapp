@@ -1,7 +1,6 @@
 package com.app.springapp.repository;
 
 import com.app.springapp.domain.vo.ChatRoomVO;
-import com.app.springapp.mapper.ChatMemberMapper;
 import com.app.springapp.mapper.ChatRoomMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

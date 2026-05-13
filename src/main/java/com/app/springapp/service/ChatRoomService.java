@@ -1,7 +1,5 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.ChatMemberRequestDTO;
-import com.app.springapp.domain.dto.request.ChatRequestDTO;
 import com.app.springapp.domain.dto.request.ChatRoomRequestDTO;
 
 public interface ChatRoomService {

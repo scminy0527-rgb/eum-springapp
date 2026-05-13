@@ -1,13 +1,13 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.JwtTokenDTO;
-import com.app.springapp.domain.dto.MemberDTO;
-import com.app.springapp.domain.vo.MemberVO;
-import com.app.springapp.domain.vo.SocialMemberVO;
+import com.app.springapp.domain.dto.UserDTO;
+import com.app.springapp.domain.vo.UserVO;
+import com.app.springapp.domain.vo.SocialUserVO;
 import com.app.springapp.exception.JwtTokenException;
-import com.app.springapp.exception.MemberException;
-import com.app.springapp.repository.MemberDAO;
-import com.app.springapp.repository.SocialMemberDAO;
+import com.app.springapp.exception.UserException;
+import com.app.springapp.repository.UserDAO;
+import com.app.springapp.repository.SocialUserDAO;
 import com.app.springapp.util.AuthCodeGenerator;
 import com.app.springapp.util.JwtTokenUtil;
 import com.app.springapp.util.SmsUtil;
@@ -36,88 +36,64 @@ public class AuthServiceImpl implements AuthService {
     @Value("${jwt.refresh-blacklist-prefix}")
     private String REFRESH_TOKEN_PREFIX;
 
-    private final MemberDAO memberDAO;
-    private final SocialMemberDAO socialMemberDAO;
+    private final UserDAO userDAO;
+    private final SocialUserDAO socialUserDAO;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisTemplate redisTemplate;
     private final SmsUtil smsUtil;
 
-    //    일반 로그인
-//    순수데이터(JwtTokenDTO) 반환
     @Override
-    public JwtTokenDTO login(MemberDTO memberDTO) {
-        // 사용자가 맞는지 (이메일, 비밀번호, 프로바이더(local)
+    public JwtTokenDTO login(UserDTO userDTO) {
+        UserVO userVO = UserVO.from(userDTO);
+        log.info("userDTO: {}", userDTO);
 
-        // elary return
-        MemberVO memberVO = MemberVO.from(memberDTO);
-        log.info("memberDTO: {}", memberDTO);
-        // 회원 유무 검사
-        MemberDTO foundMember = memberDAO
-                .findMemberByMemberEmailAndSocialMemberProvider(memberDTO)
-                .orElseThrow(() -> {
-                    throw new MemberException("회원이 아닙니다.", HttpStatus.BAD_REQUEST);
-                });
+        UserDTO foundUser = userDAO
+                .findUserByUserEmailAndSocialUserProvider(userDTO)
+                .orElseThrow(() -> new UserException("회원이 아닙니다.", HttpStatus.BAD_REQUEST));
 
-        // 회원 비밀번호 일치 검사
-        // 화면에서 받은 비밀번호, DB에 있는 비밀번호 검사
-        if(!passwordEncoder.matches(memberVO.getMemberPassword(), foundMember.getMemberPassword())){
-            throw new MemberException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+        if (!passwordEncoder.matches(userVO.getUserPassword(), foundUser.getUserPassword())) {
+            throw new UserException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 
-        // 토큰 생성(access, refresh)
         Map<String, String> claims = new HashMap<>();
-        claims.put("id", foundMember.getId().toString());
-        claims.put("memberEmail", foundMember.getMemberEmail());
-        claims.put("socialMemberProvider", "local");
+        claims.put("id", foundUser.getId().toString());
+        claims.put("userEmail", foundUser.getUserEmail());
+        claims.put("socialUserProvider", "local");
 
         String accessToken = jwtTokenUtil.generateAccessToken(claims);
         String refreshToken = jwtTokenUtil.generateRefreshToken(claims);
 
-        log.info("accessToken: {}", accessToken);
-        log.info("refreshToken: {}", refreshToken);
-
         JwtTokenDTO jwtTokenDTO = new JwtTokenDTO();
-
         jwtTokenDTO.setAccessToken(accessToken);
         jwtTokenDTO.setRefreshToken(refreshToken);
 
-        // redis에 refresh 토큰 저장
         saveRefreshToken(jwtTokenDTO);
-
         return jwtTokenDTO;
     }
 
     @Override
-    public JwtTokenDTO socialLogin(MemberDTO memberDTO) {
-
+    public JwtTokenDTO socialLogin(UserDTO userDTO) {
         JwtTokenDTO jwtTokenDTO = new JwtTokenDTO();
-        Map<String, String> claims = new HashMap<String, String>();
+        Map<String, String> claims = new HashMap<>();
 
+        if (userDAO.existsUserByUserEmailAndSocialUserProvider(userDTO)) {
+            UserDTO foundUser = userDAO
+                    .findUserByUserEmailAndSocialUserProvider(userDTO)
+                    .orElseThrow(() -> new UserException("socialLogin 유저 조회 실패", HttpStatus.BAD_REQUEST));
+            claims.put("id", foundUser.getId().toString());
+        } else {
+            UserVO userVO = UserVO.from(userDTO);
+            SocialUserVO socialUserVO = SocialUserVO.from(userDTO);
 
-        if(memberDAO.existsMemberByMemberEmailAndSocialMemberProvider(memberDTO)){
-            // 만약 유저가 있다면 -> 토큰 발급(id)
-            // 조회
-            MemberDTO foundMember = memberDAO
-                    .findMemberByMemberEmailAndSocialMemberProvider(memberDTO)
-                    .orElseThrow(() -> { throw new MemberException("socialLogin 회원 조회 실패", HttpStatus.BAD_REQUEST);});
-
-            claims.put("id", foundMember.getId().toString());
-
-        }else {
-            // 만약 유저가 없다면 회원가입 후 -> 토큰 발급
-            MemberVO memberVO = MemberVO.from(memberDTO);
-            SocialMemberVO socialMemberVO = SocialMemberVO.from(memberDTO);
-
-            memberDAO.save(memberVO);
-            socialMemberVO.setMemberId(memberVO.getId());
-
-            socialMemberDAO.save(socialMemberVO);
-            claims.put("id", memberVO.getId().toString());
+            userDAO.save(userVO);
+            socialUserVO.setUserId(userVO.getId());
+            socialUserDAO.save(socialUserVO);
+            claims.put("id", userVO.getId().toString());
         }
 
-        claims.put("memberEmail", memberDTO.getMemberEmail());
-        claims.put("socialMemberProvider", memberDTO.getSocialMemberProvider());
+        claims.put("userEmail", userDTO.getUserEmail());
+        claims.put("socialUserProvider", userDTO.getSocialUserProvider());
 
         String accessToken = jwtTokenUtil.generateAccessToken(claims);
         String refreshToken = jwtTokenUtil.generateRefreshToken(claims);
@@ -125,9 +101,7 @@ public class AuthServiceImpl implements AuthService {
         jwtTokenDTO.setAccessToken(accessToken);
         jwtTokenDTO.setRefreshToken(refreshToken);
 
-        // redis에 토큰 저장
         saveRefreshToken(jwtTokenDTO);
-
         return jwtTokenDTO;
     }
 
@@ -234,12 +208,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Map<String, String> claims = new HashMap<>();
-        MemberDTO member = memberDAO
-                .findMemberById(id).orElseThrow(() -> new MemberException("회원이 없습니다"));
+        UserDTO user = userDAO
+                .findUserById(id).orElseThrow(() -> new UserException("유저가 없습니다", HttpStatus.BAD_REQUEST));
 
-        claims.put("id", member.getId().toString());
-        claims.put("memberEmail", member.getMemberEmail());
-        claims.put("socialMemberProvider", member.getSocialMemberProvider());
+        claims.put("id", user.getId().toString());
+        claims.put("userEmail", user.getUserEmail());
+        claims.put("socialUserProvider", user.getSocialUserProvider());
 
         // 새로운 토큰 생성
         String newAccessToken = jwtTokenUtil.generateAccessToken(claims);
@@ -250,28 +224,24 @@ public class AuthServiceImpl implements AuthService {
 
     // 핸드폰 인증 코드 발송
     @Override
-    public boolean sendMemberPhoneVerificationCode(String memberPhone) {
-        String message = null;
+    public boolean sendUserPhoneVerificationCode(String userPhone) {
         String code = AuthCodeGenerator.generateAuthCode();
-        message = "[낮잠 자다만 고양이]\n인증코드를 입력해주세요.\n["+ code +"]";
-        smsUtil.sendOneMemberPhone(memberPhone, message);
-
-        // redis 저장
-        // phone:01078787878:1234587
-        String key = "phone:" + memberPhone + ":" + code;
-
+        String message = "[이음]\n인증코드를 입력해주세요.\n[" + code + "]";
+        String key = "phone:" + userPhone + ":" + code;
         try {
+            var smsResponse = smsUtil.sendOneMemberPhone(userPhone, message);
+            log.info("SMS 발송 결과: {}", smsResponse);
             redisTemplate.opsForValue().set(key, code, 3, TimeUnit.MINUTES);
             return true;
         } catch (Exception e) {
+            log.error("SMS 발송 실패 - phone: {}, error: {}", userPhone, e.getMessage());
             return false;
         }
     }
 
-    // 핸드폰 인증 코드 검증
     @Override
-    public boolean verifyMemberPhoneVerificationCode(String memberPhone, String code) {
-        String key = "phone:" + memberPhone + ":" + code;
+    public boolean verifyUserPhoneVerificationCode(String userPhone, String code) {
+        String key = "phone:" + userPhone + ":" + code;
         try {
             String storedCode = String.valueOf(redisTemplate.opsForValue().get(key));
             redisTemplate.delete(key);
@@ -281,16 +251,32 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    // 이메일 인증 코드 발송
     @Override
-    public boolean sendMemberEmailVerificationCode(String memberEmail) {
-        return false;
+    public boolean sendUserEmailVerificationCode(String userEmail) {
+        String code = AuthCodeGenerator.generateAuthCode();
+        String subject = "[이음] 이메일 인증 코드";
+        String content = "인증코드를 입력해주세요.\n[" + code + "]\n유효시간: 3분";
+        String key = "email:" + userEmail + ":" + code;
+        try {
+            smsUtil.sendMemberEmail(userEmail, subject, content);
+            redisTemplate.opsForValue().set(key, code, 3, TimeUnit.MINUTES);
+            return true;
+        } catch (Exception e) {
+            log.error("이메일 발송 실패 - email: {}, error: {}", userEmail, e.getMessage());
+            return false;
+        }
     }
 
-    // 이메일 인증 코드 검증
     @Override
-    public boolean verifyMemberEmailVerificationCode(String memberEmail, String code) {
-        return false;
+    public boolean verifyUserEmailVerificationCode(String userEmail, String code) {
+        String key = "email:" + userEmail + ":" + code;
+        try {
+            String storedCode = String.valueOf(redisTemplate.opsForValue().get(key));
+            redisTemplate.delete(key);
+            return code.equals(storedCode);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
 

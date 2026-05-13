@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.UserMapper">
+
+    <!-- 유저 추가 -->
+    <insert id="insert" parameterType="UserVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_USER.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_USER (ID, USER_EMAIL, USER_PASSWORD, USER_PROFILE, USER_NAME, USER_NICKNAME)
+        VALUES (#{id}, #{userEmail}, #{userPassword}, #{userProfile}, #{userName}, #{userNickname})
+    </insert>
+
+    <!-- 유저 조회 (ID) -->
+    <select id="select" parameterType="Long" resultType="UserDTO">
+        SELECT TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_NICKNAME,
+               TBSU.SOCIAL_USER_PROVIDER_ID, TBSU.SOCIAL_USER_PROVIDER, TBSU.USER_ID
+        FROM TBL_USER TBU
+        JOIN TBL_SOCIAL_USER TBSU ON TBU.ID = TBSU.USER_ID
+        WHERE TBU.ID = #{id}
+    </select>
+
+    <!-- 유저 조회 (이메일 + 소셜 프로바이더) -->
+    <select id="selectByUserEmailAndSocialUserProvider" parameterType="UserDTO" resultType="UserDTO">
+        SELECT TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_NICKNAME,
+               TBSU.SOCIAL_USER_PROVIDER_ID, TBSU.SOCIAL_USER_PROVIDER, TBSU.USER_ID
+        FROM TBL_USER TBU
+        JOIN TBL_SOCIAL_USER TBSU ON TBU.ID = TBSU.USER_ID
+        WHERE TBU.USER_EMAIL = #{userEmail}
+          AND TBSU.SOCIAL_USER_PROVIDER = #{socialUserProvider}
+    </select>
+
+    <!-- 가입 여부 조회 -->
+    <select id="existsUserByUserEmailAndSocialUserProvider" parameterType="UserDTO" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM TBL_USER TBU
+        JOIN TBL_SOCIAL_USER TBSU ON TBU.ID = TBSU.USER_ID
+        WHERE TBU.USER_EMAIL = #{userEmail}
+          AND TBSU.SOCIAL_USER_PROVIDER = #{socialUserProvider}
+    </select>
+
+    <!-- 유저 수정 -->
+    <update id="update" parameterType="UserVO">
+        UPDATE TBL_USER
+        SET USER_EMAIL    = #{userEmail},
+            USER_PASSWORD = #{userPassword},
+            USER_PROFILE  = #{userProfile},
+            USER_NAME     = #{userName},
+            USER_NICKNAME = #{userNickname}
+        WHERE ID = #{id}
+    </update>
+
+    <!-- 프로필 사진 변경 -->
+    <update id="updatePicture" parameterType="UserVO">
+        UPDATE TBL_USER
+        SET USER_PROFILE = #{userProfile}
+        WHERE ID = #{id}
+    </update>
+
+    <!-- 유저 삭제 -->
+    <delete id="delete" parameterType="Long">
+        DELETE FROM TBL_USER WHERE ID = #{id}
+    </delete>
+
+</mapper>

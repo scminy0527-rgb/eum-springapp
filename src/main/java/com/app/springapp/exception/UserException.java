@@ -6,14 +6,14 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @NoArgsConstructor
-public class MemberException extends RuntimeException{
+public class UserException extends RuntimeException{
 
     private HttpStatus httpStatus;
 
-    public MemberException(String message) {
+    public UserException(String message) {
         super(message);
     }
-    public MemberException(String message, HttpStatus httpStatus) {
+    public UserException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

@@ -1,7 +1,7 @@
 package com.app.springapp.handler;
 
 import com.app.springapp.domain.dto.JwtTokenDTO;
-import com.app.springapp.domain.dto.MemberDTO;
+import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,66 +31,62 @@ public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        if(authentication instanceof OAuth2AuthenticationToken authToken){
+        if (authentication instanceof OAuth2AuthenticationToken authToken) {
             OAuth2User oauth2User = authToken.getPrincipal();
             Map<String, Object> attributes = oauth2User.getAttributes();
-            String socialMemberProvider = authToken.getAuthorizedClientRegistrationId();
+            String socialUserProvider = authToken.getAuthorizedClientRegistrationId();
 
-            String memberEmail = null;
-            String socialMemberProviderId = null;
-            String memberName = null;
+            String userEmail = null;
+            String socialUserProviderId = null;
+            String userName = null;
 
-            if("google".equals(socialMemberProvider)){
-                memberEmail = (String)attributes.get("email");
-                socialMemberProviderId = (String)attributes.get("sub");
-                memberName = (String)attributes.get("name");
-            }else if("kakao".equals(socialMemberProvider)){
-                socialMemberProviderId = String.valueOf(attributes.get("id"));
-                Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
-                Map<String, Object> profile = (Map<String, Object>)kakaoAccount.get("profile");
-
-                memberEmail = (String)kakaoAccount.get("email");
-                memberName = (String)profile.get("nickname");
-
-            }else if("naver".equals(socialMemberProvider)){
+            if ("google".equals(socialUserProvider)) {
+                userEmail = (String) attributes.get("email");
+                socialUserProviderId = (String) attributes.get("sub");
+                userName = (String) attributes.get("name");
+            } else if ("kakao".equals(socialUserProvider)) {
+                socialUserProviderId = String.valueOf(attributes.get("id"));
+                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+                userEmail = (String) kakaoAccount.get("email");
+                userName = (String) profile.get("nickname");
+            } else if ("naver".equals(socialUserProvider)) {
                 Map<String, Object> naverResponse = (Map<String, Object>) attributes.get("response");
-                socialMemberProviderId = (String)naverResponse.get("id");
-                memberEmail = (String)naverResponse.get("email");
-                memberName = (String)naverResponse.get("name");
+                socialUserProviderId = (String) naverResponse.get("id");
+                userEmail = (String) naverResponse.get("email");
+                userName = (String) naverResponse.get("name");
             }
 
-            MemberDTO memberDTO = new MemberDTO();
-            memberDTO.setMemberEmail(memberEmail);
-            memberDTO.setSocialMemberProviderId(socialMemberProviderId);
-            memberDTO.setMemberName(memberName);
-            memberDTO.setSocialMemberProvider(socialMemberProvider);
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUserEmail(userEmail);
+            userDTO.setSocialUserProviderId(socialUserProviderId);
+            userDTO.setUserName(userName);
+            userDTO.setSocialUserProvider(socialUserProvider);
 
-            JwtTokenDTO jwtTokenDTO = authService.socialLogin(memberDTO);
+            JwtTokenDTO jwtTokenDTO = authService.socialLogin(userDTO);
 
             ResponseCookie accessTokenCookie = ResponseCookie
                     .from("accessToken", jwtTokenDTO.getAccessToken())
-                    .httpOnly(true) // XSS 공격 차단
-                    .sameSite("Lax") // CSRF 공격 차단
+                    .httpOnly(true)
+                    .sameSite("Lax")
                     .path("/")
-                    .secure(false) // 개발 환경 false, 배포 환경 true (http <-> https)
-                    .maxAge(60 * 60 * 24) // 쿠키 만료 기간
+                    .secure(false)
+                    .maxAge(60 * 60 * 24)
                     .build();
 
             ResponseCookie refreshTokenCookie = ResponseCookie
                     .from("refreshToken", jwtTokenDTO.getRefreshToken())
-                    .httpOnly(true) // XSS 공격 차단
-                    .sameSite("Lax") // CSRF 공격 차단
+                    .httpOnly(true)
+                    .sameSite("Lax")
                     .path("/")
-                    .secure(false) // 개발 환경 false, 배포 환경 true (http <-> https)
-                    .maxAge(60 * 60 * 24 * 30) // 쿠키 만료 기간
+                    .secure(false)
+                    .maxAge(60 * 60 * 24 * 30)
                     .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
             response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-            String redirectUrl = "http://localhost:3000";
-            getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+            getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
         }
-
     }
 }

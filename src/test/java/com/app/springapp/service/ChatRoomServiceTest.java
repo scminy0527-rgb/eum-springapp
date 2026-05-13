@@ -1,6 +1,5 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.ChatMemberRequestDTO;
 import com.app.springapp.domain.dto.request.ChatRoomRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

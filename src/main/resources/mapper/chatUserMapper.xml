@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.app.springapp.mapper.ChatMemberMapper">
-    <insert id="insert" parameterType="ChatMemberVO">
+<mapper namespace="com.app.springapp.mapper.ChatUserMapper">
+
+    <insert id="insert" parameterType="ChatUserVO">
         <selectKey resultType="Long" keyProperty="id" order="BEFORE">
-            SELECT SEQ_CHAT_MEMBER.NEXTVAL FROM DUAL
+            SELECT SEQ_CHAT_USER.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_CHAT_MEMBER (ID, USER_ID, CHAT_ROOM_ID)
+        INSERT INTO TBL_CHAT_USER (ID, USER_ID, CHAT_ROOM_ID)
         VALUES (#{id}, #{userId}, #{chatRoomId})
     </insert>
 

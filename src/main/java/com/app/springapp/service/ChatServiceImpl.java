@@ -1,6 +1,5 @@
 package com.app.springapp.service;
 
-import com.app.springapp.domain.dto.request.ChatMemberRequestDTO;
 import com.app.springapp.domain.dto.request.ChatRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.ChatResponseDTO;
