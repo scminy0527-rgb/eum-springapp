@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.springapp.mapper.ChatMapper">
-    <select id="selectAll" parameterType="Long" resultType="ChatDTO">
+    <select id="selectAll" parameterType="ChatVO" resultType="ChatDTO">
         SELECT
             TBC.ID, TBC.CHAT_CONTENT, TBC.CHAT_CREATE_AT, TBC.CHAT_TYPE, TBC.USER_ID, TBC.CHAT_ROOM_ID,
-            TBU.USER_NICKNAME, TBU.USER_PROFILE
+            TBU.USER_NICKNAME, TBU.USER_PROFILE,
+            CASE
+                WHEN TBC.USER_ID = #{userId} THEN 1
+                ELSE 0
+            END AS CHAT_IS_ME
         FROM TBL_CHAT TBC
         JOIN TBL_USER TBU ON TBC.USER_ID = TBU.ID
         JOIN TBL_CHAT_ROOM TCR ON TBC.CHAT_ROOM_ID = TCR.ID
         WHERE TBC.CHAT_ROOM_ID = #{chatRoomId} AND TCR.CHAT_ROOM_IS_DELETED = 0
         ORDER BY TBC.ID DESC
+    </select>
+
+    <select id="selectById" parameterType="Long" resultType="ChatDTO">
+        SELECT
+            TBC.ID, TBC.CHAT_CONTENT, TBC.CHAT_CREATE_AT, TBC.CHAT_TYPE, TBC.USER_ID, TBC.CHAT_ROOM_ID,
+            TBU.USER_NICKNAME, TBU.USER_PROFILE
+        FROM TBL_CHAT TBC
+             JOIN TBL_USER TBU ON TBC.USER_ID = TBU.ID
+             JOIN TBL_CHAT_ROOM TCR ON TBC.CHAT_ROOM_ID = TCR.ID
+        WHERE TBC.ID = #{id}
     </select>
 
     <select id="existByChatRoomIdAndUserId" parameterType="ChatVO" resultType="int">

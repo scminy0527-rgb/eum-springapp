@@ -1,5 +1,6 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.ChatDTO;
 import com.app.springapp.domain.dto.ChatRoomDTO;
 import com.app.springapp.domain.dto.request.ChatRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
@@ -31,17 +32,35 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomService chatRoomService;
     private final CommunityAuthService communityAuthService;
 
-
     //    채팅 메세지 관련
     //    채팅방 내 모든 메세지 불러오기
     @Override
     public List<ChatResponseDTO> loadAllChatRoomMessage(Long chatRoomId) {
-        return chatDAO.findAll(chatRoomId).stream()
+        Long userId = communityAuthService.getUserId();
+        communityAuthService.checkUserValidity(userId);
+        ChatVO chatVO = new ChatVO();
+        chatVO.setChatRoomId(chatRoomId);
+        chatVO.setUserId(userId);
+
+        return chatDAO.findAll(chatVO).stream()
                 .map(ChatResponseDTO::from)
                 .collect(Collectors.toList());
     }
 
-//    메세지 작성
+//    특정 채팅 메세지 가져오기
+    @Override
+    public ChatDTO loadChatMessageById(Long id) {
+        return chatDAO.findById(id);
+    }
+
+//    웹소캣 통해서 메세지 작성 및 작성 된 메세지 반환
+    @Override
+    public ChatDTO playRealTimeChat(Long chatRoomId, ChatRequestDTO chatRequestDTO) {
+        Long id = this.writeChatMessage(chatRoomId, chatRequestDTO);
+        return chatDAO.findById(id);
+    }
+
+    //    메세지 작성
     @Override
     public Long writeChatMessage(Long chatRoomId, ChatRequestDTO chatRequestDTO) {
 //        DTO 를 VO 로 변환 한 뒤에 작성 해야함

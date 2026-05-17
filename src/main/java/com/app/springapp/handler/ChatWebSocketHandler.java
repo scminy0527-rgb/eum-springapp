@@ -1,8 +1,11 @@
 package com.app.springapp.handler;
 
+import com.app.springapp.domain.dto.ChatDTO;
 import com.app.springapp.domain.dto.request.ChatRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
+import com.app.springapp.domain.vo.ChatVO;
 import com.app.springapp.service.ChatService;
+import com.app.springapp.service.CommunityAuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     // chatRoomId → 해당 방에 연결된 세션 목록
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
+    private final CommunityAuthService communityAuthService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -40,23 +44,32 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         Long chatRoomId = extractChatRoomId(session);
+        Long userId = communityAuthService.getUserId();
+        communityAuthService.checkUserValidity(userId);
         ChatRequestDTO chatRequestDTO = objectMapper.readValue(message.getPayload(), ChatRequestDTO.class);
 
         log.info("사용자가 메세지 전송 시도");
         log.info("메세지: {}", chatRequestDTO);
 
         // DB 저장 — 내부적으로 CommunityAuthServiceImpl.getUserId() = 2L(더미) 사용
-        Long id = chatService.writeChatMessage(chatRoomId, chatRequestDTO);
+//        Long id = chatService.writeChatMessage(chatRoomId, chatRequestDTO);
+
+//        DB 에서 다시 해당 채팅 아이디에 해당 하는 메세지 불러와서 반환 하는거 생각하기
+//        ChatDTO chatDTO = chatService.loadChatMessageById(id);
+
+//        메세지 작성 및 작성한 메세지 쿼리로 불러오는 트랜젝션
+        ChatDTO chatDTO = chatService.playRealTimeChat(chatRoomId, chatRequestDTO);
 
         // 브로드캐스트 메시지 구성
         Map<String, Object> broadcastData = new HashMap<>();
 //        채팅 메세지의 id 반환
-        broadcastData.put("id", id);
-        broadcastData.put("chatContent", chatRequestDTO.getChatContent());
-        broadcastData.put("chatType", chatRequestDTO.getChatType());
-        broadcastData.put("userId", 2L);
+        broadcastData.put("id", chatDTO.getId());
+        broadcastData.put("chatContent", chatDTO.getChatContent());
+        broadcastData.put("chatCreateAt", chatDTO.getChatCreateAt());
+        broadcastData.put("chatType", chatDTO.getChatType());
+        broadcastData.put("userNickname", chatDTO.getUserNickname());
+        broadcastData.put("userProfile", chatDTO.getUserProfile());
         broadcastData.put("chatRoomId", chatRoomId);
-        broadcastData.put("chatCreateAt", LocalDateTime.now().toString());
 
         log.info("타 사용자 한테도 전달");
 

@@ -25,4 +25,6 @@ public class ChatDTO {
     private String userProfile;
     @Schema(description = "채팅방 번호", example = "1")
     private Long chatRoomId;
+    @Schema(description = "내가 작성한 여부", example = "true")
+    private Boolean chatIsMe;
 }

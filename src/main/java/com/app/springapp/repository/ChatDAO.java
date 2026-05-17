@@ -16,8 +16,13 @@ public class ChatDAO {
     private final ChatMapper chatMapper;
 
 //    특정 채팅방 에서의 전체 메세지 불러오기
-    public List<ChatDTO> findAll(Long chatRoomId) {
-        return chatMapper.selectAll(chatRoomId);
+    public List<ChatDTO> findAll(ChatVO chatVO) {
+        return chatMapper.selectAll(chatVO);
+    }
+
+//    웹소캣 용 채팅 메세지 가져오기
+    public ChatDTO findById(Long id) {
+        return chatMapper.selectById(id);
     }
 
 //    유저가 해당 채팅방에 메시지 남긴 이력 확인

@@ -1,5 +1,6 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.ChatDTO;
 import com.app.springapp.domain.dto.request.ChatRequestDTO;
 import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import com.app.springapp.repository.ChatDAO;
@@ -24,6 +25,13 @@ public class ChatServiceTest {
         chatService.loadAllChatRoomMessage(1L)
                 .stream()
                 .forEach((chat) -> log.info(chat.toString()));
+    }
+
+//    채팅 메세지 단일 조회 테스트
+    @Test
+    public void loadChatMessageByIdTest() {
+        ChatDTO chatDTO = chatService.loadChatMessageById(1L);
+        log.info(chatDTO.toString());
     }
 
 //    해당 채팅방에 유저가 참여 중인지 확인

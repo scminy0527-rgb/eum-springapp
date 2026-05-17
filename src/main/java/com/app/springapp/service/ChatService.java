@@ -14,6 +14,12 @@ public interface ChatService {
 //    채팅방 내의 모든 메세지 불러오기
     public List<ChatResponseDTO> loadAllChatRoomMessage(Long chatRoomId);
 
+//    특정 채팅 메세지 가져오기
+    public ChatDTO loadChatMessageById(Long id);
+
+//    웹소켓에 의해 메세지 전송
+    public ChatDTO playRealTimeChat(Long chatRoomId, ChatRequestDTO chatRequestDTO);
+
 //    채팅방 내 메세지 작성
     public Long writeChatMessage(Long chatRoomId, ChatRequestDTO chatRequestDTO);
 

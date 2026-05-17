@@ -18,14 +18,16 @@ public class ChatResponseDTO {
     private LocalDateTime chatCreateAt;
     @Schema(description = "채팅 타입", example = "텍스트")
     private String chatType;
-    @Schema(description = "유저 번호", example = "1")
-    private Long userId;
+//    @Schema(description = "유저 번호", example = "1")
+//    private Long userId;
     @Schema(description = "유저 닉네임", example = "수어러버박지민")
     private String userNickname;
     @Schema(description = "유저 프로필", example = "default.jpg")
     private String userProfile;
     @Schema(description = "채팅방 번호", example = "1")
     private Long chatRoomId;
+    @Schema(description = "내가 작성한 여부", example = "true")
+    private Boolean chatIsMe;
 
     public static ChatResponseDTO from(ChatDTO dto) {
         ChatResponseDTO res = new ChatResponseDTO();
@@ -33,10 +35,11 @@ public class ChatResponseDTO {
         res.setChatContent(dto.getChatContent());
         res.setChatCreateAt(dto.getChatCreateAt());
         res.setChatType(dto.getChatType());
-        res.setUserId(dto.getUserId());
+//        res.setUserId(dto.getUserId());
         res.setUserNickname(dto.getUserNickname());
         res.setUserProfile(dto.getUserProfile());
         res.setChatRoomId(dto.getChatRoomId());
+        res.setChatIsMe(dto.getChatIsMe());
         return res;
     }
 }
