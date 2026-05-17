@@ -19,7 +19,7 @@ public class NoticeResponseDTO {
     @Schema(description = "공지사항 생성일시", example = "2024-01-01T00:00:00")
     private LocalDateTime noticeCreateAt;
     @Schema(description = "관리자 번호", example = "1")
-    private Long managerId;
+    private Long userId;
 
     public static NoticeResponseDTO from(NoticeDTO dto) {
         NoticeResponseDTO res = new NoticeResponseDTO();
@@ -27,7 +27,7 @@ public class NoticeResponseDTO {
         res.setNoticeTitle(dto.getNoticeTitle());
         res.setNoticeContent(dto.getNoticeContent());
         res.setNoticeCreateAt(dto.getNoticeCreateAt());
-        res.setManagerId(dto.getManagerId());
+        res.setUserId(dto.getUserId());
         return res;
     }
 }

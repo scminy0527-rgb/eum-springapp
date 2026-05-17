@@ -57,6 +57,7 @@
         <typeAlias type="com.app.springapp.domain.dto.AiChatDTO" alias="AiChatDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.CertRenewDTO" alias="CertRenewDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.UserReportDTO" alias="UserReportDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.InquireDTO" alias="InquireDTO"/>
 
         <!-- Request DTO Alias -->
         <typeAlias type="com.app.springapp.domain.dto.request.UserRequestDTO" alias="UserRequestDTO"/>
@@ -207,5 +208,6 @@
         <typeAlias type="com.app.springapp.domain.vo.SettingVO" alias="SettingVO"/>
         <typeAlias type="com.app.springapp.domain.vo.AiChatVO" alias="AiChatVO"/>
         <typeAlias type="com.app.springapp.domain.vo.CertRenewVO" alias="CertRenewVO"/>
+        <typeAlias type="com.app.springapp.domain.vo.InquireVO" alias="InquireVO"/>
     </typeAliases>
 </configuration>

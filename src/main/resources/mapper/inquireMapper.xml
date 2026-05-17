@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.InquireMapper">
+
+    <insert id="insert" parameterType="InquireVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_INQUIRE.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_INQUIRE (
+        ID, INQUIRE_TYPE, INQUIRE_EMAIL, INQUIRE_TITLE,
+        INQUIRE_CONTENT, INQUIRE_FILE_URL, USER_ID
+        ) VALUES (
+        #{id}, #{inquireType}, #{inquireEmail}, #{inquireTitle},
+        #{inquireContent}, #{inquireFileUrl}, #{userId}
+        )
+    </insert>
+
+    <select id="selectAll" parameterType="InquireDTO" resultType="InquireDTO">
+        SELECT ID, INQUIRE_TYPE, INQUIRE_EMAIL, INQUIRE_TITLE, INQUIRE_CONTENT, INQUIRE_ANSWER,
+               INQUIRE_STATUS, INQUIRE_CREATE_AT
+        FROM TBL_INQUIRE
+        WHERE USER_ID = #{userId}
+        ORDER BY ID DESC
+    </select>
+
+    <select id="countAll" parameterType="InquireDTO" resultType="int">
+        SELECT COUNT(*) FROM TBL_INQUIRE
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="select" parameterType="Long" resultType="InquireDTO">
+        SELECT ID, INQUIRE_TYPE, INQUIRE_EMAIL, INQUIRE_TITLE,
+               INQUIRE_CONTENT, INQUIRE_FILE_URL, INQUIRE_STATUS, INQUIRE_CREATE_AT, USER_ID
+        FROM TBL_INQUIRE
+        WHERE ID = #{id}
+    </select>
+
+    <update id="update" parameterType="InquireVO">
+        UPDATE TBL_INQUIRE SET
+        INQUIRE_ANSWER = #{inquireAnswer},
+        INQUIRE_STATUS = '답변완료'
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM TBL_INQUIRE
+        WHERE ID = #{id}
+    </delete>
+
+    <select id="selectAllForAdmin" resultType="InquireDTO">
+        SELECT ID, INQUIRE_TYPE, INQUIRE_EMAIL, INQUIRE_TITLE,
+               INQUIRE_CONTENT, INQUIRE_ANSWER,
+               INQUIRE_STATUS, INQUIRE_CREATE_AT, USER_ID
+        FROM TBL_INQUIRE
+        ORDER BY ID DESC
+    </select>
+
+</mapper>
