@@ -16,14 +16,14 @@ public class ChatRoomDAO {
 
     private final ChatRoomMapper chatRoomMapper;
 
-//    채팅방 목록 전체 불러와주기
+//    채팅방 목록 전체 불러오기
     public List<ChatRoomDTO> findAll(){
-        return chatRoomMapper.selectAll();
+        return chatRoomMapper.select(null);
     }
 
-//    채팅방 정보 불러오기
-    public Optional<ChatRoomVO> findById(Long id){
-        return Optional.ofNullable(chatRoomMapper.selectById(id));
+//    채팅방 단건 정보 불러오기
+    public Optional<ChatRoomDTO> findById(Long id){
+        return chatRoomMapper.select(id).stream().findFirst();
     }
 
 //    채팅방 목록 페이징 조회
