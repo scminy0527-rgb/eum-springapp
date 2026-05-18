@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.request.ChatRoomRequestDTO;
+import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,18 @@ public class ChatRoomServiceTest {
                 .forEach((chatUser) -> {
                     log.info(chatUser.toString());
                 });
+    }
+
+    @Test
+    public void getChatRoomInfoTest() {
+        Long chatRoomId = 3L;
+        log.info("시나리오1: 존재하는 방 id = {}", chatRoomId);
+        ChatRoomResponseDTO chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
+        log.info(chatRoomInfo.toString());
+
+        chatRoomId = 100L;
+        log.info("시나리오2: 존재하지 않는 방 id = {}", chatRoomId);
+        chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
+        log.info(chatRoomInfo.toString());
     }
 }

@@ -40,11 +40,22 @@ public class ChatRoomApi {
     }
 
 //    채팅방 정보 불러오기
-    @GetMapping("/{id}")
+    @GetMapping("/{chatRoomId}")
+    @Operation(description = "채팅방 정보 불러오기")
+    @ApiResponse(responseCode = "200", description = "채팅방 정보 불러오기 성공")
+    @ApiResponse(responseCode = "400", description = "채팅방 정보 불러오기 실패")
+    @Parameter(
+            name = "chatRoomId",
+            description = "채팅방 아이디",
+            example = "1",
+            required = true,
+            in = ParameterIn.PATH,
+            schema = @Schema(type = "number")
+    )
     public ResponseEntity<ApiResponseDTO> getChatRoomInfo(
-            @PathVariable Long id
+            @PathVariable Long chatRoomId
     ){
-        ChatRoomResponseDTO chatRoomInfo = chatRoomService.getChatRoomInfo(id);
+        ChatRoomResponseDTO chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "채팅방 정보 불러오기 성공", chatRoomInfo));
