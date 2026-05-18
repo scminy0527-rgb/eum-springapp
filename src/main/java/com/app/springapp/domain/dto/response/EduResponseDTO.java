@@ -17,8 +17,8 @@ public class EduResponseDTO {
     private String eduDetail;
     @Schema(description = "다이아 가격", example = "0")
     private int eduDia;
-//    @Schema(description = "삭제 여부 (0: 미삭제, 1: 삭제)", example = "0")
-//    private int eduIsDeleted;
+    @Schema(description = "삭제 여부 (0: 미삭제, 1: 삭제)", example = "0")
+    private int eduIsDeleted;
 
     public static EduResponseDTO from(EduDTO dto) {
         EduResponseDTO res = new EduResponseDTO();
@@ -26,7 +26,7 @@ public class EduResponseDTO {
         res.setEduTitle(dto.getEduTitle());
         res.setEduDetail(dto.getEduDetail());
         res.setEduDia(dto.getEduDia());
-//        res.setEduIsDeleted(dto.getEduIsDeleted());
+        res.setEduIsDeleted(dto.getEduIsDeleted());
         return res;
     }
 }

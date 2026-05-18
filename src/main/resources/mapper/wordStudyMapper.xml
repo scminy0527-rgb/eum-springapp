@@ -1,57 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.app.springapp.mapper.TimeMapper">
+<mapper namespace="com.app.springapp.mapper.WordStudyMapper">
 
-    <select id="selectByUserIdAndEduWordMapId" parameterType="WordStudyRequestDTO" resultType="WordStudyResponseDTO">
-        SELECT
-            ID AS id,
-            WORD_STUDY_CREATE_AT AS wordStudyCreateAt,
-            WORD_STUDY_UPDATE_AT AS wordStudyUpdateAt,
-            WORD_STUDY_IS_COMPLETED AS wordStudyIsCompleted,
-            EDU_WORD_MAP_ID AS eduWordMapId,
-            USER_ID AS userId
+    <!-- 단어 학습 기록 등록 -->
+    <insert id="insert" parameterType="WordStudyVO">
+        <selectKey keyProperty="id" order="BEFORE" resultType="Long">
+            SELECT SEQ_WORD_STUDY.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_WORD_STUDY(ID, WORD_STUDY_IS_COMPLETED, EDU_WORD_MAP_ID, USER_ID)
+        VALUES(#{id}, #{wordStudyIsCompleted}, #{eduWordMapId}, #{userId})
+    </insert>
+
+    <!-- 단어 학습 기록 조회 -->
+    <select id="select" resultType="WordStudyResponseDTO">
+        SELECT ID, WORD_STUDY_CREATE_AT, WORD_STUDY_UPDATE_AT, WORD_STUDY_IS_COMPLETED, EDU_WORD_MAP_ID, USER_ID
         FROM TBL_WORD_STUDY
         WHERE USER_ID = #{userId}
           AND EDU_WORD_MAP_ID = #{eduWordMapId}
     </select>
 
-    <insert id="insert" parameterType="WordStudyRequestDTO">
-        <selectKey resultType="Long" keyProperty="id" order="BEFORE">
-            SELECT SEQ_WORD_STUDY.NEXTVAL FROM DUAL
-        </selectKey>
+    <!-- 학습별 완료 단어 개수 조회 -->
+    <select id="countCompletedByEduId" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_WORD_STUDY TWS
+        JOIN TBL_EDU_WORD_MAP TEWM
+            ON TWS.EDU_WORD_MAP_ID = TEWM.ID
+        WHERE TWS.USER_ID = #{userId}
+          AND TEWM.EDU_ID = #{eduId}
+          AND TWS.WORD_STUDY_IS_COMPLETED = 1
+    </select>
 
-        INSERT INTO TBL_WORD_STUDY (
-        ID,
-        WORD_STUDY_IS_COMPLETED,
-        EDU_WORD_MAP_ID,
-        USER_ID
-        ) VALUES (
-        #{id},
-        #{wordStudyIsCompleted},
-        #{eduWordMapId},
-        #{userId}
-        )
-    </insert>
+    <!-- 학습별 전체 단어 개수 조회 -->
+    <select id="countTotalByEduId" parameterType="Long" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_EDU_WORD_MAP
+        WHERE EDU_ID = #{eduId}
+    </select>
 
-    <update id="updateComplete" parameterType="WordStudyRequestDTO">
+    <!-- 단어 학습 완료 상태 수정 -->
+    <update id="update" parameterType="WordStudyVO">
         UPDATE TBL_WORD_STUDY
-        SET
-            WORD_STUDY_IS_COMPLETED = #{wordStudyIsCompleted},
-            WORD_STUDY_UPDATE_AT = CURRENT_TIMESTAMP
+        SET WORD_STUDY_IS_COMPLETED = #{wordStudyIsCompleted}, WORD_STUDY_UPDATE_AT = CURRENT_TIMESTAMP
         WHERE USER_ID = #{userId}
           AND EDU_WORD_MAP_ID = #{eduWordMapId}
     </update>
-
-    <select id="countCompletedByEduId" parameterType="map" resultType="int">
-        SELECT COUNT(*)
-        FROM TBL_WORD_STUDY WS
-                 JOIN TBL_EDU_WORD_MAP EWM
-                      ON WS.EDU_WORD_MAP_ID = EWM.ID
-        WHERE WS.USER_ID = #{userId}
-          AND EWM.EDU_ID = #{eduId}
-          AND WS.WORD_STUDY_IS_COMPLETED = 1
-    </select>
-
-
-
 </mapper>
