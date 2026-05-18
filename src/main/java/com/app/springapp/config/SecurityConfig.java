@@ -53,6 +53,7 @@ public class SecurityConfig {
             .anonymous(anonymous -> anonymous.disable())
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers("/private/**").authenticated() // "/private" -> 보호된 라우트
+                    .requestMatchers("/api/auth/check").authenticated()
                     .anyRequest().permitAll() // 위 경로를 제외한 나머지 경로는 허용된 라우트
             ) // 모든 경로 해제
             .exceptionHandling(exception -> exception

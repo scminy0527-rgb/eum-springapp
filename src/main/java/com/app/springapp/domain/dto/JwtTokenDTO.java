@@ -8,4 +8,5 @@ import org.springframework.stereotype.Component;
 public class JwtTokenDTO {
     private String accessToken;
     private String refreshToken;
+    private String role;
 }

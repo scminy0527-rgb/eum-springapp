@@ -4,6 +4,7 @@ import com.app.springapp.domain.dto.JwtTokenDTO;
 import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.AuthService;
+import com.app.springapp.util.JwtTokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthApi {
 
     private final AuthService authService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     // 로그인
     @PostMapping("/login")
@@ -83,5 +87,40 @@ public class AuthApi {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString())
                 .body(ApiResponseDTO.of(true, "토큰 재발급 성공"));
+    }
+
+    @GetMapping("/check")
+    @Operation(summary = "인증 확인", description = "Access Token 유효성 확인")
+    @ApiResponse(responseCode = "200", description = "인증 성공")
+    @ApiResponse(responseCode = "401", description = "인증 실패")
+    public ResponseEntity<ApiResponseDTO> check(
+            @CookieValue(name = "accessToken", required = false) String accessToken) {
+        if (accessToken == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponseDTO.of(false, "인증 실패"));
+        }
+        return ResponseEntity.ok()
+                .body(ApiResponseDTO.of(true, "인증 성공"));
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "내 정보 조회", description = "토큰에서 유저 정보 반환")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "401", description = "인증 실패")
+    public ResponseEntity<?> getMe(
+            @CookieValue(name = "accessToken", required = false) String accessToken) {
+
+        if (accessToken == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponseDTO.of(false, "인증 실패"));
+        }
+
+        Map<String, Object> claims = jwtTokenUtil.parseToken(accessToken);
+
+        return ResponseEntity.ok(Map.of(
+                "id", claims.get("id"),
+                "userEmail", claims.get("userEmail"),
+                "role", claims.getOrDefault("role", "USER")  // ← null 대신 기본값
+        ));
     }
 }

@@ -37,9 +37,13 @@ public class UserDTO {
     private String socialUserProviderId;
     @Schema(description = "소셜 로그인(google/naver/kakao/local)", example = "local")
     private String socialUserProvider;
+    @Schema(description = "유저 권한", example = "user")
+    private String userRole;
 
-//    소셜 로그인 제공자의 초기값
+
+    //    소셜 로그인 제공자의 초기값
     {
         socialUserProvider = "local";
+        userRole = "user";
     }
 }

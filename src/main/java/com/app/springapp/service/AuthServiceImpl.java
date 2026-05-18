@@ -60,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("id", foundUser.getId().toString());
         claims.put("userEmail", foundUser.getUserEmail());
         claims.put("socialUserProvider", "local");
+        claims.put("role", foundUser.getUserRole());
 
         String accessToken = jwtTokenUtil.generateAccessToken(claims);
         String refreshToken = jwtTokenUtil.generateRefreshToken(claims);
@@ -82,6 +83,7 @@ public class AuthServiceImpl implements AuthService {
                     .findUserByUserEmailAndSocialUserProvider(userDTO)
                     .orElseThrow(() -> new UserException("socialLogin 유저 조회 실패", HttpStatus.BAD_REQUEST));
             claims.put("id", foundUser.getId().toString());
+            claims.put("role", foundUser.getUserRole());
         } else {
             UserVO userVO = UserVO.from(userDTO);
             SocialUserVO socialUserVO = SocialUserVO.from(userDTO);
@@ -90,6 +92,7 @@ public class AuthServiceImpl implements AuthService {
             socialUserVO.setUserId(userVO.getId());
             socialUserDAO.save(socialUserVO);
             claims.put("id", userVO.getId().toString());
+            claims.put("role", "USER");
         }
 
         claims.put("userEmail", userDTO.getUserEmail());
@@ -214,6 +217,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("id", user.getId().toString());
         claims.put("userEmail", user.getUserEmail());
         claims.put("socialUserProvider", user.getSocialUserProvider());
+        claims.put("role", user.getUserRole());
 
         // 새로운 토큰 생성
         String newAccessToken = jwtTokenUtil.generateAccessToken(claims);
