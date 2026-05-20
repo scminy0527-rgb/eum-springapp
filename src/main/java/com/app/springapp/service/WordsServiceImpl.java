@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.response.WordsResponseDTO;
+import com.app.springapp.domain.vo.WordsVO;
 import com.app.springapp.exception.EduException;
 import com.app.springapp.repository.WordsDAO;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,18 @@ public class WordsServiceImpl implements WordsService {
     @Override
     public WordsResponseDTO getWordById(Long id) {
         return wordsDAO.findWordById(id).orElseThrow(() -> new EduException("단어 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+    }
+
+    // 관리자
+    // 단어 등록
+    @Override
+    public void saveWord(WordsVO wordsVO) {
+        wordsDAO.save(wordsVO);
+    }
+
+    // 단어 수정
+    @Override
+    public void updateWord(WordsVO wordsVO) {
+        wordsDAO.update(wordsVO);
     }
 }

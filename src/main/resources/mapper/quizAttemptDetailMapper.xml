@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.QuizAttemptDetailMapper">
+
+    <!-- 퀴즈 문제별 응시 결과 등록 -->
+    <insert id="insert" parameterType="QuizAttemptDetailVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_QUIZ_ATTEMPT_DETAIL.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_QUIZ_ATTEMPT_DETAIL(ID, QUIZ_ATTEMPT_ID, QUIZ_QUESTION_ID, QUIZ_CHOICE_ID, QUIZ_ATTEMPT_DETAIL_IS_CORRECT)
+        VALUES(#{id}, #{quizAttemptId}, #{quizQuestionId}, #{quizChoiceId}, #{quizAttemptDetailIsCorrect})
+    </insert>
+
+    <!-- 퀴즈 응시별 문제 결과 목록 조회 -->
+    <select id="selectByAttemptId" parameterType="Long" resultType="QuizAttemptDetailResponseDTO">
+        SELECT ID, QUIZ_ATTEMPT_ID, QUIZ_QUESTION_ID, QUIZ_CHOICE_ID, QUIZ_ATTEMPT_DETAIL_IS_CORRECT
+        FROM TBL_QUIZ_ATTEMPT_DETAIL
+        WHERE QUIZ_ATTEMPT_ID = #{quizAttemptId}
+        ORDER BY ID ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.QuizAttemptMapper">
+
+    <!-- 퀴즈 응시 기록 등록 -->
+    <insert id="insert" parameterType="QuizAttemptVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_QUIZ_ATTEMPT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_QUIZ_ATTEMPT(ID, QUIZ_ATTEMPT_SCORE, QUIZ_ATTEMPT_TOTAL_COUNT, USER_ID, QUIZ_ID)
+        VALUES(#{id}, #{quizAttemptScore}, #{quizAttemptTotalCount}, #{userId}, #{quizId})
+    </insert>
+
+    <!-- 퀴즈 응시 기록 상세 조회 -->
+    <select id="select" parameterType="Long" resultType="QuizAttemptResponseDTO">
+        SELECT ID, QUIZ_ATTEMPT_CREATE_AT, QUIZ_ATTEMPT_SCORE, QUIZ_ATTEMPT_TOTAL_COUNT, USER_ID, QUIZ_ID
+        FROM TBL_QUIZ_ATTEMPT
+        WHERE ID = #{id}
+    </select>
+
+    <!-- 사용자별 퀴즈 응시 기록 조회 -->
+    <select id="selectByUserId" parameterType="Long" resultType="QuizAttemptResponseDTO">
+        SELECT ID, QUIZ_ATTEMPT_CREATE_AT, QUIZ_ATTEMPT_SCORE, QUIZ_ATTEMPT_TOTAL_COUNT, USER_ID, QUIZ_ID
+        FROM TBL_QUIZ_ATTEMPT
+        WHERE USER_ID = #{userId}
+        ORDER BY ID DESC
+    </select>
+
+    <!-- 퀴즈 응시 점수 수정 -->
+    <update id="updateScore" parameterType="QuizAttemptVO">
+        UPDATE TBL_QUIZ_ATTEMPT
+        SET QUIZ_ATTEMPT_SCORE = #{quizAttemptScore},
+            QUIZ_ATTEMPT_TOTAL_COUNT = #{quizAttemptTotalCount}
+        WHERE ID = #{id}
+    </update>
+
+</mapper>

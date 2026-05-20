@@ -1,6 +1,7 @@
 package com.app.springapp.repository;
 
 import com.app.springapp.domain.dto.response.WordsResponseDTO;
+import com.app.springapp.domain.vo.WordsVO;
 import com.app.springapp.mapper.WordsMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,17 @@ public class WordsDAO {
     // 단어 상세 조회
     public Optional<WordsResponseDTO> findWordById(Long id) {
         return Optional.ofNullable(wordsMapper.select(id));
+    }
+
+    // 관리자용
+    // 단어 등록
+    public void save(WordsVO wordsVO) {
+        wordsMapper.insert(wordsVO);
+    }
+
+    // 단어 수정
+    public void update(WordsVO wordsVO) {
+        wordsMapper.update(wordsVO);
     }
 
 }

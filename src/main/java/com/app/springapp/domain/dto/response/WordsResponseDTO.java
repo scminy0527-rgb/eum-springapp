@@ -21,6 +21,9 @@ public class WordsResponseDTO {
     private String wordsType;
     @Schema(description = "수어 영상 번호", example = "1")
     private Long eduVideoId;
+    // 추가
+    @Schema(description = "학습-단어 매핑 번호", example = "1")
+    private Long eduWordMapId;
 
     public static WordsResponseDTO from(WordsDTO dto) {
         WordsResponseDTO res = new WordsResponseDTO();
