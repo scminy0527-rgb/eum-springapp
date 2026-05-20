@@ -9,4 +9,21 @@
         WHERE ID = #{id}
     </select>
 
+    <!-- 관리자용 -->
+    <!-- 수어 영상 등록 -->
+    <insert id="insert" parameterType="EduVideoVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_EDU_VIDEO.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_EDU_VIDEO(ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE, EDU_VIDEO_URL)
+        VALUES(#{id}, #{eduVideoTitle}, #{eduVideoDetail}, #{eduVideoType}, #{eduVideoUrl})
+    </insert>
+
+    <!-- 수어 영상 수정 -->
+    <update id="update" parameterType="EduVideoVO">
+        UPDATE TBL_EDU_VIDEO
+        SET EDU_VIDEO_TITLE = #{eduVideoTitle}, EDU_VIDEO_DETAIL = #{eduVideoDetail}, EDU_VIDEO_TYPE = #{eduVideoType}, EDU_VIDEO_URL = #{eduVideoUrl}
+        WHERE ID = #{id}
+    </update>
+
 </mapper>

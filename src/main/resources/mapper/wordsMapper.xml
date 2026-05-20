@@ -4,7 +4,8 @@
 
     <!-- 학습별 단어 목록 조회 -->
     <select id="selectByEduId" parameterType="Long" resultType="WordsResponseDTO">
-        SELECT TBW.ID, TBW.WORDS_TITLE, TBW.WORDS_DETAIL, TBW.WORDS_IMAGE, TBW.WORDS_TYPE, TBW.EDU_VIDEO_ID
+        SELECT TEWM.ID,
+            TBW.ID, TBW.WORDS_TITLE, TBW.WORDS_DETAIL, TBW.WORDS_IMAGE, TBW.WORDS_TYPE, TBW.EDU_VIDEO_ID
         FROM TBL_EDU_WORD_MAP TEWM
         JOIN TBL_WORDS TBW
             ON TEWM.WORDS_ID = TBW.ID
@@ -18,5 +19,22 @@
         FROM TBL_WORDS
         WHERE ID = #{id}
     </select>
+
+    <!-- 관리자용 -->
+    <!-- 단어 등록 -->
+    <insert id="insert" parameterType="WordsVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_WORDS.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_WORDS(ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID)
+        VALUES(#{id}, #{wordsTitle}, #{wordsDetail}, #{wordsImage}, #{wordsType}, #{eduVideoId})
+    </insert>
+
+    <!-- 단어 수정 -->
+    <update id="update" parameterType="WordsVO">
+        UPDATE TBL_WORDS
+        SET WORDS_TITLE = #{wordsTitle}, WORDS_DETAIL = #{wordsDetail}, WORDS_IMAGE = #{wordsImage}, WORDS_TYPE = #{wordsType}, EDU_VIDEO_ID = #{eduVideoId}
+        WHERE ID = #{id}
+    </update>
 
 </mapper>

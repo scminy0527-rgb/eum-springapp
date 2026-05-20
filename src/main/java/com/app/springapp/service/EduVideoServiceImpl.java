@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.response.EduVideoResponseDTO;
+import com.app.springapp.domain.vo.EduVideoVO;
 import com.app.springapp.exception.EduException;
 import com.app.springapp.repository.EduVideoDAO;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,18 @@ public class EduVideoServiceImpl implements EduVideoService {
     @Override
     public EduVideoResponseDTO getEduVideoById(Long id) {
         return eduVideoDAO.findVideoById(id).orElseThrow(() -> new EduException("수어 영상 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+    }
+
+    // 관리자
+    // 수어 영상 등록
+    @Override
+    public void saveEduVideo(EduVideoVO eduVideoVO) {
+        eduVideoDAO.save(eduVideoVO);
+    }
+
+    // 수어 영상 수정
+    @Override
+    public void updateEduVideo(EduVideoVO eduVideoVO) {
+        eduVideoDAO.update(eduVideoVO);
     }
 }
