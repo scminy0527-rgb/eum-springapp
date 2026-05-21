@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,6 +66,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatUserDTO> chatUsers = chatMemberDAO.findByChatRoomId(chatRoomId);
         return chatUsers.stream()
                 .map(ChatUserResponseDTO::from)
+                .collect(Collectors.toList());
+    }
+
+//    사용자가 참여 중인 채팅방 페이지네이션 조회
+    @Override
+    public List<ChatRoomResponseDTO> getJoinedChatRooms(Map<String, Object> filters) {
+        return chatRoomDAO.findByUserId(filters)
+                .stream()
+                .map(ChatRoomResponseDTO::from)
                 .collect(Collectors.toList());
     }
 }

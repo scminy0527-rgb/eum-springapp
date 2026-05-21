@@ -35,6 +35,18 @@
         FROM TBL_CHAT_ROOM
     </select>
 
+    <select id="selectByUserId" parameterType="map" resultType="ChatRoomDTO">
+        SELECT
+            VCR.ID, VCR.CHAT_ROOM_NAME, VCR.CHAT_ROOM_DETAIL, VCR.CHAT_ROOM_TYPE, VCR.CHAT_ROOM_CREATE_AT,
+            VCR.CHAT_ROOM_PROFILE, VCR.CHAT_ROOM_LIMIT, VCR.CHAT_ROOM_IS_DELETED, VCR.CHAT_ROOM_USERS,
+            TCU.CHAT_START_AT, TCU.CHAT_LAST_READ_AT, TCU.USER_ID
+        FROM VW_CHAT_ROOM VCR
+        JOIN TBL_CHAT_USER TCU ON VCR.ID = TCU.CHAT_ROOM_ID
+        WHERE TCU.USER_ID = #{userId}
+        ORDER BY TCU.CHAT_LAST_READ_AT DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
     <insert id="insert" parameterType="ChatRoomVO">
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT SEQ_CHAT_ROOM.NEXTVAL FROM DUAL

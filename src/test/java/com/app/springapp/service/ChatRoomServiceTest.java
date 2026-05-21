@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @SpringBootTest
 @Slf4j
 public class ChatRoomServiceTest {
@@ -53,5 +56,19 @@ public class ChatRoomServiceTest {
         log.info("시나리오2: 존재하지 않는 방 id = {}", chatRoomId);
         chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
         log.info(chatRoomInfo.toString());
+    }
+
+    @Test
+    public void getJoinedChatRoomsTest() {
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("userId", 1L);
+        filters.put("offset", 0);
+        filters.put("size", 10);
+
+        chatRoomService.getJoinedChatRooms(filters)
+                .stream()
+                .forEach((joinedChatRoom) -> {
+                    log.info(joinedChatRoom.toString());
+                });
     }
 }

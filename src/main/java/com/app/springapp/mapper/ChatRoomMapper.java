@@ -19,6 +19,9 @@ public interface ChatRoomMapper {
 //    채팅방 전체 개수 조회
     public int selectCount();
 
+//    사용자가 현재 참여중인 채팅방 목록 페이지네이션 조회
+    public List<ChatRoomDTO> selectByUserId(Map<String, Object> filters);
+
 //    채팅방 생성
     public void insert(ChatRoomVO chatRoomVO);
 

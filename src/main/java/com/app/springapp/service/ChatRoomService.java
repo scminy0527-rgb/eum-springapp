@@ -5,6 +5,7 @@ import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import com.app.springapp.domain.dto.response.ChatUserResponseDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ChatRoomService {
 //    순수하게 채팅방을 생성 하는것
@@ -18,6 +19,9 @@ public interface ChatRoomService {
 
 //    채팅방 내 참여중인 유저 목록 불러오기
     public List<ChatUserResponseDTO> getChatRoomUsers(Long chatRoomId);
+
+//    사용자가 참여 중인 채팅방 페이지네이션 조회
+    public List<ChatRoomResponseDTO> getJoinedChatRooms(Map<String, Object> filters);
 
 //    채팅방 정보 수정
 

@@ -26,9 +26,14 @@ public class ChatRoomDAO {
         return chatRoomMapper.select(id).stream().findFirst();
     }
 
-//    채팅방 목록 페이징 조회
+//    전체 채팅방 목록 페이지네이션 조회
     public List<ChatRoomDTO> findAllWithPaging(Map<String, Object> filters){
         return chatRoomMapper.selectAllWithPaging(filters);
+    }
+
+//    사용자가 현재 참여 중인 채팅방 목록 페이지네이션 조회
+    public List<ChatRoomDTO> findByUserId(Map<String, Object> filters){
+        return chatRoomMapper.selectByUserId(filters);
     }
 
 //    채팅방 전체 개수 조회
