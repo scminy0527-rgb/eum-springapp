@@ -123,4 +123,50 @@ public class AuthApi {
                 "role", claims.getOrDefault("role", "USER")  // ← null 대신 기본값
         ));
     }
+
+    // 소셜 신규 회원가입 완료
+    @PostMapping("/social-signup")
+    @Operation(summary = "소셜 회원가입", description = "소셜 임시 토큰 검증 후 추가 정보 입력으로 회원가입 완료")
+    @ApiResponse(responseCode = "200", description = "회원가입 성공")
+    @ApiResponse(responseCode = "400", description = "유효하지 않은 임시 토큰 또는 잘못된 요청")
+    public ResponseEntity<ApiResponseDTO> socialSignup(
+            @CookieValue(name = "socialTempToken", required = false) String tempToken,
+            @RequestBody UserDTO userDTO) {
+
+        JwtTokenDTO jwtTokenDTO = authService.socialSignup(userDTO, tempToken);
+
+        ResponseCookie accessTokenCookie = ResponseCookie
+                .from("accessToken", jwtTokenDTO.getAccessToken())
+                .httpOnly(true)
+                .sameSite("Lax")
+                .path("/")
+                .secure(false)
+                .maxAge(60 * 60 * 24)
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie
+                .from("refreshToken", jwtTokenDTO.getRefreshToken())
+                .httpOnly(true)
+                .sameSite("Lax")
+                .path("/")
+                .secure(false)
+                .maxAge(60 * 60 * 24 * 30)
+                .build();
+
+        // 임시 토큰 삭제
+        ResponseCookie clearTempToken = ResponseCookie
+                .from("socialTempToken", "")
+                .httpOnly(true)
+                .sameSite("Lax")
+                .path("/")
+                .secure(false)
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, clearTempToken.toString())
+                .body(ApiResponseDTO.of(true, "소셜 회원가입 성공"));
+    }
 }

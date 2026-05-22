@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.TestApplyMapper">
+
+    <!-- 원서 접수 등록 -->
+    <insert id="insert" parameterType="TestApplyVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_TEST_APPLY.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_TEST_APPLY (
+            ID,
+            TEST_APPLY_AT,
+            USER_ID,
+            TEST_ID
+        ) VALUES (
+            #{id},
+            SYSDATE,
+            #{userId},
+            #{testId}
+        )
+    </insert>
+
+    <!-- 특정 시험의 현재 신청 인원 수 조회 -->
+    <select id="countByTestId" parameterType="Long" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_TEST_APPLY
+        WHERE TEST_ID = #{testId}
+    </select>
+
+</mapper>

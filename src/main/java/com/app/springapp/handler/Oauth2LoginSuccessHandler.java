@@ -63,30 +63,50 @@ public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             userDTO.setUserName(userName);
             userDTO.setSocialUserProvider(socialUserProvider);
 
-            JwtTokenDTO jwtTokenDTO = authService.socialLogin(userDTO);
+            if (authService.isSocialUserExists(userDTO)) {
+                // ✅ 기존 회원 → JWT 발급 후 메인으로 이동
+                JwtTokenDTO jwtTokenDTO = authService.socialLogin(userDTO);
 
-            ResponseCookie accessTokenCookie = ResponseCookie
-                    .from("accessToken", jwtTokenDTO.getAccessToken())
-                    .httpOnly(true)
-                    .sameSite("Lax")
-                    .path("/")
-                    .secure(false)
-                    .maxAge(60 * 60 * 24)
-                    .build();
+                ResponseCookie accessTokenCookie = ResponseCookie
+                        .from("accessToken", jwtTokenDTO.getAccessToken())
+                        .httpOnly(true)
+                        .sameSite("Lax")
+                        .path("/")
+                        .secure(false)
+                        .maxAge(60 * 60 * 24)
+                        .build();
 
-            ResponseCookie refreshTokenCookie = ResponseCookie
-                    .from("refreshToken", jwtTokenDTO.getRefreshToken())
-                    .httpOnly(true)
-                    .sameSite("Lax")
-                    .path("/")
-                    .secure(false)
-                    .maxAge(60 * 60 * 24 * 30)
-                    .build();
+                ResponseCookie refreshTokenCookie = ResponseCookie
+                        .from("refreshToken", jwtTokenDTO.getRefreshToken())
+                        .httpOnly(true)
+                        .sameSite("Lax")
+                        .path("/")
+                        .secure(false)
+                        .maxAge(60 * 60 * 24 * 30)
+                        .build();
 
-            response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+                response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+                response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-            getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
+                getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
+
+            } else {
+                // 🆕 신규 회원 → 임시 토큰 발급 후 회원가입 페이지로 이동
+                String tempToken = authService.generateTempSocialToken(userDTO);
+
+                ResponseCookie tempTokenCookie = ResponseCookie
+                        .from("socialTempToken", tempToken)
+                        .httpOnly(true)
+                        .sameSite("Lax")
+                        .path("/")
+                        .secure(false)
+                        .maxAge(60 * 10) // 10분
+                        .build();
+
+                response.addHeader(HttpHeaders.SET_COOKIE, tempTokenCookie.toString());
+
+                getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/social-join");
+            }
         }
     }
 }

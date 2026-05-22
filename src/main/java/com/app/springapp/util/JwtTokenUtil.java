@@ -50,6 +50,20 @@ public class JwtTokenUtil {
                 .compact();
     }
 
+    // 소셜 신규 회원용 임시 토큰 (10분 유효)
+    public String generateTempSocialToken(Map<String, String> claims) {
+        Long expirationTimeInMillis = 1000L * 60 * 10; // 10분
+        Date expirationDate = new Date(System.currentTimeMillis() + expirationTimeInMillis);
+
+        return Jwts
+                .builder()
+                .claims(claims)
+                .expiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setHeaderParam("typ", "JWT")
+                .compact();
+    }
+
 
     // 토큰 파싱(token -> claim)
     public Claims parseToken(String token) {

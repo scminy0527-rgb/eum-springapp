@@ -75,32 +75,97 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtTokenDTO socialLogin(UserDTO userDTO) {
-        JwtTokenDTO jwtTokenDTO = new JwtTokenDTO();
+        // 기존 회원 전용 - Oauth2LoginSuccessHandler에서 isSocialUserExists() 확인 후 호출
+        UserDTO foundUser = userDAO
+                .findUserByUserEmailAndSocialUserProvider(userDTO)
+                .orElseThrow(() -> new UserException("socialLogin 유저 조회 실패", HttpStatus.BAD_REQUEST));
+
         Map<String, String> claims = new HashMap<>();
-
-        if (userDAO.existsUserByUserEmailAndSocialUserProvider(userDTO)) {
-            UserDTO foundUser = userDAO
-                    .findUserByUserEmailAndSocialUserProvider(userDTO)
-                    .orElseThrow(() -> new UserException("socialLogin 유저 조회 실패", HttpStatus.BAD_REQUEST));
-            claims.put("id", foundUser.getId().toString());
-            claims.put("role", foundUser.getUserRole());
-        } else {
-            UserVO userVO = UserVO.from(userDTO);
-            SocialUserVO socialUserVO = SocialUserVO.from(userDTO);
-
-            userDAO.save(userVO);
-            socialUserVO.setUserId(userVO.getId());
-            socialUserDAO.save(socialUserVO);
-            claims.put("id", userVO.getId().toString());
-            claims.put("role", "USER");
-        }
-
-        claims.put("userEmail", userDTO.getUserEmail());
-        claims.put("socialUserProvider", userDTO.getSocialUserProvider());
+        claims.put("id", foundUser.getId().toString());
+        claims.put("userEmail", foundUser.getUserEmail());
+        claims.put("socialUserProvider", foundUser.getSocialUserProvider());
+        claims.put("role", foundUser.getUserRole());
 
         String accessToken = jwtTokenUtil.generateAccessToken(claims);
         String refreshToken = jwtTokenUtil.generateRefreshToken(claims);
 
+        JwtTokenDTO jwtTokenDTO = new JwtTokenDTO();
+        jwtTokenDTO.setAccessToken(accessToken);
+        jwtTokenDTO.setRefreshToken(refreshToken);
+
+        saveRefreshToken(jwtTokenDTO);
+        return jwtTokenDTO;
+    }
+
+    @Override
+    public boolean isSocialUserExists(UserDTO userDTO) {
+        return userDAO.existsUserByUserEmailAndSocialUserProvider(userDTO);
+    }
+
+    @Override
+    public String generateTempSocialToken(UserDTO userDTO) {
+        Map<String, String> claims = new HashMap<>();
+        claims.put("tempSignup", "true");
+        claims.put("userEmail", userDTO.getUserEmail() != null ? userDTO.getUserEmail() : "");
+        claims.put("socialUserProvider", userDTO.getSocialUserProvider());
+        claims.put("socialUserProviderId", userDTO.getSocialUserProviderId());
+        claims.put("userName", userDTO.getUserName() != null ? userDTO.getUserName() : "");
+        return jwtTokenUtil.generateTempSocialToken(claims);
+    }
+
+    @Override
+    public JwtTokenDTO socialSignup(UserDTO userDTO, String tempToken) {
+        if (tempToken == null || tempToken.isBlank()) {
+            throw new UserException("소셜 임시 토큰이 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        // 임시 토큰 파싱 및 검증
+        var claims = jwtTokenUtil.parseToken(tempToken);
+        if (!"true".equals(String.valueOf(claims.get("tempSignup")))) {
+            throw new UserException("유효하지 않은 소셜 임시 토큰입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        // 임시 토큰에서 소셜 정보 추출
+        String userEmail = String.valueOf(claims.get("userEmail"));
+        String socialUserProvider = String.valueOf(claims.get("socialUserProvider"));
+        String socialUserProviderId = String.valueOf(claims.get("socialUserProviderId"));
+        String userName = String.valueOf(claims.get("userName"));
+
+        // 이미 가입된 경우 중복 방지
+        UserDTO checkDTO = new UserDTO();
+        checkDTO.setUserEmail(userEmail);
+        checkDTO.setSocialUserProvider(socialUserProvider);
+        if (userDAO.existsUserByUserEmailAndSocialUserProvider(checkDTO)) {
+            throw new UserException("이미 가입된 소셜 계정입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        // 유저 생성
+        UserVO userVO = new UserVO();
+        userVO.setUserEmail(userEmail);
+        userVO.setUserName(userName);
+        userVO.setUserNickname(userDTO.getUserNickname() != null ? userDTO.getUserNickname() : "개복치 1단계");
+        userVO.setUserPhoneNum(userDTO.getUserPhoneNum());
+        userVO.setUserProfile("https://testapp-gyuhoroh213589.s3.ap-northeast-2.amazonaws.com/cat.jpg");
+        userDAO.save(userVO);
+
+        // 소셜 유저 연결 정보 저장
+        SocialUserVO socialUserVO = new SocialUserVO();
+        socialUserVO.setSocialUserProviderId(socialUserProviderId);
+        socialUserVO.setSocialUserProvider(socialUserProvider);
+        socialUserVO.setUserId(userVO.getId());
+        socialUserDAO.save(socialUserVO);
+
+        // JWT 발급
+        Map<String, String> jwtClaims = new HashMap<>();
+        jwtClaims.put("id", userVO.getId().toString());
+        jwtClaims.put("userEmail", userEmail);
+        jwtClaims.put("socialUserProvider", socialUserProvider);
+        jwtClaims.put("role", "USER");
+
+        String accessToken = jwtTokenUtil.generateAccessToken(jwtClaims);
+        String refreshToken = jwtTokenUtil.generateRefreshToken(jwtClaims);
+
+        JwtTokenDTO jwtTokenDTO = new JwtTokenDTO();
         jwtTokenDTO.setAccessToken(accessToken);
         jwtTokenDTO.setRefreshToken(refreshToken);
 

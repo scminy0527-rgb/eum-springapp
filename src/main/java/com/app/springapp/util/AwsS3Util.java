@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AwsS3Util {
     private final S3Client s3Client;
-    private final String buckket = "testapp-codefuling";
+    private final String buckket = "testapp-gyuhoroh213589";
 
     public String getPath(){
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd/"));

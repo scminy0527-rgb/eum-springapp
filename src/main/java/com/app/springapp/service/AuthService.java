@@ -7,8 +7,17 @@ public interface AuthService {
     // 로컬 로그인
     public JwtTokenDTO login(UserDTO userDTO);
 
-    // 소셜 로그인
+    // 소셜 로그인 (기존 회원)
     public JwtTokenDTO socialLogin(UserDTO userDTO);
+
+    // 소셜 신규 회원 여부 확인
+    public boolean isSocialUserExists(UserDTO userDTO);
+
+    // 소셜 신규 회원용 임시 토큰 발급
+    public String generateTempSocialToken(UserDTO userDTO);
+
+    // 소셜 회원가입 완료 (임시 토큰 검증 후 계정 생성)
+    public JwtTokenDTO socialSignup(UserDTO userDTO, String tempToken);
 
     // 로그아웃
     public void logout(JwtTokenDTO jwtTokenDTO);

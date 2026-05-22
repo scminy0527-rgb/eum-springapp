@@ -25,7 +25,7 @@ public class UserVO {
         UserVO userVO = new UserVO();
         userVO.setUserEmail(userDTO.getUserEmail());
         userVO.setUserPassword(userDTO.getUserPassword());
-        userVO.setUserProfile(userDTO.getUserProfile() != null ? userDTO.getUserProfile() : "https://testapp-codefuling.s3.ap-northeast-2.amazonaws.com/cat.jpg");
+        userVO.setUserProfile(userDTO.getUserProfile() != null ? userDTO.getUserProfile() : "https://testapp-gyuhoroh213589.s3.ap-northeast-2.amazonaws.com/cat.jpg");
         userVO.setUserName(userDTO.getUserName());
         userVO.setUserNickname(userDTO.getUserNickname() != null ? userDTO.getUserNickname() : "개복치 1단계");
         return userVO;
