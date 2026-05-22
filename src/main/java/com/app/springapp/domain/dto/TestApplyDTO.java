@@ -22,4 +22,7 @@ public class TestApplyDTO {
     private String testTitle;
     private LocalDateTime testDate;
     private String testLocation;
+
+    // 증빙서류 파일 경로 (콤마 구분)
+    private String filePaths;
 }

@@ -12,6 +12,7 @@ public class TestApplyVO {
     private LocalDateTime testApplyAt;
     private Long userId;
     private Long testId;
+    private String filePaths;
 
     public static TestApplyVO from(TestApplyDTO dto) {
         TestApplyVO vo = new TestApplyVO();
@@ -19,6 +20,7 @@ public class TestApplyVO {
         vo.setTestApplyAt(dto.getTestApplyAt());
         vo.setUserId(dto.getUserId());
         vo.setTestId(dto.getTestId());
+        vo.setFilePaths(dto.getFilePaths());
         return vo;
     }
 }

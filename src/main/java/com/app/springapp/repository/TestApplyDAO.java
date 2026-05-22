@@ -22,6 +22,11 @@ public class TestApplyDAO {
         return testApplyMapper.countByTestId(testId);
     }
 
+    // 접수 취소
+    public void deleteById(Long id, Long userId) {
+        testApplyMapper.deleteById(id, userId);
+    }
+
     // 내 접수 목록 조회
     public List<TestApplyDTO> findByUserId(Long userId) {
         return testApplyMapper.selectByUserId(userId);
