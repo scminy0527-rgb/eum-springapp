@@ -7,10 +7,12 @@ import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.ChatResponseDTO;
 import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import com.app.springapp.domain.vo.ChatRoomVO;
+import com.app.springapp.domain.vo.ChatUserVO;
 import com.app.springapp.domain.vo.ChatVO;
 import com.app.springapp.exception.ChatException;
 import com.app.springapp.repository.ChatDAO;
 import com.app.springapp.repository.ChatRoomDAO;
+import com.app.springapp.repository.ChatUserDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomDAO chatRoomDAO;
     private final ChatRoomService chatRoomService;
     private final CommunityAuthService communityAuthService;
+    private final ChatUserDAO chatUserDAO;
 
     //    채팅 메세지 관련
     //    채팅방 내 모든 메세지 불러오기
@@ -86,11 +89,18 @@ public class ChatServiceImpl implements ChatService {
 //    유저가 해당 채팅방에 참여가 되어 있는지?
     @Override
     public boolean isUserInChatRoom(Long chatRoomId) {
-        ChatVO chatVO = new ChatVO();
-        chatVO.setChatRoomId(chatRoomId);
-        chatVO.setUserId(communityAuthService.getUserId());
-        log.info("테스트 위한 chat vo: {}", chatVO);
-        return chatDAO.existByChatRoomIdAndUserId(chatVO) != 0;
+        Long userId = communityAuthService.getUserId();
+        communityAuthService.checkUserValidity(userId);
+        ChatUserVO  chatUserVO = new ChatUserVO();
+        chatUserVO.setChatRoomId(chatRoomId);
+        chatUserVO.setUserId(userId);
+
+//        ChatVO chatVO = new ChatVO();
+//        chatVO.setChatRoomId(chatRoomId);
+//        chatVO.setUserId(communityAuthService.getUserId());
+//        log.info("테스트 위한 chat vo: {}", chatVO);
+//        return chatDAO.existByChatRoomIdAndUserId(chatVO) != 0;
+        return chatUserDAO.existByUserIdAndChatRoomId(chatUserVO) != 0;
     }
 
 //    채팅방 관련

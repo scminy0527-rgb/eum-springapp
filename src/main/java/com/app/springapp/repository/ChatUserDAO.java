@@ -27,4 +27,9 @@ public class ChatUserDAO {
     public int countByUserId(Long userId){
         return chatUserMapper.countByUserId(userId);
     }
+
+//    사용자가 특정 채팅방 참여 했는지 여부 확인
+    public int existByUserIdAndChatRoomId(ChatUserVO chatUserVO){
+        return chatUserMapper.existByUserIdAndChatRoomId(chatUserVO);
+    }
 }

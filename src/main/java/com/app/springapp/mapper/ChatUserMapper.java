@@ -16,4 +16,7 @@ public interface ChatUserMapper {
 
 //    사용자가 참여 중인 채팅방 갯수
     public int countByUserId(Long userId);
+
+//    사용자가 해당 체팅방 참여 했는지 여부 (채팅방 / 유저 매칭 개념)
+    public int existByUserIdAndChatRoomId(ChatUserVO chatUserVO);
 }

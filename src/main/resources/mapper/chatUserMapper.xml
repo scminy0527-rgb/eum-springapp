@@ -25,4 +25,10 @@
         WHERE USER_ID = #{userId}
     </select>
 
+    <select id="existByUserIdAndChatRoomId" parameterType="ChatUserVO" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_CHAT_USER
+        WHERE USER_ID = #{userId} AND CHAT_ROOM_ID = #{chatRoomId}
+    </select>
+
 </mapper>
