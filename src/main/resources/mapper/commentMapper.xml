@@ -16,7 +16,18 @@
             USER_NICKNAME, USER_PROFILE, POST_ID, USER_ID
         FROM VW_COMMENT
         WHERE USER_ID = #{userId}
-        ORDER BY ID DESC
+        <if test="keyword != null and keyword != ''">
+            AND (COMMENT_CONTENT LIKE '%' || #{keyword} || '%'
+            OR USER_NICKNAME LIKE '%' || #{keyword} || '%')
+        </if>
+        <choose>
+            <when test="order != null and order == 'popular'">
+                ORDER BY COMMENT_LIKE_COUNT DESC
+            </when>
+            <otherwise>
+                ORDER BY ID DESC
+            </otherwise>
+        </choose>
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 

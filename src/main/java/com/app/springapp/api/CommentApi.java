@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,11 +68,34 @@ public class CommentApi {
             in = ParameterIn.QUERY,
             schema = @Schema(type = "number")
     )
+    @Parameter(
+            name = "order",
+            description = "댓글 정렬 기준",
+            example = "latest",
+            required = false,
+            in = ParameterIn.QUERY,
+            schema = @Schema(type = "string")
+    )
+    @Parameter(
+            name = "keyword",
+            description = "댓글 부분 검색 키워드",
+            example = "수어",
+            required = false,
+            in = ParameterIn.QUERY,
+            schema = @Schema(type = "string")
+    )
     public ResponseEntity<ApiResponseDTO> getUserWrittenComments(
             @PathVariable Long userId,
-            @RequestParam(defaultValue = "1") int page
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "latest") String order,
+            @RequestParam(defaultValue = "") String keyword
     ){
-        Map<String, Object> result = commentService.getUserWrittenComments(userId, page);
+        Map<String, Object> req = new HashMap<>();
+        req.put("page", page);
+        req.put("order", order);
+        req.put("keyword", keyword);
+
+        Map<String, Object> result = commentService.getUserWrittenComments(userId, req);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "유저 작성 댓글 불러오기 성공", result));

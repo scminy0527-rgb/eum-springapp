@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,9 @@ public class CommentServiceTest {
     @Test
     public void getUserWrittenCommentsTest(){
         Long userId = 1L;
-        Map<String, Object> result = commentService.getUserWrittenComments(userId, 1);
+        Map<String, Object> req = new HashMap<>();
+        req.put("page", 1);
+        Map<String, Object> result = commentService.getUserWrittenComments(userId, req);
         List<CommentResponseDTO> comments = (List<CommentResponseDTO>) result.get("comments");
         comments.stream()
                 .forEach(comment -> {log.info(comment.toString());});

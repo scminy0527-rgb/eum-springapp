@@ -37,14 +37,20 @@ public class CommentServiceImpl implements CommentService {
 
 //    유저가 작성 한 댓글 목록 불러오기 (페이지네이션)
     @Override
-    public Map<String, Object> getUserWrittenComments(Long userId, int page) {
+    public Map<String, Object> getUserWrittenComments(Long userId, Map<String, Object> req) {
         int size = 10;
+        int page = (Integer) req.get("page");
+        String order = (String) req.get("order");
+        String keyword = (String) req.get("keyword");
+
         int offset = (page - 1) * size;
 
         Map<String, Object> filters = new HashMap<>();
         filters.put("userId", userId);
         filters.put("size", size);
         filters.put("offset", offset);
+        filters.put("order", order);
+        filters.put("keyword", keyword);
 
         List<CommentResponseDTO> comments = commentDAO.findAllByUserId(filters)
                 .stream()

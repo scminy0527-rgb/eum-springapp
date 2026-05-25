@@ -21,6 +21,8 @@ public class PostDTO {
     private LocalDateTime postCreateAt;
     @Schema(description = "게시글 태그", example = "자유게시판")
     private String postTag;
+    @Schema(description = "게시글 프로필 이미지", example = "default.jpg")
+    private String postProfile;
     @Schema(description = "작성자 유저 번호", example = "1")
     private Long userId;
     @Schema(description = "작성자 유저 닉네임", example = "수어러버박지민")

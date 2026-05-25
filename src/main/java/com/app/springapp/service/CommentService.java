@@ -10,7 +10,7 @@ public interface CommentService {
     public List<CommentResponseDTO> getAllPostComments(Long postId);
 
 //    유저가 남긴 댓글 조회 (페이지네이션)
-    public Map<String, Object> getUserWrittenComments(Long userId, int page);
+    public Map<String, Object> getUserWrittenComments(Long userId, Map<String, Object> req);
 
     public void writePostComment(Long postId, CommentRequestDTO commentRequestDTO);
 
