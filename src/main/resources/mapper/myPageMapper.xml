@@ -20,42 +20,72 @@
     </select>
 
     <!-- 내가 작성한 게시글 목록 조회 -->
-    <select id="selectMyPostListByUserId" parameterType="Long" resultType="MyPagePostResponseDTO">
-        SELECT TP.ID, TP.POST_TITLE, TP.POST_TAG, TP.POST_READ_COUNT, NVL((SELECT COUNT(*) FROM TBL_COMMENT TC WHERE TC.POST_ID = TP.ID AND TC.COMMENT_IS_DELETED = 0), 0) AS commentCount, NVL((SELECT COUNT(*) FROM TBL_POST_LIKE TPL WHERE TPL.POST_ID = TP.ID), 0) AS likeCount
+    <select id="selectMyPostListByUserId" parameterType="Long" resultType="com.app.springapp.domain.dto.response.MyPagePostResponseDTO">
+        SELECT
+            TP.ID AS id,
+            TP.POST_TITLE AS postTitle,
+            TP.POST_TAG AS postTag,
+            TP.POST_READ_COUNT AS postReadCount,
+            TP.POST_CREATE_AT AS postCreateAt,
+            NVL((
+                    SELECT COUNT(*)
+                    FROM TBL_POST_LIKE TPL
+                    WHERE TPL.POST_ID = TP.ID
+                ), 0) AS likeCount
         FROM TBL_POST TP
-        WHERE TP.USER_ID = #{userId} AND TP.POST_IS_DELETED = 0
+        WHERE TP.USER_ID = #{userId}
+          AND TP.POST_IS_DELETED = 0
         ORDER BY TP.ID DESC
-            FETCH FIRST 4 ROWS ONLY
     </select>
 
+
     <!-- 좋아요한 게시글 목록 조회 -->
-    <select id="selectBookmarkListByUserId" parameterType="Long" resultType="MyPagePostResponseDTO">
-        SELECT TP.ID, TP.POST_TITLE, TP.POST_TAG, TP.POST_READ_COUNT, NVL((SELECT COUNT(*) FROM TBL_COMMENT TC WHERE TC.POST_ID = TP.ID AND TC.COMMENT_IS_DELETED = 0), 0) AS commentCount, NVL((SELECT COUNT(*) FROM TBL_POST_LIKE TPL2 WHERE TPL2.POST_ID = TP.ID), 0) AS likeCount
+    <select id="selectBookmarkListByUserId" parameterType="Long" resultType="com.app.springapp.domain.dto.response.MyPagePostResponseDTO">
+        SELECT
+            TP.ID AS id,
+            TP.POST_TITLE AS postTitle,
+            TP.POST_TAG AS postTag,
+            TP.POST_READ_COUNT AS postReadCount,
+            TP.POST_CREATE_AT AS postCreateAt,
+            TU.USER_NAME AS userName,
+            TU.USER_NICKNAME AS userNickname,
+            NVL((
+                    SELECT COUNT(*)
+                    FROM TBL_POST_LIKE TPL2
+                    WHERE TPL2.POST_ID = TP.ID
+                ), 0) AS likeCount
         FROM TBL_POST_LIKE TPL
                  JOIN TBL_POST TP ON TPL.POST_ID = TP.ID
-        WHERE TPL.USER_ID = #{userId} AND TP.POST_IS_DELETED = 0
+                 JOIN TBL_USER TU ON TP.USER_ID = TU.ID
+        WHERE TPL.USER_ID = #{userId}
+          AND TP.POST_IS_DELETED = 0
         ORDER BY TPL.ID DESC
-            FETCH FIRST 4 ROWS ONLY
     </select>
 
     <!-- 팔로잉 목록 조회 -->
     <select id="selectFollowingListByUserId" parameterType="Long" resultType="MyPageFollowResponseDTO">
-        SELECT TU.ID, TU.USER_NICKNAME, TU.USER_PROFILE
+        SELECT
+            TU.ID AS id,
+            TU.USER_NAME AS userName,
+            TU.USER_NICKNAME AS userNickname,
+            TU.USER_PROFILE AS userProfile
         FROM TBL_FOLLOW TF
                  JOIN TBL_USER TU ON TF.FOLLOWING_ID = TU.ID
         WHERE TF.FOLLOWER_ID = #{userId}
         ORDER BY TF.ID DESC
-            FETCH FIRST 8 ROWS ONLY
     </select>
 
     <!-- 팔로워 목록 조회 -->
     <select id="selectFollowerListByUserId" parameterType="Long" resultType="MyPageFollowResponseDTO">
-        SELECT TU.ID, TU.USER_NICKNAME, TU.USER_PROFILE
+        SELECT
+            TU.ID AS id,
+            TU.USER_NAME AS userName,
+            TU.USER_NICKNAME AS userNickname,
+            TU.USER_PROFILE AS userProfile
         FROM TBL_FOLLOW TF
                  JOIN TBL_USER TU ON TF.FOLLOWER_ID = TU.ID
         WHERE TF.FOLLOWING_ID = #{userId}
         ORDER BY TF.ID DESC
-            FETCH FIRST 8 ROWS ONLY
     </select>
 
     <!-- 출석 날짜 목록 조회 -->
@@ -83,10 +113,29 @@
     <!-- ===================================================== -->
 
     <!-- 정보수정 화면 회원 정보 조회 -->
-    <select id="selectUserInfoById" parameterType="Long" resultType="MyPageProfileResponseDTO">
-        SELECT ID AS id, USER_NAME AS userName, USER_NICKNAME AS userNickname, USER_INTRO AS userIntro, USER_JOB AS userJob, USER_ADDRESS AS userAddress, USER_EMAIL AS userEmail, USER_PHONE_NUM AS userPhoneNum, USER_EXP AS userExp, USER_PROFILE AS userProfile, USER_CREATE_AT AS userCreateAt
-        FROM TBL_USER
-        WHERE ID = #{userId}
+    <select id="selectUserInfoById" parameterType="Long" resultType="com.app.springapp.domain.dto.response.MyPageProfileResponseDTO">
+        SELECT
+            TU.ID AS id,
+            TU.USER_NAME AS userName,
+            TU.USER_NICKNAME AS userNickname,
+            TU.USER_INTRO AS userIntro,
+            TU.USER_JOB AS userJob,
+            TU.USER_ADDRESS AS userAddress,
+            TU.USER_EMAIL AS userEmail,
+            TU.USER_PHONE_NUM AS userPhoneNum,
+            TU.USER_EXP AS userExp,
+            TU.USER_PROFILE AS userProfile,
+            TU.USER_CREATE_AT AS userCreateAt,
+            TU.USER_ROLE AS userRole,
+            CASE
+                WHEN TSU.ID IS NOT NULL THEN 1
+                ELSE 0
+                END AS socialUser,
+            TSU.SOCIAL_USER_PROVIDER AS socialMemberProvider
+        FROM TBL_USER TU
+                 LEFT JOIN TBL_SOCIAL_USER TSU
+                           ON TU.ID = TSU.USER_ID
+        WHERE TU.ID = #{userId}
     </select>
 
     <!-- 소셜 로그인 회원 여부 조회 -->

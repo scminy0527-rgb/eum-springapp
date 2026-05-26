@@ -15,9 +15,9 @@ public class MyPageMainResponseDTO {
     @Schema(description = "내 활동 정보", required = true)
     private MyPageActivityResponseDTO activity;
     @Schema(description = "내 게시글 목록", required = true)
-    private List<MyPagePostResponseDTO> posts;
+    private List<MyPagePostResponseDTO> myPostList;
     @Schema(description = "좋아요한 게시글 목록", required = true)
-    private List<MyPagePostResponseDTO> bookmarks;
+    private List<MyPagePostResponseDTO> bookmarkList;
     @Schema(description = "팔로잉 목록", required = true)
     private List<MyPageFollowResponseDTO> followingList;
     @Schema(description = "팔로워 목록", required = true)

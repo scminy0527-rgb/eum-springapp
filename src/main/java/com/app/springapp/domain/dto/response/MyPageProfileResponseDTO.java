@@ -12,24 +12,43 @@ import java.time.LocalDateTime;
 public class MyPageProfileResponseDTO {
     @Schema(description = "회원 번호", example = "1", required = true)
     private Long id;
-    @Schema(description = "회원 이름", example = "홍길동", required = true)
+
+    @Schema(description = "회원 이름", example = "김민준", required = true)
     private String userName;
-    @Schema(description = "회원 닉네임", example = "홍길동", required = false)
+
+    @Schema(description = "회원 닉네임", example = "minjun_k", required = true)
     private String userNickname;
-    @Schema(description = "회원 소개", example = "수어를 배우는 중입니다", required = false)
+
+    @Schema(description = "회원 자기소개", example = "수어를 배우고 청각장애인 친구들과 소통하고 싶어요!", required = false)
     private String userIntro;
-    @Schema(description = "회원 직업", example = "학생", required = false)
+
+    @Schema(description = "회원 직업", example = "학생", required = true)
     private String userJob;
-    @Schema(description = "회원 지역", example = "서울 · 수도권", required = false)
+
+    @Schema(description = "회원 지역", example = "서울특별시 강남구", required = true)
     private String userAddress;
-    @Schema(description = "회원 이메일", example = "user123@gmail.com", required = true)
+
+    @Schema(description = "회원 이메일", example = "minginew77@gmail.com", required = true)
     private String userEmail;
-    @Schema(description = "회원 전화번호", example = "010-1234-5678", required = false)
+
+    @Schema(description = "회원 전화번호", example = "01012345678", required = false)
     private String userPhoneNum;
-    @Schema(description = "회원 경험치", example = "40", required = true)
+
+    @Schema(description = "회원 경험치", example = "120", required = true)
     private Long userExp;
-    @Schema(description = "회원 프로필 이미지", example = "default.jpg", required = true)
+
+    @Schema(description = "회원 프로필 이미지", example = "/2026/05/27/example.png", required = false)
     private String userProfile;
-    @Schema(description = "회원 가입일", example = "2025-01-15T00:00:00", required = true)
+
+    @Schema(description = "회원 가입일", example = "2026-05-27T04:09:09", required = true)
     private LocalDateTime userCreateAt;
+
+    @Schema(description = "회원 권한", example = "USER", required = false)
+    private String userRole;
+
+    @Schema(description = "소셜 로그인 회원 여부", example = "true", required = true)
+    private Boolean socialUser;
+
+    @Schema(description = "소셜 로그인 제공자", example = "GOOGLE", required = false)
+    private String socialMemberProvider;
 }

@@ -44,8 +44,8 @@ public class MyPageServiceImpl implements MyPageService {
 
         myPageMainResponseDTO.setProfile(getProfile(userId));
         myPageMainResponseDTO.setActivity(getActivity(userId));
-        myPageMainResponseDTO.setPosts(getMyPostList(userId));
-        myPageMainResponseDTO.setBookmarks(getBookmarkList(userId));
+        myPageMainResponseDTO.setMyPostList(getMyPostList(userId));
+        myPageMainResponseDTO.setBookmarkList(getBookmarkList(userId));
         myPageMainResponseDTO.setFollowingList(getFollowingList(userId));
         myPageMainResponseDTO.setFollowerList(getFollowerList(userId));
         myPageMainResponseDTO.setAttendance(getAttendance(userId));
