@@ -1,5 +1,6 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.MyTestResultDTO;
 import com.app.springapp.domain.dto.TestApplyDTO;
 import com.app.springapp.domain.dto.TestDTO;
 import com.app.springapp.domain.vo.TestApplyVO;
@@ -37,6 +38,12 @@ public class TestApplyServiceImpl implements TestApplyService {
     @Override
     public List<TestApplyDTO> getMyApplyList(Long userId) {
         return testApplyDAO.findByUserId(userId);
+    }
+
+    // 내 합격 여부 조회
+    @Override
+    public List<MyTestResultDTO> getMyResults(Long userId) {
+        return testApplyDAO.findMyResultsByUserId(userId);
     }
 
     // 원서 접수 (정원 초과 시 예외 발생)

@@ -52,7 +52,11 @@ public class AuthServiceImpl implements AuthService {
                 .findUserByUserEmailAndSocialUserProvider(userDTO)
                 .orElseThrow(() -> new UserException("회원이 아닙니다.", HttpStatus.BAD_REQUEST));
 
-        if (!passwordEncoder.matches(userVO.getUserPassword(), foundUser.getUserPassword())) {
+        // BCrypt 비활성화 - 테스트용
+        // if (!passwordEncoder.matches(userVO.getUserPassword(), foundUser.getUserPassword())) {
+        //     throw new UserException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+        // }
+        if (!userVO.getUserPassword().equals(foundUser.getUserPassword())) {
             throw new UserException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 

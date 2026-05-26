@@ -1,5 +1,6 @@
 package com.app.springapp.mapper;
 
+import com.app.springapp.domain.dto.MyTestResultDTO;
 import com.app.springapp.domain.dto.TestApplyDTO;
 import com.app.springapp.domain.vo.TestApplyVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,4 +20,7 @@ public interface TestApplyMapper {
 
     // 내 접수 목록 조회
     List<TestApplyDTO> selectByUserId(Long userId);
+
+    // 내 합격 여부 조회
+    List<MyTestResultDTO> selectMyResultsByUserId(Long userId);
 }

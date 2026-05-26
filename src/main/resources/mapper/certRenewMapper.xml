@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.CertRenewMapper">
+
+    <insert id="insert" parameterType="CertRenewVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_CERT_RENEW.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_CERT_RENEW (
+            ID, CERT_RENEW_CREATE_AT, USER_ID,
+            CERT_RENEW_TYPE, CERT_RECEIVE_TYPE, CERT_NO, CERT_NAME, CERT_PHONE, CERT_ADDRESS
+        ) VALUES (
+            #{id}, SYSDATE, #{userId},
+            #{certRenewType}, #{certReceiveType}, #{certNo}, #{certName}, #{certPhone}, #{certAddress}
+        )
+    </insert>
+
+</mapper>

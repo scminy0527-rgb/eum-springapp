@@ -52,4 +52,19 @@
         ORDER BY A.TEST_APPLY_AT DESC
     </select>
 
+
+    <!-- 내 합격 여부 조회 (시험 응시 내역 + 결과 LEFT JOIN) -->
+    <select id="selectMyResultsByUserId" parameterType="Long" resultType="com.app.springapp.domain.dto.MyTestResultDTO">
+        SELECT
+            A.ID            AS TEST_APPLY_ID,
+            T.TEST_TITLE,
+            T.TEST_DATE,
+            R.TEST_RESULT_POINT
+        FROM TBL_TEST_APPLY A
+        JOIN TBL_TEST T ON A.TEST_ID = T.ID
+        LEFT JOIN TBL_TEST_RESULT R ON R.TEST_APPLY_ID = A.ID
+        WHERE A.USER_ID = #{userId}
+        ORDER BY A.TEST_APPLY_AT DESC
+    </select>
+
 </mapper>

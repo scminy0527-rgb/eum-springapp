@@ -1,5 +1,6 @@
 package com.app.springapp.api;
 
+import com.app.springapp.domain.dto.MyTestResultDTO;
 import com.app.springapp.domain.dto.TestApplyDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.TestApplyService;
@@ -63,6 +64,23 @@ public class TestApplyApi {
 
         testApplyService.cancel(id, userId);
         return ResponseEntity.ok(ApiResponseDTO.of(true, "접수가 취소되었습니다."));
+    }
+
+    // 내 합격 여부 조회
+    @GetMapping("/my-results")
+    @Operation(summary = "내 합격 여부 조회")
+    public ResponseEntity<ApiResponseDTO> getMyResults(
+            @CookieValue(name = "accessToken", required = false) String accessToken) {
+
+        if (accessToken == null) {
+            return ResponseEntity.status(401).body(ApiResponseDTO.of(false, "인증 실패"));
+        }
+
+        Map<String, Object> claims = jwtTokenUtil.parseToken(accessToken);
+        Long userId = Long.parseLong((String) claims.get("id"));
+
+        List<MyTestResultDTO> list = testApplyService.getMyResults(userId);
+        return ResponseEntity.ok(ApiResponseDTO.of(true, "조회 성공", list));
     }
 
     // 내 접수 목록 조회

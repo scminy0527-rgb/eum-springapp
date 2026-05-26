@@ -1,5 +1,6 @@
 package com.app.springapp.repository;
 
+import com.app.springapp.domain.dto.MyTestResultDTO;
 import com.app.springapp.domain.dto.TestApplyDTO;
 import com.app.springapp.domain.vo.TestApplyVO;
 import com.app.springapp.mapper.TestApplyMapper;
@@ -30,5 +31,10 @@ public class TestApplyDAO {
     // 내 접수 목록 조회
     public List<TestApplyDTO> findByUserId(Long userId) {
         return testApplyMapper.selectByUserId(userId);
+    }
+
+    // 내 합격 여부 조회
+    public List<MyTestResultDTO> findMyResultsByUserId(Long userId) {
+        return testApplyMapper.selectMyResultsByUserId(userId);
     }
 }

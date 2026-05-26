@@ -1,5 +1,6 @@
 package com.app.springapp.service;
 
+import com.app.springapp.domain.dto.MyTestResultDTO;
 import com.app.springapp.domain.dto.TestApplyDTO;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -13,4 +14,7 @@ public interface TestApplyService {
 
     // 내 접수 목록 조회
     List<TestApplyDTO> getMyApplyList(Long userId);
+
+    // 내 합격 여부 조회
+    List<MyTestResultDTO> getMyResults(Long userId);
 }
