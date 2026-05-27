@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -36,5 +38,22 @@ public class UserApi {
     public ResponseEntity<ApiResponseDTO> me(Authentication authentication) {
         UserDTO userDTO = (UserDTO) authentication.getPrincipal();
         return ResponseEntity.ok(userService.me(userDTO.getId()));
+    }
+
+    // 이메일 찾기
+    @PostMapping("/find-email")
+    @Operation(summary = "이메일 찾기", description = "이름으로 가입된 이메일 조회")
+    public ResponseEntity<ApiResponseDTO> findEmail(@RequestBody Map<String, String> body) {
+        String userName = body.get("userName");
+        return ResponseEntity.ok(userService.findEmail(userName));
+    }
+
+    // 비밀번호 재설정
+    @PostMapping("/reset-password")
+    @Operation(summary = "비밀번호 재설정", description = "이메일로 비밀번호 변경")
+    public ResponseEntity<ApiResponseDTO> resetPassword(@RequestBody Map<String, String> body) {
+        String userEmail = body.get("userEmail");
+        String newPassword = body.get("newPassword");
+        return ResponseEntity.ok(userService.resetPassword(userEmail, newPassword));
     }
 }

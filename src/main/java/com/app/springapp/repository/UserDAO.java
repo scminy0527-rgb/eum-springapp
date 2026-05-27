@@ -47,4 +47,14 @@ public class UserDAO {
     public void delete(Long id) {
         userMapper.delete(id);
     }
+
+    // 이메일 찾기
+    public Optional<String> findEmailByUserName(String userName) {
+        return Optional.ofNullable(userMapper.selectEmailByUserName(userName));
+    }
+
+    // 비밀번호 재설정
+    public void updatePasswordByEmail(String userEmail, String newPassword) {
+        userMapper.updatePasswordByEmail(userEmail, newPassword);
+    }
 }

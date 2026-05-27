@@ -3,6 +3,7 @@ package com.app.springapp.mapper;
 import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.domain.vo.UserVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper {
@@ -20,4 +21,8 @@ public interface UserMapper {
     public void updatePicture(UserVO userVO);
     // 유저 삭제
     public void delete(Long id);
+    // 이메일 찾기
+    public String selectEmailByUserName(String userName);
+    // 비밀번호 재설정
+    public void updatePasswordByEmail(@Param("userEmail") String userEmail, @Param("newPassword") String newPassword);
 }

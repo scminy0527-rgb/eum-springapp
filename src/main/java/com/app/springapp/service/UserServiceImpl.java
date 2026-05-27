@@ -70,6 +70,21 @@ public class UserServiceImpl implements UserService {
         return new ApiResponseDTO(true, "유저 조회 성공", userResponseDTO);
     }
 
+    // 이메일 찾기
+    @Override
+    public ApiResponseDTO findEmail(String userName) {
+        String email = userDAO.findEmailByUserName(userName)
+                .orElseThrow(() -> new UserException("일치하는 계정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+        return ApiResponseDTO.of(true, "이메일 조회 성공", Map.of("userEmail", email));
+    }
+
+    // 비밀번호 재설정
+    @Override
+    public ApiResponseDTO resetPassword(String userEmail, String newPassword) {
+        userDAO.updatePasswordByEmail(userEmail, newPassword);
+        return ApiResponseDTO.of(true, "비밀번호가 변경되었습니다.");
+    }
+
     // 프로필 사진 변경
     @Override
     public ApiResponseDTO updatePicture(UserVO userVO) {

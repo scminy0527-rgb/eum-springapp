@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,8 @@ public class SmsApi {
     // 휴대폰 인증코드 발송
     @PostMapping("/phone/verification-code")
     @Operation(summary = "휴대폰 인증코드 발송", description = "입력한 휴대폰 번호로 6자리 인증코드 SMS 발송")
-    @ApiResponse(responseCode = "200", description = "SMS 발송 성공/실패 결과 반환")
+    @ApiResponse(responseCode = "200", description = "SMS 발송 성공")
+    @ApiResponse(responseCode = "400", description = "SMS 발송 실패 (유효하지 않은 번호)")
     public ResponseEntity<ApiResponseDTO> sendMemberPhoneVerificationCode(
             @RequestBody VerificationRequestDTO verificationRequestDTO) {
 
@@ -33,17 +35,19 @@ public class SmsApi {
         boolean result = authService.sendUserPhoneVerificationCode(memberPhone);
         log.info(">>> SMS 인증코드 발송 결과 - result: {}", result);
 
-        return ResponseEntity.ok(
-                result
-                ? ApiResponseDTO.of(true, "메시지가 발송되었습니다.")
-                : ApiResponseDTO.of(false, "휴대폰 번호를 확인해주세요.")
-        );
+        if (!result) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponseDTO.of(false, "휴대폰 번호를 확인해주세요."));
+        }
+        return ResponseEntity.ok(ApiResponseDTO.of(true, "메시지가 발송되었습니다."));
     }
 
     // 휴대폰 인증코드 검증
     @PostMapping("/phone/verification-code/verify")
     @Operation(summary = "휴대폰 인증코드 검증", description = "발송된 SMS 인증코드 일치 여부 확인")
-    @ApiResponse(responseCode = "200", description = "인증 성공/실패 결과 반환")
+    @ApiResponse(responseCode = "200", description = "인증 성공")
+    @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")
     public ResponseEntity<ApiResponseDTO> verifyMemberPhoneVerificationCode(
             @RequestBody VerificationRequestDTO verificationRequestDTO) {
 
@@ -51,34 +55,38 @@ public class SmsApi {
         String code = verificationRequestDTO.getCode();
         boolean result = authService.verifyUserPhoneVerificationCode(memberPhone, code);
 
-        return ResponseEntity.ok(
-                result
-                ? ApiResponseDTO.of(true, "인증이 완료되었습니다.")
-                : ApiResponseDTO.of(false, "인증번호를 확인해주세요.")
-        );
+        if (!result) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponseDTO.of(false, "인증번호를 확인해주세요."));
+        }
+        return ResponseEntity.ok(ApiResponseDTO.of(true, "인증이 완료되었습니다."));
     }
 
     // 이메일 인증코드 발송
     @PostMapping("/email/verification-code")
     @Operation(summary = "이메일 인증코드 발송", description = "입력한 이메일로 6자리 인증코드 발송")
-    @ApiResponse(responseCode = "200", description = "이메일 발송 성공/실패 결과 반환")
+    @ApiResponse(responseCode = "200", description = "이메일 발송 성공")
+    @ApiResponse(responseCode = "400", description = "이메일 발송 실패 (유효하지 않은 이메일)")
     public ResponseEntity<ApiResponseDTO> sendMemberEmailVerificationCode(
             @RequestBody VerificationRequestDTO verificationRequestDTO) {
 
         String memberEmail = verificationRequestDTO.getMemberEmail();
         boolean result = authService.sendUserEmailVerificationCode(memberEmail);
 
-        return ResponseEntity.ok(
-                result
-                ? ApiResponseDTO.of(true, "이메일이 발송되었습니다.")
-                : ApiResponseDTO.of(false, "이메일 주소를 확인해주세요.")
-        );
+        if (!result) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponseDTO.of(false, "이메일 주소를 확인해주세요."));
+        }
+        return ResponseEntity.ok(ApiResponseDTO.of(true, "이메일이 발송되었습니다."));
     }
 
     // 이메일 인증코드 검증
     @PostMapping("/email/verification-code/verify")
     @Operation(summary = "이메일 인증코드 검증", description = "발송된 이메일 인증코드 일치 여부 확인")
-    @ApiResponse(responseCode = "200", description = "인증 성공/실패 결과 반환")
+    @ApiResponse(responseCode = "200", description = "인증 성공")
+    @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")
     public ResponseEntity<ApiResponseDTO> verifyMemberEmailVerificationCode(
             @RequestBody VerificationRequestDTO verificationRequestDTO) {
 
@@ -86,10 +94,11 @@ public class SmsApi {
         String code = verificationRequestDTO.getCode();
         boolean result = authService.verifyUserEmailVerificationCode(memberEmail, code);
 
-        return ResponseEntity.ok(
-                result
-                ? ApiResponseDTO.of(true, "인증이 완료되었습니다.")
-                : ApiResponseDTO.of(false, "인증번호를 확인해주세요.")
-        );
+        if (!result) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponseDTO.of(false, "인증번호를 확인해주세요."));
+        }
+        return ResponseEntity.ok(ApiResponseDTO.of(true, "인증이 완료되었습니다."));
     }
 }

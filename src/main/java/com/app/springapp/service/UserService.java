@@ -16,5 +16,11 @@ public interface UserService {
     // 프로필 사진 수정
     public ApiResponseDTO updatePicture(UserVO userVO);
 
+    // 이메일 찾기
+    public ApiResponseDTO findEmail(String userName);
+
+    // 비밀번호 재설정
+    public ApiResponseDTO resetPassword(String userEmail, String newPassword);
+
     // 회원 탈퇴
 }

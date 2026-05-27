@@ -62,4 +62,14 @@
         DELETE FROM TBL_USER WHERE ID = #{id}
     </delete>
 
+    <!-- 이메일 찾기 (이름으로 조회) -->
+    <select id="selectEmailByUserName" parameterType="String" resultType="String">
+        SELECT USER_EMAIL FROM TBL_USER WHERE USER_NAME = #{userName}
+    </select>
+
+    <!-- 비밀번호 재설정 -->
+    <update id="updatePasswordByEmail">
+        UPDATE TBL_USER SET USER_PASSWORD = #{newPassword} WHERE USER_EMAIL = #{userEmail}
+    </update>
+
 </mapper>
