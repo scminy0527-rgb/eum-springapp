@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/sms")
+@RequestMapping("/api/verifications")
 @RequiredArgsConstructor
 @Slf4j
 public class SmsApi {
@@ -44,7 +44,7 @@ public class SmsApi {
     }
 
     // 휴대폰 인증코드 검증
-    @PostMapping("/phone/verification-code/verify")
+    @PutMapping("/phone/verification-code")
     @Operation(summary = "휴대폰 인증코드 검증", description = "발송된 SMS 인증코드 일치 여부 확인")
     @ApiResponse(responseCode = "200", description = "인증 성공")
     @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")
@@ -83,7 +83,7 @@ public class SmsApi {
     }
 
     // 이메일 인증코드 검증
-    @PostMapping("/email/verification-code/verify")
+    @PutMapping("/email/verification-code")
     @Operation(summary = "이메일 인증코드 검증", description = "발송된 이메일 인증코드 일치 여부 확인")
     @ApiResponse(responseCode = "200", description = "인증 성공")
     @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")

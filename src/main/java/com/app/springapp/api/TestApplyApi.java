@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/test-apply")
+@RequestMapping("/api/test-applications")
 @Slf4j
 public class TestApplyApi {
 

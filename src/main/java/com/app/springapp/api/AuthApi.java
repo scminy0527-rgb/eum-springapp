@@ -62,7 +62,7 @@ public class AuthApi {
     }
 
     // Access Token 재발급
-    @PostMapping("/reissue")
+    @PutMapping("/token")
     @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새로운 Access Token 발급")
     @ApiResponse(responseCode = "200", description = "토큰 재발급 성공")
     @ApiResponse(responseCode = "400", description = "유효하지 않은 Refresh Token")
@@ -90,8 +90,8 @@ public class AuthApi {
                 .body(ApiResponseDTO.of(true, "토큰 재발급 성공"));
     }
 
-    @GetMapping("/check")
-    @Operation(summary = "인증 확인", description = "Access Token 유효성 확인")
+    @GetMapping("/status")
+    @Operation(summary = "인증 상태 확인", description = "Access Token 유효성 확인")
     @ApiResponse(responseCode = "200", description = "인증 성공")
     @ApiResponse(responseCode = "401", description = "인증 실패")
     public ResponseEntity<ApiResponseDTO> check(
@@ -126,7 +126,7 @@ public class AuthApi {
     }
 
     // 소셜 신규 회원가입 완료
-    @PostMapping("/social-signup")
+    @PostMapping("/social")
     @Operation(summary = "소셜 회원가입", description = "소셜 임시 토큰 검증 후 추가 정보 입력으로 회원가입 완료")
     @ApiResponse(responseCode = "200", description = "회원가입 성공")
     @ApiResponse(responseCode = "400", description = "유효하지 않은 임시 토큰 또는 잘못된 요청")

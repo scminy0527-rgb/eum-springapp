@@ -81,6 +81,15 @@ public class UserServiceImpl implements UserService {
     // 비밀번호 재설정
     @Override
     public ApiResponseDTO resetPassword(String userEmail, String newPassword) {
+        // 새 비밀번호 유효성 검사
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new UserException("새 비밀번호를 입력해주세요.", HttpStatus.BAD_REQUEST);
+        }
+        // 이메일 존재 여부 확인
+        if (!userDAO.existsUserByEmail(userEmail)) {
+            throw new UserException("존재하지 않는 이메일입니다.", HttpStatus.NOT_FOUND);
+        }
+        // TODO: 배포 시 BCrypt 인코딩 적용
         userDAO.updatePasswordByEmail(userEmail, newPassword);
         return ApiResponseDTO.of(true, "비밀번호가 변경되었습니다.");
     }
