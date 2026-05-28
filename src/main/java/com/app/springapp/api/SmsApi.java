@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/verifications")
@@ -44,7 +41,7 @@ public class SmsApi {
     }
 
     // 휴대폰 인증코드 검증
-    @PutMapping("/phone/verification-code")
+    @PatchMapping("/phone/verification-code")
     @Operation(summary = "휴대폰 인증코드 검증", description = "발송된 SMS 인증코드 일치 여부 확인")
     @ApiResponse(responseCode = "200", description = "인증 성공")
     @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")
