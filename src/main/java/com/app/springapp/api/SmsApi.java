@@ -41,7 +41,7 @@ public class SmsApi {
     }
 
     // 휴대폰 인증코드 검증
-    @PatchMapping("/phone/verification-code")
+    @PutMapping("/phone/verification-code")
     @Operation(summary = "휴대폰 인증코드 검증", description = "발송된 SMS 인증코드 일치 여부 확인")
     @ApiResponse(responseCode = "200", description = "인증 성공")
     @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")
@@ -83,7 +83,7 @@ public class SmsApi {
     @PutMapping("/email/verification-code")
     @Operation(summary = "이메일 인증코드 검증", description = "발송된 이메일 인증코드 일치 여부 확인")
     @ApiResponse(responseCode = "200", description = "인증 성공")
-    @ApiResponse(responseCode = "400", description = "인증 실패 (코드 불일치)")
+    @ApiResponse(responseCode = "400", description = "인증 실패 (인증코드 불일치)")
     public ResponseEntity<ApiResponseDTO> verifyMemberEmailVerificationCode(
             @RequestBody VerificationRequestDTO verificationRequestDTO) {
 
