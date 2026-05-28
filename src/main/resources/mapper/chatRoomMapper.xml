@@ -54,4 +54,10 @@
         INSERT INTO TBL_CHAT_ROOM (ID, CHAT_ROOM_NAME, CHAT_ROOM_TYPE, CHAT_ROOM_PROFILE, USER_ID, CHAT_ROOM_DETAIL, CHAT_ROOM_LIMIT)
         VALUES (#{id}, #{chatRoomName}, #{chatRoomType}, #{chatRoomProfile}, #{userId}, #{chatRoomDetail}, #{chatRoomLimit})
     </insert>
+
+    <update id="update" parameterType="ChatRoomVO">
+        UPDATE TBL_CHAT_ROOM
+        SET CHAT_ROOM_NAME = #{chatRoomId}, CHAT_ROOM_DETAIL = #{chatRoomDetail}, CHAT_ROOM_LIMIT = 60, CHAT_ROOM_PROFILE = 'default.jpg'
+        WHERE ID = 5 AND USER_ID = 3
+    </update>
 </mapper>
