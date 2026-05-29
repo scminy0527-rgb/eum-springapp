@@ -27,6 +27,10 @@
             GROUP BY CHAT_ROOM_ID
         ) TBU ON TBC.ID = TBU.CHAT_ROOM_ID
         WHERE TBC.CHAT_ROOM_IS_DELETED = 0
+        <if test="keyword != null and keyword != ''">
+            AND (TBC.CHAT_ROOM_NAME LIKE '%' || #{keyword} || '%'
+            OR TBC.CHAT_ROOM_DETAIL LIKE '%' || #{keyword} || '%')
+        </if>
         ORDER BY TBC.ID DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>

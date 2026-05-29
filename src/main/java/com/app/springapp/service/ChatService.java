@@ -27,5 +27,5 @@ public interface ChatService {
     public boolean isUserInChatRoom(Long chatRoomId);
 
 //    모든 채팅방들을 불러와주기 (페이지네이션)
-    public Map<String, Object> loadAllChatRoom(int page, int size);
+    public Map<String, Object> loadAllChatRoom(Map<String, Object> req);
 }

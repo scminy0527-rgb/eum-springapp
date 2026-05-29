@@ -107,12 +107,17 @@ public class ChatServiceImpl implements ChatService {
 
 //    모든 채팅방 불러와주기 (커뮤니티 페이지 들어왔을 때 보이는 모든 채팅방, 페이지네이션)
     @Override
-    public Map<String, Object> loadAllChatRoom(int page, int size) {
+    public Map<String, Object> loadAllChatRoom(Map<String, Object> req) {
+        int page = (Integer) req.get("page");
+        int size = (Integer) req.get("size");
+        String keyword = (String) req.get("keyword");
+
         int offset = (page - 1) * size;
 
         Map<String, Object> filters = new HashMap<>();
         filters.put("size", size);
         filters.put("offset", offset);
+        filters.put("keyword", keyword);
 
         List<ChatRoomResponseDTO> rooms = chatRoomDAO.findAllWithPaging(filters).stream()
                 .map(ChatRoomResponseDTO::from)

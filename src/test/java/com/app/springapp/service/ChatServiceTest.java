@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,12 @@ public class ChatServiceTest {
 //    테스트: 예
     @Test
     public void loadAllChatRoomTest() {
-        Map<String, Object> result = chatService.loadAllChatRoom(1, 3);
+        Map<String,Object> req = new HashMap<>();
+        req.put("page", 1);
+        req.put("size", 4);
+
+        Map<String, Object> result = chatService.loadAllChatRoom(req);
+
         List<ChatRoomResponseDTO> rooms = (List<ChatRoomResponseDTO>) result.get("rooms");
         rooms
                 .stream()

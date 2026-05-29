@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -82,12 +83,26 @@ public class ChatApi {
             in = ParameterIn.QUERY,
             schema = @Schema(type = "number")
     )
+    @Parameter(
+            name = "keyword",
+            description = "채팅방 목록 검색 키워드",
+            example = "수어",
+            required = false,
+            in = ParameterIn.QUERY,
+            schema = @Schema(type = "String")
+    )
     @GetMapping("/rooms")
     public ResponseEntity<ApiResponseDTO> getAllChatRooms(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "6") int size
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(required = false, defaultValue = "") String keyword
     ){
-        Map<String, Object> result = chatService.loadAllChatRoom(page, size);
+        Map<String,Object> req = new HashMap<>();
+        req.put("page", page);
+        req.put("size", size);
+        req.put("keyword", keyword);
+
+        Map<String, Object> result = chatService.loadAllChatRoom(req);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "채팅방 불러오기 성공", result));
