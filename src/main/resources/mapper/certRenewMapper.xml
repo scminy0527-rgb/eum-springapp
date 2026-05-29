@@ -2,17 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.springapp.mapper.CertRenewMapper">
 
+    <select id="selectByUserId" parameterType="Long" resultType="CertRenewDTO">
+        SELECT ID, CERT_RENEW_CREATE_AT, USER_ID, CERT_RENEW_TYPE, CERT_RECEIVE_TYPE,
+               CERT_NO, CERT_NAME, CERT_PHONE, CERT_ADDRESS, CERT_RENEW_STATUS
+        FROM TBL_CERT_RENEW
+        WHERE USER_ID = #{userId}
+        ORDER BY CERT_RENEW_CREATE_AT DESC
+    </select>
+
     <insert id="insert" parameterType="CertRenewVO">
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT SEQ_CERT_RENEW.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO TBL_CERT_RENEW (
             ID, CERT_RENEW_CREATE_AT, USER_ID,
-            CERT_RENEW_TYPE, CERT_RECEIVE_TYPE, CERT_NO, CERT_NAME, CERT_PHONE, CERT_ADDRESS
+            CERT_RENEW_TYPE, CERT_RECEIVE_TYPE, CERT_NO, CERT_NAME, CERT_PHONE, CERT_ADDRESS, CERT_RENEW_STATUS
         ) VALUES (
             #{id}, SYSDATE, #{userId},
-            #{certRenewType}, #{certReceiveType}, #{certNo}, #{certName}, #{certPhone}, #{certAddress}
+            #{certRenewType}, #{certReceiveType}, #{certNo}, #{certName}, #{certPhone}, #{certAddress}, 'processing'
         )
     </insert>
+
+    <update id="cancelById">
+        UPDATE TBL_CERT_RENEW
+        SET CERT_RENEW_STATUS = 'cancelled'
+        WHERE ID = #{id} AND USER_ID = #{userId}
+    </update>
 
 </mapper>

@@ -29,4 +29,6 @@ public class CertRenewDTO {
     private String certPhone;
     @Schema(description = "배송 주소")
     private String certAddress;
+    @Schema(description = "신청 상태 (processing/cancelled)")
+    private String certRenewStatus;
 }

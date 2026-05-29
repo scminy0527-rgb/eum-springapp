@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("id", foundUser.getId().toString());
         claims.put("userEmail", foundUser.getUserEmail());
         claims.put("socialUserProvider", "local");
-        claims.put("role", foundUser.getUserRole());
+        claims.put("role", foundUser.getUserRole() != null ? foundUser.getUserRole() : "USER");
 
         String accessToken = jwtTokenUtil.generateAccessToken(claims);
         String refreshToken = jwtTokenUtil.generateRefreshToken(claims);

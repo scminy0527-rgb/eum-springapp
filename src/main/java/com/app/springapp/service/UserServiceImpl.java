@@ -41,9 +41,10 @@ public class UserServiceImpl implements UserService {
         UserVO userVO = UserVO.from(userDTO);
         SocialUserVO socialUserVO = SocialUserVO.from(userDTO);
 
-        if ("local".equals(socialUserVO.getSocialUserProvider())) {
-            userVO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
-        }
+        // [테스트] BCrypt 암호화 비활성화 - 실서비스 전 아래 주석 해제 후 이 줄 삭제
+        // if ("local".equals(socialUserVO.getSocialUserProvider())) {
+        //     userVO.setUserPassword(passwordEncoder.encode(userDTO.getUserPassword()));
+        // }
 
         userDAO.save(userVO);
         socialUserVO.setUserId(userVO.getId());
