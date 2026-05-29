@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class CommunityAuthServiceImpl implements CommunityAuthService {
     @Override
     public Long getUserId() {
-        return 2L;
+        return 1L;
     }
 
 //    만약 userid 가 null 이면 예외 반환

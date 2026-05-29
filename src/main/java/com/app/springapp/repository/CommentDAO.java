@@ -54,6 +54,11 @@ public class CommentDAO {
         commentMapper.updateRepliesIsDeleted(commentId);
     }
 
+//    게시글에 달린 모든 댓글 삭제
+    public void updateDeleteByPostId(Long postId) {
+        commentMapper.updateDeleteByPostId(postId);
+    }
+
     public int isParentComment(Long commentId) {
         return commentMapper.isParentComment(commentId);
     }

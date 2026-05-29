@@ -28,5 +28,8 @@ public interface CommentMapper {
 
     public void updateRepliesIsDeleted(Long commentId);
 
+//    게시글에 달린 모든 댓글 삭제 (소프트 삭제)
+    public void updateDeleteByPostId(Long postId);
+
     public int isParentComment(Long commentId);
 }

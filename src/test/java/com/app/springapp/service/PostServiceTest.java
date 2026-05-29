@@ -118,7 +118,7 @@ public class PostServiceTest {
 //    게시글 삭제 테스트
     @Test
     public void deletePostTest(){
-        Long id = 21L;
+        Long id = 1L;
         postService.deletePost(id);
     }
 
