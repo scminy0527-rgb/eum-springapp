@@ -23,6 +23,8 @@ public interface UserMapper {
     public void delete(Long id);
     // 이메일 찾기
     public String selectEmailByUserName(String userName);
+    // 이메일 존재 여부 조회
+    public boolean existsUserByEmail(@Param("userEmail") String userEmail);
     // 비밀번호 재설정
     public void updatePasswordByEmail(@Param("userEmail") String userEmail, @Param("newPassword") String newPassword);
 }

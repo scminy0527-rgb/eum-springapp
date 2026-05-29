@@ -21,14 +21,14 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/private/api/file")
+@RequestMapping("/private/api/files")
 @RequiredArgsConstructor
 public class FileApi {
 
     private final FileService fileService;
 
     // 파일 1개 업로드
-    @PostMapping("/upload-file")
+    @PostMapping("/single")
     @Operation(summary = "파일 1개 업로드", description = "파일 1개를 AWS S3에 업로드합니다.")
     @ApiResponse(responseCode = "200", description = "파일 업로드 성공")
     @ApiResponse(responseCode = "400", description = "파일 업로드 실패 (잘못된 파일 또는 빈 파일)")
@@ -39,7 +39,7 @@ public class FileApi {
     }
 
     // 파일 여러 개 업로드
-    @PostMapping("/upload-files")
+    @PostMapping
     @Operation(summary = "파일 여러 개 업로드", description = "파일 여러 개를 AWS S3에 업로드합니다.")
     @ApiResponse(responseCode = "200", description = "파일 업로드 성공")
     @ApiResponse(responseCode = "400", description = "파일 업로드 실패 (잘못된 파일 또는 빈 파일 포함)")
@@ -50,13 +50,13 @@ public class FileApi {
     }
 
     // 업로드 파일 조회
-    @GetMapping("/display")
+    @GetMapping("/{fileName}")
     @Operation(summary = "파일 조회", description = "S3에 저장된 파일을 바이트 배열로 반환합니다.")
     @ApiResponse(responseCode = "200", description = "파일 조회 성공")
     @ApiResponse(responseCode = "400", description = "파일 조회 실패 (존재하지 않는 파일)")
-    @Parameter(name = "fileName", description = "조회할 파일명 (S3 경로)", required = true, in = ParameterIn.QUERY, schema = @Schema(type = "string"))
+    @Parameter(name = "fileName", description = "조회할 파일명 (S3 경로)", required = true, in = ParameterIn.PATH, schema = @Schema(type = "string"))
     public ResponseEntity<byte[]> display(
-            @RequestParam String fileName
+            @PathVariable String fileName
     ) {
 
         ResponseBytes<GetObjectResponse> responseBytes =

@@ -53,6 +53,11 @@ public class UserDAO {
         return Optional.ofNullable(userMapper.selectEmailByUserName(userName));
     }
 
+    // 이메일 존재 여부 조회
+    public boolean existsUserByEmail(String userEmail) {
+        return userMapper.existsUserByEmail(userEmail);
+    }
+
     // 비밀번호 재설정
     public void updatePasswordByEmail(String userEmail, String newPassword) {
         userMapper.updatePasswordByEmail(userEmail, newPassword);

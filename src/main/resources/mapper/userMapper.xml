@@ -67,6 +67,12 @@
         SELECT USER_EMAIL FROM TBL_USER WHERE USER_NAME = #{userName}
     </select>
 
+    <!-- 이메일 존재 여부 조회 -->
+    <select id="existsUserByEmail" parameterType="String" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM TBL_USER WHERE USER_EMAIL = #{userEmail}
+    </select>
+
     <!-- 비밀번호 재설정 -->
     <update id="updatePasswordByEmail">
         UPDATE TBL_USER SET USER_PASSWORD = #{newPassword} WHERE USER_EMAIL = #{userEmail}
