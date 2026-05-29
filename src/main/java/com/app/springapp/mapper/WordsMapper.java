@@ -2,6 +2,7 @@ package com.app.springapp.mapper;
 
 import com.app.springapp.domain.dto.response.WordsResponseDTO;
 import com.app.springapp.domain.vo.WordsVO;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public interface WordsMapper {
 
     // 단어 상세 조회
     public WordsResponseDTO select(Long id);
+
+    // OpenAPI 수어 번호로 조회
+    public WordsResponseDTO selectBySignWordId(Long signWordId);
 
     // 관리자용
     // 단어 등록

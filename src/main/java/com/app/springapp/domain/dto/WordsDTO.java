@@ -20,4 +20,7 @@ public class WordsDTO {
     private String wordsType;
     @Schema(description = "수어 영상 번호", example = "1")
     private Long eduVideoId;
+    @Schema(description = "OpenAPI 수어 단어 번호", example = "5")
+    private Long signWordId;
+
 }

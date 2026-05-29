@@ -5,7 +5,7 @@
     <!-- 학습별 단어 목록 조회 -->
     <select id="selectByEduId" parameterType="Long" resultType="WordsResponseDTO">
         SELECT TEWM.ID AS EDU_WORD_MAP_ID,
-            TBW.ID, TBW.WORDS_TITLE, TBW.WORDS_DETAIL, TBW.WORDS_IMAGE, TBW.WORDS_TYPE, TBW.EDU_VIDEO_ID
+            TBW.ID, TBW.WORDS_TITLE, TBW.WORDS_DETAIL, TBW.WORDS_IMAGE, TBW.WORDS_TYPE, TBW.EDU_VIDEO_ID, TBW.SIGN_WORD_ID
         FROM TBL_EDU_WORD_MAP TEWM
         JOIN TBL_WORDS TBW
             ON TEWM.WORDS_ID = TBW.ID
@@ -15,9 +15,16 @@
 
     <!-- 단어 상세 조회 -->
     <select id="select" parameterType="Long" resultType="WordsResponseDTO">
-        SELECT ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID
+        SELECT ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID, SIGN_WORD_ID
         FROM TBL_WORDS
         WHERE ID = #{id}
+    </select>
+
+    <!-- OpenAPI 수어 번호로 조회-->
+    <select id="selectBySignWordId" parameterType="Long" resultType="WordsResponseDTO">
+        SELECT ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID, SIGN_WORD_ID
+        FROM TBL_WORDS
+        WHERE SIGN_WORD_ID = #{signWordId}
     </select>
 
     <!-- 관리자용 -->
@@ -26,14 +33,14 @@
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT SEQ_WORDS.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_WORDS(ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID)
-        VALUES(#{id}, #{wordsTitle}, #{wordsDetail}, #{wordsImage}, #{wordsType}, #{eduVideoId})
+        INSERT INTO TBL_WORDS(ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID, SIGN_WORD_ID)
+        VALUES(#{id}, #{wordsTitle}, #{wordsDetail}, #{wordsImage}, #{wordsType}, #{eduVideoId}, #{signWordId})
     </insert>
 
     <!-- 단어 수정 -->
     <update id="update" parameterType="WordsVO">
         UPDATE TBL_WORDS
-        SET WORDS_TITLE = #{wordsTitle}, WORDS_DETAIL = #{wordsDetail}, WORDS_IMAGE = #{wordsImage}, WORDS_TYPE = #{wordsType}, EDU_VIDEO_ID = #{eduVideoId}
+        SET WORDS_TITLE = #{wordsTitle}, WORDS_DETAIL = #{wordsDetail}, WORDS_IMAGE = #{wordsImage}, WORDS_TYPE = #{wordsType}, EDU_VIDEO_ID = #{eduVideoId}, SIGN_WORD_ID = #{signWordId}
         WHERE ID = #{id}
     </update>
 

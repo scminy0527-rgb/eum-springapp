@@ -2,6 +2,7 @@ package com.app.springapp.service.edu;
 
 import com.app.springapp.domain.dto.request.EduWordFromSignWordRequestDTO;
 import com.app.springapp.domain.dto.response.SignWordResponseDTO;
+import com.app.springapp.domain.dto.response.WordsResponseDTO;
 import com.app.springapp.domain.vo.EduVideoVO;
 import com.app.springapp.domain.vo.EduWordMapVO;
 import com.app.springapp.domain.vo.WordsVO;
@@ -105,43 +106,56 @@ public class EduWordMapServiceImpl implements EduWordMapService {
         SignWordResponseDTO signWord = signWordDAO.findById(requestDTO.getSignWordId())
                 .orElseThrow(() -> new EduException("수어 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
 
-        Long eduVideoId = null;
+        Long wordsId;
 
-        // 영상 URL이 있으면 학습 영상으로 등록
-        if(signWord.getSignWordVideoUrl() != null && !signWord.getSignWordVideoUrl().isBlank()) {
-            EduVideoVO eduVideoVO = new EduVideoVO();
-            eduVideoVO.setEduVideoTitle(signWord.getSignWordTitle() + "수어 영상");
-            eduVideoVO.setEduVideoDetail(signWord.getSignWordDescription());
-            eduVideoVO.setEduVideoType("openapi");
-            eduVideoVO.setEduVideoUrl(signWord.getSignWordVideoUrl());
+        // 이미 같은 OpenAPI 수어로 만든 학습 단어가 있는지 확인
+        WordsResponseDTO savedWord = wordsDAO.findWordBySignWordId(requestDTO.getSignWordId()).orElse(null);
 
-            eduVideoDAO.save(eduVideoVO);
-            eduVideoId = eduVideoVO.getId();
+        if (savedWord != null) {
+            wordsId = savedWord.getId();
+        } else {
+            Long eduVideoId = null;
+
+            // 영상 URL이 있으면 학습 영상으로 등록
+            if (signWord.getSignWordVideoUrl() != null && !signWord.getSignWordVideoUrl().isBlank()) {
+                EduVideoVO eduVideoVO = new EduVideoVO();
+                eduVideoVO.setEduVideoTitle(signWord.getSignWordTitle() + " 수어 영상");
+                eduVideoVO.setEduVideoDetail(signWord.getSignWordDescription());
+                eduVideoVO.setEduVideoType("openapi");
+                eduVideoVO.setEduVideoUrl(signWord.getSignWordVideoUrl());
+
+                eduVideoDAO.save(eduVideoVO);
+                eduVideoId = eduVideoVO.getId();
+            }
+
+            // OpenAPI 수어 데이터를 학습 단어로 등록
+            WordsVO wordsVO = new WordsVO();
+            wordsVO.setWordsTitle(signWord.getSignWordTitle());
+            wordsVO.setWordsDetail(signWord.getSignWordDescription());
+            wordsVO.setWordsImage(
+                    signWord.getSignWordThumbnailUrl() != null && !signWord.getSignWordThumbnailUrl().isBlank()
+                            ? signWord.getSignWordThumbnailUrl()
+                            : signWord.getSignWordImages()
+            );
+            wordsVO.setWordsType(requestDTO.getWordsType());
+            wordsVO.setEduVideoId(eduVideoId);
+            wordsVO.setSignWordId(requestDTO.getSignWordId());
+
+            wordsDAO.save(wordsVO);
+            wordsId = wordsVO.getId();
         }
 
-        // OpenAPI 수어 데이터를 학습 단어로 등록
-        WordsVO wordsVO = new WordsVO();
-
-        wordsVO.setWordsTitle(signWord.getSignWordTitle());
-        wordsVO.setWordsDetail(signWord.getSignWordDescription());
-        wordsVO.setWordsImage(
-                signWord.getSignWordThumbnailUrl() != null && !signWord.getSignWordThumbnailUrl().isBlank()
-                ? signWord.getSignWordThumbnailUrl()
-                : signWord.getSignWordImages()
-        );
-
-        wordsVO.setWordsType(requestDTO.getWordsType());
-        wordsVO.setEduVideoId(eduVideoId);
-
-        wordsDAO.save(wordsVO);
+        // 이미 같은 학습에 연결되어 있으면 막기
+        if (eduWordMapDAO.findByEduIdAndWordsId(requestDTO.getEduId(), wordsId).isPresent()) {
+            throw new EduException("이미 등록된 학습 단어 매핑입니다.", HttpStatus.CONFLICT);
+        }
 
         // 학습과 단어 연결
         EduWordMapVO eduWordMapVO = new EduWordMapVO();
         eduWordMapVO.setEduId(requestDTO.getEduId());
-        eduWordMapVO.setWordsId(wordsVO.getId());
+        eduWordMapVO.setWordsId(wordsId);
 
         eduWordMapDAO.save(eduWordMapVO);
-
     }
 
 }

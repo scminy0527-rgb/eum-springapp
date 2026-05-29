@@ -12,4 +12,5 @@ public class WordsVO {
     private String wordsImage;
     private String wordsType;
     private Long eduVideoId;
+    private Long signWordId;
 }

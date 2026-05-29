@@ -22,6 +22,9 @@ public class WordsResponseDTO {
     @Schema(description = "수어 영상 번호", example = "1")
     private Long eduVideoId;
     // 추가
+    @Schema(description = "OpenAPI 수어 단어 번호", example = "5")
+    private Long signWordId;
+    // 추가
     @Schema(description = "학습-단어 매핑 번호", example = "1")
     private Long eduWordMapId;
 
@@ -33,6 +36,7 @@ public class WordsResponseDTO {
         res.setWordsImage(dto.getWordsImage());
         res.setWordsType(dto.getWordsType());
         res.setEduVideoId(dto.getEduVideoId());
+        res.setSignWordId(dto.getSignWordId());
         return res;
     }
 }

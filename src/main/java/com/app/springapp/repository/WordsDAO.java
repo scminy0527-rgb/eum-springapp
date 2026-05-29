@@ -24,6 +24,11 @@ public class WordsDAO {
         return Optional.ofNullable(wordsMapper.select(id));
     }
 
+    // OpenAPI 수어 번호로 조회
+    public Optional<WordsResponseDTO> findWordBySignWordId(Long signWordId) {
+        return Optional.ofNullable(wordsMapper.selectBySignWordId(signWordId));
+    }
+
     // 관리자용
     // 단어 등록
     public void save(WordsVO wordsVO) {
