@@ -32,6 +32,8 @@ public class UserResponseDTO {
     private String userProfile;
     @Schema(description = "유저 생성일시", example = "2024-01-01T00:00:00")
     private LocalDateTime userCreateAt;
+    @Schema(description = "유저 생년월일", example = "1990-01-01")
+    private String userBirth;
 
     public static UserResponseDTO from(UserDTO dto) {
         UserResponseDTO res = new UserResponseDTO();
@@ -46,6 +48,7 @@ public class UserResponseDTO {
         res.setUserExp(dto.getUserExp());
         res.setUserProfile(dto.getUserProfile());
         res.setUserCreateAt(dto.getUserCreateAt());
+        res.setUserBirth(dto.getUserBirth());
         return res;
     }
 }

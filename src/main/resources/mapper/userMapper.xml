@@ -7,13 +7,13 @@
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT SEQ_USER.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_USER (ID, USER_EMAIL, USER_PASSWORD, USER_PROFILE, USER_NAME, USER_NICKNAME)
-        VALUES (#{id}, #{userEmail}, #{userPassword}, #{userProfile}, #{userName}, #{userNickname})
+        INSERT INTO TBL_USER (ID, USER_EMAIL, USER_PASSWORD, USER_PROFILE, USER_NAME, USER_NICKNAME, USER_ROLE, USER_BIRTH)
+        VALUES (#{id}, #{userEmail}, #{userPassword}, #{userProfile}, #{userName}, #{userNickname}, 'USER', #{userBirth})
     </insert>
 
     <!-- 유저 조회 (ID) -->
     <select id="select" parameterType="Long" resultType="UserDTO">
-        SELECT TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_NICKNAME,TBU.USER_ROLE,
+        SELECT TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_NICKNAME, TBU.USER_ROLE, TBU.USER_BIRTH,
                TBSU.SOCIAL_USER_PROVIDER_ID, TBSU.SOCIAL_USER_PROVIDER, TBSU.USER_ID
         FROM TBL_USER TBU
         JOIN TBL_SOCIAL_USER TBSU ON TBU.ID = TBSU.USER_ID
@@ -22,7 +22,7 @@
 
     <!-- 유저 조회 (이메일 + 소셜 프로바이더) -->
     <select id="selectByUserEmailAndSocialUserProvider" parameterType="UserDTO" resultType="UserDTO">
-        SELECT TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_NICKNAME,TBU.USER_ROLE,
+        SELECT TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_NICKNAME, TBU.USER_ROLE, TBU.USER_BIRTH,
                TBSU.SOCIAL_USER_PROVIDER_ID, TBSU.SOCIAL_USER_PROVIDER, TBSU.USER_ID
         FROM TBL_USER TBU
         JOIN TBL_SOCIAL_USER TBSU ON TBU.ID = TBSU.USER_ID
@@ -46,7 +46,8 @@
             USER_PASSWORD = #{userPassword},
             USER_PROFILE  = #{userProfile},
             USER_NAME     = #{userName},
-            USER_NICKNAME = #{userNickname}
+            USER_NICKNAME = #{userNickname},
+            USER_BIRTH    = #{userBirth}
         WHERE ID = #{id}
     </update>
 

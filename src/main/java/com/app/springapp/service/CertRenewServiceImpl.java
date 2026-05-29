@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(rollbackFor = {Exception.class})
 @RequiredArgsConstructor
@@ -17,5 +19,15 @@ public class CertRenewServiceImpl implements CertRenewService {
     @Override
     public void apply(CertRenewDTO certRenewDTO) {
         certRenewDAO.save(CertRenewVO.from(certRenewDTO));
+    }
+
+    @Override
+    public List<CertRenewDTO> getMyApplications(Long userId) {
+        return certRenewDAO.findByUserId(userId);
+    }
+
+    @Override
+    public void cancel(Long id, Long userId) {
+        certRenewDAO.cancel(id, userId);
     }
 }

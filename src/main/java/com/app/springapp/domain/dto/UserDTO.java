@@ -37,6 +37,8 @@ public class UserDTO {
     private String socialUserProviderId;
     @Schema(description = "소셜 로그인(google/naver/kakao/local)", example = "local")
     private String socialUserProvider;
+    @Schema(description = "유저 생년월일", example = "1990-01-01")
+    private String userBirth;
     @Schema(description = "유저 권한", example = "user")
     private String userRole;
     @Schema(description = "자동 로그인 여부", example = "false")

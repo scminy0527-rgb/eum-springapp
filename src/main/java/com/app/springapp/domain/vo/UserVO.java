@@ -20,6 +20,7 @@ public class UserVO {
     private int userExp;
     private String userProfile;
     private LocalDateTime userCreateAt;
+    private String userBirth;
 
     public static UserVO from(UserDTO userDTO) {
         UserVO userVO = new UserVO();
@@ -28,6 +29,7 @@ public class UserVO {
         userVO.setUserProfile(userDTO.getUserProfile() != null ? userDTO.getUserProfile() : "https://testapp-gyuhoroh213589.s3.ap-northeast-2.amazonaws.com/cat.jpg");
         userVO.setUserName(userDTO.getUserName());
         userVO.setUserNickname(userDTO.getUserNickname() != null ? userDTO.getUserNickname() : "개복치 1단계");
+        userVO.setUserBirth(userDTO.getUserBirth());
         return userVO;
     }
 }
