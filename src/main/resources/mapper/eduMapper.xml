@@ -7,7 +7,7 @@
         SELECT ID, EDU_TITLE, EDU_DETAIL, EDU_DIA, EDU_IS_DELETED
         FROM TBL_EDU
         WHERE EDU_IS_DELETED = 0
-        ORDER BY ID DESC
+        ORDER BY ID ASC
     </select>
 
     <!-- 학습 상세 조회 -->
