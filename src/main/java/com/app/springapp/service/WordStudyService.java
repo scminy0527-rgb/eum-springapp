@@ -17,6 +17,9 @@ public interface WordStudyService {
     // 학습별 전체 단어 개수 조회
     public int getTotalWordCount(Long eduId);
 
+    // 오늘 완료한 단어 개수 조회
+    public int getTodayCompletedWordCount(Long userId);
+
     // 단어 학습 완료 상태 수정 -> 일단 빼둠
     // public void changeWordStudyStatus(WordStudyVO wordStudyVO);
 }

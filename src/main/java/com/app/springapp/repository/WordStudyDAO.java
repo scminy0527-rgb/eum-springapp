@@ -33,6 +33,11 @@ public class WordStudyDAO {
         return wordStudyMapper.countTotalByEduId(eduId);
     }
 
+    // 오늘 완료한 단어 개수 조회
+    public int countTodayCompletedByUserId(Long userId) {
+        return wordStudyMapper.countTodayCompletedByUserId(userId);
+    }
+
     // 단어 학습 완료 상태 수정
     public void update(WordStudyVO wordStudyVO) {
         wordStudyMapper.update(wordStudyVO);

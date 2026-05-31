@@ -37,6 +37,15 @@
         WHERE EDU_ID = #{eduId}
     </select>
 
+    <!-- 오늘 완료한 단어 개수 조회 -->
+    <select id="countTodayCompletedByUserId" parameterType="Long" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_WORD_STUDY
+        WHERE USER_ID = #{userId}
+          AND WORD_STUDY_IS_COMPLETED = 1
+          AND TRUNC(WORD_STUDY_UPDATE_AT) = TRUNC(SYSDATE)
+    </select>
+
     <!-- 단어 학습 완료 상태 수정 -->
     <update id="update" parameterType="WordStudyVO">
         UPDATE TBL_WORD_STUDY

@@ -100,5 +100,22 @@ public class WordStudyApi {
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "학습별 전체 단어 개수 조회 성공", wordStudyService.getTotalWordCount(eduId)));
     }
+
+    @GetMapping("/users/{userId}/today-completed-count")
+    @Operation(summary = "오늘 완료한 단어 개수 조회", description = "사용자가 오늘 완료한 단어 개수를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "오늘 완료한 단어 개수 조회 성공")
+    @Parameter(
+            name = "userId",
+            description = "사용자 번호",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1",
+            schema = @Schema(type = "number")
+    )
+    public ResponseEntity<ApiResponseDTO> getTodayCompletedWordCount(@PathVariable Long userId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "오늘 완료한 단어 개수 조회 성공", wordStudyService.getTodayCompletedWordCount(userId)));
+    }
 }
 

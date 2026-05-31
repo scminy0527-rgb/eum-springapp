@@ -19,6 +19,9 @@ public interface WordStudyMapper {
     // 학습별 전체 단어 개수 조회
     public int countTotalByEduId(Long eduId);
 
+    // 오늘 완료한 단어 개수 조회
+    public int countTodayCompletedByUserId(Long userId);
+
     // 단어 학습 완료 상태 수정
     public void update(WordStudyVO wordStudyVO);
 

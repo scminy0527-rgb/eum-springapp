@@ -55,4 +55,10 @@ public class WordStudyServiceImpl implements WordStudyService {
     public int getTotalWordCount(Long eduId) {
         return wordStudyDAO.countTotalWordsByEduId(eduId);
     }
+
+    // 오늘 완료한 단어 개수 조회
+    @Override
+    public int getTodayCompletedWordCount(Long userId) {
+        return wordStudyDAO.countTodayCompletedByUserId(userId);
+    }
 }
