@@ -20,14 +20,14 @@ public class NoticeVO {
 
 
     public static NoticeVO from(NoticeDTO dto) {
-        NoticeVO vo = new NoticeVO();
-        vo.setId(dto.getId());
-        vo.setNoticeTitle(dto.getNoticeTitle());
-        vo.setNoticeContent(dto.getNoticeContent());
-        vo.setNoticeCategory(dto.getNoticeCategory());
-        vo.setNoticePinned(dto.getNoticePinned());
-        vo.setNoticeFileUrl(dto.getNoticeFileUrl());
-        vo.setUserId(dto.getUserId());
-        return vo;
+        NoticeVO noticeVO = new NoticeVO();
+        noticeVO.setId(dto.getId());
+        noticeVO.setNoticeTitle(dto.getNoticeTitle());
+        noticeVO.setNoticeContent(dto.getNoticeContent());
+        noticeVO.setNoticeCategory(dto.getNoticeCategory());
+        noticeVO.setNoticePinned(dto.getNoticePinned());
+        noticeVO.setNoticeFileUrl(dto.getNoticeFileUrl());
+        noticeVO.setUserId(dto.getUserId());
+        return noticeVO;
     }
 }

@@ -15,6 +15,10 @@ configurations {
 
 repositories {
     mavenCentral()
+
+//    Spring AI 다운받을 수 있는 주소를 추가
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
@@ -36,6 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
@@ -49,3 +54,4 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+

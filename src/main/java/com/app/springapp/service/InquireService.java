@@ -11,4 +11,5 @@ public interface InquireService {
     public void update(InquireDTO inquireDTO);
     public void delete(Long id);
     public List<InquireDTO> findAllInquiresForAdmin();
+    public void updateContent(InquireDTO inquireDTO);
 }

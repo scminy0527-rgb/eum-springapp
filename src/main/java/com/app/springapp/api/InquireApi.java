@@ -1,6 +1,7 @@
 package com.app.springapp.api;
 
 import com.app.springapp.domain.dto.InquireDTO;
+import com.app.springapp.domain.dto.request.InquireUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.InquireService;
 import com.app.springapp.util.JwtTokenUtil;
@@ -69,6 +70,20 @@ public class InquireApi {
         return ResponseEntity.ok(inquire);
     }
 
+    //    답변 받기전 유저가 직접 문의 내용을 수정 할수 있게 함
+    @Operation(summary = "문의 수정 (답변 전 유저가 문의를 수정할 수 있게 함)")
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateContent(@PathVariable Long id,
+                                           @RequestBody InquireUpdateRequestDTO requestDTO) {
+        InquireDTO inquireDTO = new InquireDTO();
+        inquireDTO.setId(id);
+        inquireDTO.setInquireTitle(requestDTO.getInquireTitle());
+        inquireDTO.setInquireContent(requestDTO.getInquireContent());
+
+        inquireService.updateContent(inquireDTO);
+        return ResponseEntity.ok("문의가 수정되었습니다.");
+    }
+
     // 문의 삭제
     @DeleteMapping("/{id}")
     @Operation(summary = "문의 삭제")
@@ -77,6 +92,7 @@ public class InquireApi {
         return ResponseEntity.ok(ApiResponseDTO.of(true, "삭제 성공"));
     }
 
+    // USER_ROLE중 ADMIN인 사람만 문의 답변 등록
     @PutMapping("/{id}/answer")
     @Operation(summary = "문의 답변 등록")
     public ResponseEntity<ApiResponseDTO> answer(
@@ -99,6 +115,7 @@ public class InquireApi {
         return ResponseEntity.ok(ApiResponseDTO.of(true, "답변 등록 성공"));
     }
 
+    // USER_ROLE중 ADMIN인 사람만 문의 전체 조회
     @GetMapping("/admin")
     @Operation(summary = "전체 문의 조회 (관리자)")
     public ResponseEntity<?> findAllForAdmin(

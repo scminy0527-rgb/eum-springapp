@@ -51,4 +51,15 @@ public class InquireServiceTests {
         inquireService.delete(1L);
         log.info("삭제 성공");
     }
+
+    @Test
+    public void testUpdateContent() {
+        InquireDTO inquireDTO = new InquireDTO();
+        inquireDTO.setId(1L);
+        inquireDTO.setInquireTitle("수정된 제목");
+        inquireDTO.setInquireContent("수정된 내용");
+
+        inquireService.updateContent(inquireDTO);
+        log.info("수정성공");
+    }
 }

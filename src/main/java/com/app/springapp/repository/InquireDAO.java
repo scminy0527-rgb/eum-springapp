@@ -41,4 +41,8 @@ public class InquireDAO {
     public List<InquireDTO> findAllInquiresForAdmin() {
         return inquireMapper.selectAllForAdmin();
     }
+
+    public void updateContent(InquireDTO inquireDTO) {
+        inquireMapper.updateContent(inquireDTO);
+    }
 }
