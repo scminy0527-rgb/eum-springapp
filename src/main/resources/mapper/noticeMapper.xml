@@ -8,7 +8,7 @@
         </selectKey>
         INSERT INTO TBL_NOTICE (
         ID, NOTICE_TITLE, NOTICE_CONTENT, NOTICE_CATEGORY,
-        NOTICE_PINNED, NOTICE_FILE_URL, NOTICE_USER_ID
+        NOTICE_PINNED, NOTICE_FILE_URL, USER_ID
         )
         VALUES (
         #{id}, #{noticeTitle}, #{noticeContent}, #{noticeCategory},
@@ -42,7 +42,7 @@
     <!-- 공지사항 상세 조회 -->
     <select id="select" parameterType="Long" resultType="NoticeDTO">
         SELECT ID, NOTICE_TITLE, NOTICE_CONTENT, NOTICE_CATEGORY,
-               NOTICE_PINNED, NOTICE_FILE_URL, NOTICE_CREATE_AT, NOTICE_USER_ID
+               NOTICE_PINNED, NOTICE_FILE_URL, NOTICE_CREATE_AT, USER_ID
         FROM TBL_NOTICE
         WHERE ID = #{id}
     </select>

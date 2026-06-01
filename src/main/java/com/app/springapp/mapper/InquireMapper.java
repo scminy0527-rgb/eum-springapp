@@ -14,4 +14,5 @@ public interface InquireMapper {
     public void update(InquireVO inquireVO);
     public void delete(Long id);
     public List<InquireDTO> selectAllForAdmin();
+    public void updateContent(InquireDTO inquireDTO);
 }

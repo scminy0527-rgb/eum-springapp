@@ -57,4 +57,11 @@ public class InquireServiceImpl implements InquireService {
     public List<InquireDTO> findAllInquiresForAdmin() {
         return inquireDAO.findAllInquiresForAdmin();
     }
+
+    @Override
+    public void updateContent(InquireDTO inquireDTO) {
+        inquireDAO.updateContent(inquireDTO);
+    }
+
+
 }

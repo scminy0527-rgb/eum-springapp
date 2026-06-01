@@ -58,6 +58,7 @@
         <typeAlias type="com.app.springapp.domain.dto.CertRenewDTO" alias="CertRenewDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.UserReportDTO" alias="UserReportDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.InquireDTO" alias="InquireDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.ReviewDTO" alias="ReviewDTO"/>
 
 
         <!-- Request DTO Alias -->
@@ -110,6 +111,7 @@
         <typeAlias type="com.app.springapp.domain.dto.request.VerificationRequestDTO" alias="VerificationRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.MyPageEditRequestDTO" alias="MyPageEditRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.MyPageWithdrawRequestDTO" alias="MyPageWithdrawRequestDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.request.ReviewRequestDTO" alias="ReviewRequestDTO"/>
 
         <!-- Response DTO Alias -->
         <typeAlias type="com.app.springapp.domain.dto.response.UserResponseDTO" alias="UserResponseDTO"/>
@@ -169,6 +171,7 @@
         <typeAlias type="com.app.springapp.domain.dto.response.MyPageAttendanceResponseDTO" alias="MyPageAttendanceResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.MyPageStudyStatusResponseDTO" alias="MyPageStudyStatusResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.MyPageMainResponseDTO" alias="MyPageMainResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.ReviewResponseDTO" alias="ReviewResponseDTO"/>
 
         <!-- VO Alias -->
         <typeAlias type="com.app.springapp.domain.vo.UserVO" alias="UserVO"/>
