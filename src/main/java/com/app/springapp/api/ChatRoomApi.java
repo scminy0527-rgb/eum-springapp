@@ -109,20 +109,27 @@ public class ChatRoomApi {
     }
 
 //    채팅방 내용 수정
-    @PutMapping("/{chatRoomId}")
+    @PutMapping("/{id}")
     @Operation(summary = "채팅방 수정", description = "채팅방 관리자가 채팅방 정보를 수정 가능")
     public ResponseEntity<ApiResponseDTO> updateChatRoomInfo(
-            @PathVariable Long chatRoomId
+            @PathVariable Long id,
+            @RequestBody ChatRoomRequestDTO chatRoomRequestDTO
     ){
-        return null;
+        chatRoomService.updateChatRoomInfo(id, chatRoomRequestDTO);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "채팅방 정보 수정 성공"));
     }
 
 //    채팅방 삭제
-    @DeleteMapping("/{chatRoomId}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "채팅방 삭제", description = "채팅방 관리자가 채팅방 삭제 하는 서비스")
     public ResponseEntity<ApiResponseDTO> deleteChatRoom(
-            @PathVariable Long chatRoomId
+            @PathVariable Long id
     ){
-        return null;
+        chatRoomService.softDeleteChatRoom(id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(ApiResponseDTO.of(true, "삭제 성공"));
     }
 }
