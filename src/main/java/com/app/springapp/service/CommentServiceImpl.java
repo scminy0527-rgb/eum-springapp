@@ -26,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDAO commentDAO;
     private final CommunityAuthService communityAuthService;
     private final CommentLikeDAO commentLikeDAO;
+    private final UserExpService userExpService;
 
     @Override
     public List<CommentResponseDTO> getAllPostComments(Long postId) {
@@ -86,6 +87,9 @@ public class CommentServiceImpl implements CommentService {
 
         try {
             commentDAO.save(commentVO);
+
+            //  댓글 작성 경험치 지급
+            userExpService.addCommentExp(userId, commentVO.getId());
         } catch (Exception e) {
             throw new CommentException(HttpStatus.BAD_REQUEST, "댓글 작성 실패");
         }
@@ -99,6 +103,7 @@ public class CommentServiceImpl implements CommentService {
         CommentVO parentCheck = new CommentVO();
         parentCheck.setId(commentId);
         parentCheck.setPostId(postId);
+
         if (commentDAO.existByIdAndPostId(parentCheck) == 0) {
             throw new CommentException(HttpStatus.BAD_REQUEST, "해당 게시글에 존재하지 않는 댓글입니다.");
         }
@@ -110,6 +115,9 @@ public class CommentServiceImpl implements CommentService {
 
         try {
             commentDAO.save(commentVO);
+
+            //        대댓글 작성 경험치 지급
+            userExpService.addCommentExp(userId, commentVO.getId());
         } catch (Exception e) {
             throw new CommentException(HttpStatus.BAD_REQUEST, "대댓글 작성 실패");
         }

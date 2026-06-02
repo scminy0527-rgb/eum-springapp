@@ -36,6 +36,7 @@ public class MyPageServiceImpl implements MyPageService {
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final FileService fileService;
+    private final UserExpService userExpService;
 
     // 마이페이지 메인
 
@@ -61,9 +62,13 @@ public class MyPageServiceImpl implements MyPageService {
     public MyPageProfileResponseDTO getProfile(Long userId) {
         MyPageProfileResponseDTO profile = myPageDAO.findProfileByUserId(userId);
 
+        //    회원 정보가 없으면 예외 처리
         if (profile == null) {
             throw new MyPageException("회원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }
+
+        //    회원 경험치 기준으로 레벨 정보 계산
+        userExpService.setLevelInfo(profile);
 
         return profile;
     }
@@ -394,6 +399,7 @@ public class MyPageServiceImpl implements MyPageService {
         myPageDAO.deleteUserReportByWithdrawUserId(userId);
         myPageDAO.deleteSettingByWithdrawUserId(userId);
         myPageDAO.deleteSocialUserByWithdrawUserId(userId);
+        userExpService.deleteUserExpHistoryByUserId(userId);
         myPageDAO.deleteUserByWithdrawUserId(userId);
     }
 }

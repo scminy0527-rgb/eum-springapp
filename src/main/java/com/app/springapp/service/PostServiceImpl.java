@@ -29,6 +29,7 @@ public class PostServiceImpl implements PostService {
     private final CommunityAuthService communityAuthService;
     private final PostLikeDAO postLikeDAO;
     private final CommentDAO commentDAO;
+    private final UserExpService userExpService;
 
     @Override
     public Map<String, Object> getAllPosts(Map<String, Object> req) {
@@ -147,10 +148,16 @@ public class PostServiceImpl implements PostService {
 //    게시글 작성
     @Override
     public void writePost(PostRequestDTO postRequestDTO) {
+        Long userId = communityAuthService.getUserId();
+
         PostVO postVO = PostVO.from(postRequestDTO);
-        postVO.setUserId(communityAuthService.getUserId());
+        postVO.setUserId(userId);
+
         try {
             postDAO.save(postVO);
+
+            //  게시글 작성 경험치 지급
+            userExpService.addPostExp(userId, postVO.getId());
         } catch (Exception e) {
             throw new PostException(HttpStatus.BAD_REQUEST, "게시글 작성 실패");
         }
