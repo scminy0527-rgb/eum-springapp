@@ -13,7 +13,7 @@ public interface UserExpService {
     //    학습 완료 경험치 지급
     void addStudyExp(Long userId, Long eduId);
 
-    //    출석체크 경험치 지급
+    //    출석 완료 레벨 경험치 지급
     void addAttendanceExp(Long userId);
 
     //    마이페이지 프로필 레벨 정보 계산

@@ -55,7 +55,7 @@ public class UserExpServiceImpl implements UserExpService {
         }
     }
 
-    //    출석체크 경험치 지급
+    //    출석 완료 레벨 경험치 지급
     @Override
     public void addAttendanceExp(Long userId) {
         int todayAttendanceExpCount = userExpDAO.findTodayAttendanceExpCount(userId);

@@ -3,6 +3,7 @@ package com.app.springapp.service.edu;
 import com.app.springapp.domain.dto.response.UserAttendanceSummaryResponseDTO;
 import com.app.springapp.exception.EduException;
 import com.app.springapp.repository.UserAttendanceDAO;
+import com.app.springapp.service.UserExpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,9 @@ import java.util.List;
 public class UserAttendanceServiceImpl implements UserAttendanceService {
     private final UserAttendanceDAO userAttendanceDAO;
     private final RewardService rewardService;
+    private final UserExpService userExpService;
 
-    // 오늘 출석 등록 후 일일 보상과 연속 출석 보상 지급
+    // 오늘 출석 등록 후 학습 출석 보상과 레벨 경험치를 각각 지급
     @Override
     public void checkIn(Long userId) {
         if (userAttendanceDAO.existsTodayAttendance(userId)) {
@@ -29,7 +31,11 @@ public class UserAttendanceServiceImpl implements UserAttendanceService {
 
         Long attendanceId = userAttendanceDAO.saveTodayAttendance(userId);
 
+        // 팀원 학습 출석 보상 30은 보상 이력으로 지급
         rewardService.grantReward(userId, "ATTENDANCE", "DAILY", attendanceId);
+
+        // 레벨업 출석 경험치 40은 별도 경험치 이력으로 지급
+        userExpService.addAttendanceExp(userId);
 
         int consecutiveDays = userAttendanceDAO.findConsecutiveDays(userId);
         grantStreakReward(userId, consecutiveDays, attendanceId);
@@ -57,7 +63,7 @@ public class UserAttendanceServiceImpl implements UserAttendanceService {
                 .build();
     }
 
-    // 연속 출석 달성 시 추가 보상 지급
+    // 연속 출석 달성 시 학습 보상 영역으로 추가 보상 지급
     private void grantStreakReward(Long userId, int consecutiveDays, Long attendanceId) {
         if (consecutiveDays == 3
                 || consecutiveDays == 7

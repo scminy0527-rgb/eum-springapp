@@ -21,7 +21,7 @@ public class RewardServiceImpl implements RewardService {
     private final UserRewardHistoryDAO userRewardHistoryDAO;
     private final RewardDAO rewardDAO;
 
-    // 조건에 맞는 EXP와 배지를 자동 지급
+    // 조건에 맞는 학습 보상 이력과 배지를 자동 지급
     @Override
     public int grantReward(Long userId, String rewardType, String rewardCondition, Long rewardReferenceId) {
         RewardPolicyVO policy = rewardPolicyDAO.findByTypeAndCondition(rewardType, rewardCondition);
@@ -40,8 +40,6 @@ public class RewardServiceImpl implements RewardService {
         history.setRewardReferenceId(rewardReferenceId);
         history.setUserRewardExp(policy.getRewardExp());
         userRewardHistoryDAO.save(history);
-
-        rewardDAO.addUserExp(userId, policy.getRewardExp());
 
         if (policy.getBadgeId() != null && !rewardDAO.existsUserBadge(userId, policy.getBadgeId())) {
             UserBadgeVO userBadge = new UserBadgeVO();

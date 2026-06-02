@@ -14,6 +14,7 @@ import com.app.springapp.domain.vo.UserWithdrawVO;
 import com.app.springapp.exception.MyPageException;
 import com.app.springapp.exception.PostException;
 import com.app.springapp.repository.MyPageDAO;
+import com.app.springapp.repository.UserRewardHistoryDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ public class MyPageServiceImpl implements MyPageService {
     private final AuthService authService;
     private final FileService fileService;
     private final UserExpService userExpService;
+    private final UserRewardHistoryDAO userRewardHistoryDAO;
 
     // 마이페이지 메인
 
@@ -181,6 +183,9 @@ public class MyPageServiceImpl implements MyPageService {
         if (userInfo == null) {
             throw new MyPageException("회원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }
+
+        //    회원 경험치 기준으로 레벨 정보 계산
+        userExpService.setLevelInfo(userInfo);
 
         return userInfo;
     }
@@ -399,7 +404,10 @@ public class MyPageServiceImpl implements MyPageService {
         myPageDAO.deleteUserReportByWithdrawUserId(userId);
         myPageDAO.deleteSettingByWithdrawUserId(userId);
         myPageDAO.deleteSocialUserByWithdrawUserId(userId);
+
+        //    레벨 경험치 이력과 출석 보상 이력을 먼저 삭제
         userExpService.deleteUserExpHistoryByUserId(userId);
+        userRewardHistoryDAO.deleteByUserId(userId);
         myPageDAO.deleteUserByWithdrawUserId(userId);
     }
 }

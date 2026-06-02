@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = {Exception.class})
 public class WordStudyServiceImpl implements WordStudyService {
     private final WordStudyDAO wordStudyDAO;
+    private final UserExpService userExpService;
 
     // 단어 학습 기록 등록 -> 완료 처리
     @Override
@@ -27,13 +28,23 @@ public class WordStudyServiceImpl implements WordStudyService {
         Long userId = wordStudyVO.getUserId();
         Long eduWordMapId = wordStudyVO.getEduWordMapId();
 
+        // 학습-단어 매핑 번호로 학습 번호 조회
+        Long eduId = wordStudyDAO.findEduIdByEduWordMapId(eduWordMapId);
+
         // 이미 기록 있음 → update
         if (wordStudyDAO.findByUserIdAndEduWordMapId(userId, eduWordMapId).isPresent()) {
             wordStudyDAO.update(wordStudyVO);
+
+            //  같은 학습에서는 경험치가 한 번만 지급
+            userExpService.addStudyExp(userId, eduId);
             return;
         }
+
         // 처음 완료 → insert
         wordStudyDAO.save(wordStudyVO);
+
+        //  새로운 학습 완료 경험치 지급
+        userExpService.addStudyExp(userId, eduId);
     }
 
     // 단어 학습 기록 조회
