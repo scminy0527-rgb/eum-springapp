@@ -12,7 +12,6 @@ import com.app.springapp.domain.dto.response.MyPageProfileResponseDTO;
 import com.app.springapp.domain.dto.response.MyPageStudyStatusResponseDTO;
 import com.app.springapp.domain.vo.UserWithdrawVO;
 import com.app.springapp.exception.MyPageException;
-import com.app.springapp.exception.PostException;
 import com.app.springapp.repository.MyPageDAO;
 import com.app.springapp.repository.UserRewardHistoryDAO;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = {Exception.class, PostException.class})
+@Transactional(rollbackFor = {MyPageException.class})
 @Slf4j
 public class MyPageServiceImpl implements MyPageService {
     private final MyPageDAO myPageDAO;

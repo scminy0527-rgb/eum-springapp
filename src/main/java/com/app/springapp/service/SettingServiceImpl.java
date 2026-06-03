@@ -4,13 +4,15 @@ import com.app.springapp.domain.dto.SettingDTO;
 import com.app.springapp.domain.dto.request.SettingRequestDTO;
 import com.app.springapp.domain.dto.response.SettingResponseDTO;
 import com.app.springapp.domain.vo.SettingVO;
+import com.app.springapp.exception.MyPageException;
 import com.app.springapp.repository.SettingDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(rollbackFor = {Exception.class})
+@Transactional(rollbackFor = {MyPageException.class})
 @RequiredArgsConstructor
 public class SettingServiceImpl implements SettingService {
 
@@ -40,6 +42,6 @@ public class SettingServiceImpl implements SettingService {
         settingDAO.saveDefault(settingVO);
 
         return settingDAO.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("기본 설정 생성에 실패했습니다."));
+                .orElseThrow(() -> new MyPageException("기본 설정 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.springapp.mapper.MyPageLearningMapper">
+
+    <!-- 마이페이지 학습현황 조회 -->
+    <select id="selectLearningStatusListByUserId" parameterType="Long" resultType="MyPageLearningStatusResponseDTO">
+        SELECT
+            TE.ID AS eduId,
+            TE.EDU_TITLE AS eduTitle,
+            CASE
+                WHEN COUNT(TEWM.ID) = 0 THEN 0
+                ELSE ROUND((COUNT(CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN 1 END) / COUNT(TEWM.ID)) * 100)
+                END AS progress,
+            NVL(SUM(NVL(TWS.WORD_STUDY_TIME, 0)), 0) AS studyTime,
+            MAX(TWS.WORD_STUDY_UPDATE_AT) AS recentStudyAt
+        FROM TBL_EDU TE
+                 JOIN TBL_EDU_WORD_MAP TEWM
+                      ON TE.ID = TEWM.EDU_ID
+                 LEFT JOIN TBL_WORD_STUDY TWS
+                           ON TEWM.ID = TWS.EDU_WORD_MAP_ID
+                               AND TWS.USER_ID = #{userId}
+        WHERE TE.EDU_IS_DELETED = 0
+          AND EXISTS (
+            SELECT 1
+            FROM TBL_WORD_STUDY TWS2
+                     JOIN TBL_EDU_WORD_MAP TEWM2
+                          ON TWS2.EDU_WORD_MAP_ID = TEWM2.ID
+            WHERE TWS2.USER_ID = #{userId}
+              AND TEWM2.EDU_ID = TE.ID
+        )
+        GROUP BY TE.ID, TE.EDU_TITLE
+        ORDER BY MAX(TWS.WORD_STUDY_UPDATE_AT) DESC, TE.ID ASC
+    </select>
+
+    <!-- 마이페이지 학습결과 조회 -->
+    <select id="selectLearningResultListByUserId" parameterType="Long" resultType="MyPageLearningResultResponseDTO">
+        SELECT
+            TQA.ID AS quizAttemptId,
+            TQ.ID AS quizId,
+            TQ.QUIZ_TITLE AS quizTitle,
+            TQA.QUIZ_ATTEMPT_SCORE AS correctCount,
+            TQA.QUIZ_ATTEMPT_TOTAL_COUNT AS totalCount,
+            NVL(TQA.QUIZ_ATTEMPT_TIME, 0) AS spentTime,
+            CASE
+                WHEN TQA.QUIZ_ATTEMPT_TOTAL_COUNT = 0 THEN 0
+                ELSE ROUND((TQA.QUIZ_ATTEMPT_SCORE / TQA.QUIZ_ATTEMPT_TOTAL_COUNT) * 100)
+                END AS accuracy,
+            TQA.QUIZ_ATTEMPT_CREATE_AT AS quizAttemptCreateAt
+        FROM TBL_QUIZ_ATTEMPT TQA
+                 JOIN TBL_QUIZ TQ
+                      ON TQA.QUIZ_ID = TQ.ID
+        WHERE TQA.USER_ID = #{userId}
+        ORDER BY TQA.QUIZ_ATTEMPT_CREATE_AT DESC, TQA.ID DESC
+    </select>
+
+    <!-- 마이페이지 학습요약 조회 -->
+    <select id="selectLearningSummaryByUserId" parameterType="Long" resultType="MyPageLearningSummaryResponseDTO">
+        SELECT
+            CASE
+                WHEN NVL(QUIZ_SUM.TOTAL_COUNT, 0) = 0 THEN 0
+                ELSE ROUND((QUIZ_SUM.CORRECT_COUNT / QUIZ_SUM.TOTAL_COUNT) * 100)
+                END AS totalAccuracy,
+            NVL(QUIZ_SUM.TOTAL_COUNT, 0) AS totalQuestionCount,
+            NVL(STUDY_SUM.STUDY_TIME, 0) + NVL(QUIZ_SUM.QUIZ_TIME, 0) AS totalStudyTime
+        FROM (
+                 SELECT
+                     NVL(SUM(QUIZ_ATTEMPT_SCORE), 0) AS CORRECT_COUNT,
+                     NVL(SUM(QUIZ_ATTEMPT_TOTAL_COUNT), 0) AS TOTAL_COUNT,
+                     NVL(SUM(QUIZ_ATTEMPT_TIME), 0) AS QUIZ_TIME
+                 FROM TBL_QUIZ_ATTEMPT
+                 WHERE USER_ID = #{userId}
+             ) QUIZ_SUM
+                 CROSS JOIN (
+            SELECT NVL(SUM(WORD_STUDY_TIME), 0) AS STUDY_TIME
+            FROM TBL_WORD_STUDY
+            WHERE USER_ID = #{userId}
+        ) STUDY_SUM
+    </select>
+
+</mapper>

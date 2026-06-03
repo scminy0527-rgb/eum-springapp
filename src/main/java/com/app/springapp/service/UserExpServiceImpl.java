@@ -2,14 +2,16 @@ package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.response.MyPageProfileResponseDTO;
 import com.app.springapp.domain.vo.UserExpHistoryVO;
+import com.app.springapp.exception.UserException;
 import com.app.springapp.repository.UserExpDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = {Exception.class})
+@Transactional(rollbackFor = {UserException.class})
 public class UserExpServiceImpl implements UserExpService {
     private final UserExpDAO userExpDAO;
 
@@ -68,6 +70,11 @@ public class UserExpServiceImpl implements UserExpService {
     //    마이페이지 프로필 레벨 정보 계산
     @Override
     public void setLevelInfo(MyPageProfileResponseDTO profileResponseDTO) {
+        //    프로필 정보가 없으면 레벨 계산을 진행하지 않음
+        if (profileResponseDTO == null) {
+            throw new UserException("회원 레벨 정보를 계산할 수 없습니다.", HttpStatus.NOT_FOUND);
+        }
+
         Long totalExp = profileResponseDTO.getUserExp();
 
         if (totalExp == null || totalExp < 0) {
