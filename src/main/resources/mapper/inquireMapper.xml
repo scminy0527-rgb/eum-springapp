@@ -37,7 +37,7 @@
 
     <update id="updateContent" parameterType="InquireDTO">
         UPDATE TBL_INQUIRE
-        SET INQUIRE_TITLE = #{inquireTitle}, INQUIRE_CONTENT = #{inquireContent}
+        SET INQUIRE_CONTENT = #{inquireContent}, INQUIRE_FILE_URL = #{inquireFileUrl}
         WHERE ID = #{id} AND INQUIRE_STATUS != '답변완료'
     </update>
 

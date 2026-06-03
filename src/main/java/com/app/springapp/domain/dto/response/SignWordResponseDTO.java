@@ -32,4 +32,7 @@ public class SignWordResponseDTO {
 
     @Schema(description = "원본 상세 페이지 URL", example = "https://sldict.korean.go.kr/...")
     private String signWordSourceUrl;
+
+    @Schema(description = "단어 이모지", example = "🙏")
+    private String emoji;
 }

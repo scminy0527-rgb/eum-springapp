@@ -8,29 +8,38 @@ import com.app.springapp.repository.SignWordDAO;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(rollbackFor = {Exception.class})
 public class SignWordServiceImpl implements SignWordService {
+
     private final SignWordDAO signWordDAO;
     private final RestTemplate restTemplate;
+    private final ChatClient chatClient;
 
     @Value("${culture.api.sign-word.base-url}")
     private String baseUrl;
 
     @Value("${culture.api.sign-word.service-key}")
     private String serviceKey;
-
 
     // 수어 전체 조회
     @Override
@@ -44,7 +53,6 @@ public class SignWordServiceImpl implements SignWordService {
         if (keyword == null || keyword.isBlank()) {
             return signWordDAO.findAll();
         }
-
         return signWordDAO.findByKeyword(keyword);
     }
 
@@ -73,9 +81,6 @@ public class SignWordServiceImpl implements SignWordService {
         signWordDAO.delete(id);
     }
 
-
-
-    // 문화공공데이터 수어 검색
     // OpenAPI 수어 데이터 동기화
     @Override
     public int syncSignWords(int pageNo, int numOfRows) {
@@ -88,12 +93,41 @@ public class SignWordServiceImpl implements SignWordService {
             if (signWordDAO.findBySourceUrl(signWordVO.getSignWordSourceUrl()).isPresent()) {
                 continue;
             }
-
             signWordDAO.save(signWordVO);
             savedCount++;
         }
 
         return savedCount;
+    }
+
+    // 오늘의 수어 영상 3개 (날짜 기반 + 이모지 생성)
+    @Cacheable(value = "todaySignWords", key = "#root.target.todayCacheKey()")
+    @Override
+    public List<SignWordResponseDTO> getTodaySignWords() {
+        long seed = LocalDate.now().toEpochDay();
+        List<SignWordResponseDTO> allWords = getSignWords();
+        Collections.shuffle(allWords, new Random(seed));
+
+        return allWords.stream()
+                .limit(3)
+                .map(word -> {
+                    String emoji = generateEmoji(word.getSignWordTitle());
+                    word.setEmoji(emoji);
+                    return word;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 캐시 키 (날짜 기준)
+    public String todayCacheKey() {
+        return LocalDate.now().toString();
+    }
+
+    // 자정마다 캐시 초기화
+    @Scheduled(cron = "0 0 0 * * *")
+    @CacheEvict(value = "todaySignWords", allEntries = true)
+    public void clearTodaySignWordsCache() {
+        log.info("오늘의 수어 캐시 초기화");
     }
 
     // 문화공공데이터 OpenAPI 호출
@@ -140,13 +174,22 @@ public class SignWordServiceImpl implements SignWordService {
         }
     }
 
-    // 이미지/영상 URL이 비어 있으면 빈 문자열로 처리하고, http 주소는 https로 변환
+    // OpenAI로 이모지 생성
+    private String generateEmoji(String title) {
+        String prompt = "\"" + title + "\"라는 한국 수어 단어를 가장 잘 표현하는 이모지 1개만 반환해줘. 이모지 외에 다른 텍스트는 절대 포함하지 마.";
+
+        return chatClient.prompt()
+                .user(prompt)
+                .call()
+                .content()
+                .trim();
+    }
+
+    // http → https 변환
     private String changeHttps(String url) {
         if (url == null || url.isBlank()) {
             return "";
         }
-
         return url.replace("http://", "https://");
     }
 }
-

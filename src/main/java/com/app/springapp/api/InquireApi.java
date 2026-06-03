@@ -77,7 +77,6 @@ public class InquireApi {
                                            @RequestBody InquireUpdateRequestDTO requestDTO) {
         InquireDTO inquireDTO = new InquireDTO();
         inquireDTO.setId(id);
-        inquireDTO.setInquireTitle(requestDTO.getInquireTitle());
         inquireDTO.setInquireContent(requestDTO.getInquireContent());
 
         inquireService.updateContent(inquireDTO);

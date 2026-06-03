@@ -26,4 +26,7 @@ public interface SignWordService {
 
     // OpenAPI 수어 데이터 동기화 -> OpenAPI에서 가져와 DB에 저장
     public int syncSignWords(int pageNo, int numOfRows);
+
+    // 오늘의 수어 영상 3개 (날짜 기반)
+    public List<SignWordResponseDTO> getTodaySignWords();
 }

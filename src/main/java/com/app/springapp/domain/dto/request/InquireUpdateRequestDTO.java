@@ -7,9 +7,6 @@ import lombok.Data;
 @Data
 public class InquireUpdateRequestDTO {
 
-    @Schema(description = "문의 제목", example = "제목 수정합니다")
-    private String inquireTitle;
-
     @Schema(description = "문의 내용", example = "내용 수정합니다")
     private String inquireContent;
 }

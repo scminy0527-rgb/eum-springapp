@@ -45,4 +45,15 @@ public class SignWordApi {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "수어 OpenAPI 동기화 성공", savedCount));
     }
+
+    // GET /api/sign-words/today
+    // → 오늘 날짜 기반으로 매일 다른 3개 반환
+    @GetMapping("/today")
+    @Operation(summary = "오늘의 수어 영상", description = "오늘 날짜 기반으로 매일 다른 수어 영상 3개를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "오늘의 수어 영상 조회 성공")
+    public ResponseEntity<ApiResponseDTO> getTodaySignWords() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "오늘의 수어 영상 조회 성공", signWordService.getTodaySignWords()));
+    }
 }
+
