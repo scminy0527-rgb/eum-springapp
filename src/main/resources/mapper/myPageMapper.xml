@@ -97,15 +97,30 @@
         ORDER BY USER_ATTENDANCE_DATE DESC
     </select>
 
-    <!-- 학습 현황 조회 -->
+    <!-- 학습 현황 조회: 시작한 학습 기준으로 진행률 계산 -->
     <select id="selectStudyStatusListByUserId" parameterType="Long" resultType="MyPageStudyStatusResponseDTO">
-        SELECT TE.ID, TE.EDU_TITLE, ROUND((COUNT(CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN 1 END) / COUNT(TEWM.ID)) * 100) AS progress
-        FROM TBL_EDU TE
-                 JOIN TBL_EDU_WORD_MAP TEWM ON TE.ID = TEWM.EDU_ID
-                 JOIN TBL_WORD_STUDY TWS ON TEWM.ID = TWS.EDU_WORD_MAP_ID
-        WHERE TE.EDU_IS_DELETED = 0 AND TWS.USER_ID = #{userId}
-        GROUP BY TE.ID, TE.EDU_TITLE
-        ORDER BY TE.ID ASC
+        SELECT
+            TE.ID AS id,
+            TE.EDU_TITLE AS eduTitle,
+            CASE
+                WHEN COUNT(DISTINCT TEWM.ID) = 0 THEN 0
+                ELSE ROUND(
+                        COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END)
+                            / COUNT(DISTINCT TEWM.ID) * 100
+                     )
+                END AS progress
+        FROM TBL_EDU_START TES
+                 JOIN TBL_EDU TE
+                      ON TES.EDU_ID = TE.ID
+                 JOIN TBL_EDU_WORD_MAP TEWM
+                      ON TE.ID = TEWM.EDU_ID
+                 LEFT JOIN TBL_WORD_STUDY TWS
+                           ON TEWM.ID = TWS.EDU_WORD_MAP_ID
+                               AND TWS.USER_ID = TES.USER_ID
+        WHERE TES.USER_ID = #{userId}
+          AND TE.EDU_IS_DELETED = 0
+        GROUP BY TE.ID, TE.EDU_TITLE, TES.EDU_START_AT
+        ORDER BY TES.EDU_START_AT DESC, TE.ID ASC
             FETCH FIRST 3 ROWS ONLY
     </select>
 

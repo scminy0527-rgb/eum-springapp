@@ -41,6 +41,9 @@ public class RewardServiceImpl implements RewardService {
         history.setUserRewardExp(policy.getRewardExp());
         userRewardHistoryDAO.save(history);
 
+        // 사용자 총 EXP 증가
+        rewardDAO.addUserExp(userId, policy.getRewardExp());
+
         if (policy.getBadgeId() != null && !rewardDAO.existsUserBadge(userId, policy.getBadgeId())) {
             UserBadgeVO userBadge = new UserBadgeVO();
             userBadge.setUserId(userId);

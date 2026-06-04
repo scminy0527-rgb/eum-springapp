@@ -100,7 +100,7 @@ public class SignWordServiceImpl implements SignWordService {
         return savedCount;
     }
 
-    // 오늘의 수어 영상 3개 (날짜 기반 + 이모지 생성)
+    // 오늘의 수어 영상 3개 (날짜 기반 + 이모지 생성) -> 학습 검색쪽에 넣어두기!
     @Cacheable(value = "todaySignWords", key = "#root.target.todayCacheKey()")
     @Override
     public List<SignWordResponseDTO> getTodaySignWords() {
