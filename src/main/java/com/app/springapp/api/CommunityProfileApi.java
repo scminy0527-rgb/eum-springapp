@@ -1,6 +1,7 @@
 package com.app.springapp.api;
 
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
+import com.app.springapp.domain.dto.response.CommunityUserResponseDTO;
 import com.app.springapp.domain.dto.response.UserResponseDTO;
 import com.app.springapp.service.CommunityProfileService;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,9 @@ public class CommunityProfileApi {
     public ResponseEntity<ApiResponseDTO> getUserInfo(
             @PathVariable long id
     ) {
-        UserResponseDTO userResponseDTO = communityProfileService.getUserInfo(id);
+        CommunityUserResponseDTO communityUserResponseDTO = communityProfileService.getUserInfo(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponseDTO.of(true, "커뮤니티 유저 프로필 정보 로드 성공", userResponseDTO));
+                .body(ApiResponseDTO.of(true, "커뮤니티 유저 프로필 정보 로드 성공", communityUserResponseDTO));
     }
 }
