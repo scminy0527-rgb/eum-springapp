@@ -101,7 +101,7 @@ public class SignWordServiceImpl implements SignWordService {
     }
 
     // 오늘의 수어 영상 3개 (날짜 기반 + 이모지 생성) -> 학습 검색쪽에 넣어두기!
-    @Cacheable(value = "todaySignWords", key = "#root.target.todayCacheKey()")
+    @Cacheable(value = "todaySignWords", key = "T(java.time.LocalDate).now().toString()")
     @Override
     public List<SignWordResponseDTO> getTodaySignWords() {
         long seed = LocalDate.now().toEpochDay();
@@ -111,8 +111,13 @@ public class SignWordServiceImpl implements SignWordService {
         return allWords.stream()
                 .limit(3)
                 .map(word -> {
-                    String emoji = generateEmoji(word.getSignWordTitle());
-                    word.setEmoji(emoji);
+                    try {
+                        String emoji = generateEmoji(word.getSignWordTitle());
+                        word.setEmoji(emoji);
+                    } catch (Exception e) {
+                        log.warn("이모지 생성 실패 - title: {}, error: {}", word.getSignWordTitle(), e.getMessage());
+                        word.setEmoji("🤟");
+                    }
                     return word;
                 })
                 .collect(Collectors.toList());

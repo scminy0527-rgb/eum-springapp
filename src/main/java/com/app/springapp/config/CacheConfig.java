@@ -31,7 +31,14 @@ public class CacheConfig {
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer))
                 // Value를 GenericJackson2JsonRedisSerializer로 설정 (가장 중요!)
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
-                .entryTtl(Duration.ofMinutes(10))  // 캐시 TTL 설정
+                .entryTtl(Duration.ofSeconds(
+                        java.time.LocalDate.now()
+                                .plusDays(1)
+                                .atStartOfDay()
+                                .toEpochSecond(java.time.ZoneOffset.of("+09:00"))
+                                - java.time.LocalDateTime.now()
+                                .toEpochSecond(java.time.ZoneOffset.of("+09:00"))
+                ))
                 .disableCachingNullValues();
 
         return RedisCacheManager.builder(connectionFactory)
