@@ -1,14 +1,19 @@
 package com.app.springapp.handler;
 
 import com.app.springapp.domain.dto.ChatDTO;
+import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.domain.dto.request.ChatRequestDTO;
-import com.app.springapp.domain.dto.response.ApiResponseDTO;
-import com.app.springapp.domain.vo.ChatVO;
+import com.app.springapp.domain.enums.SocialProvider;
+import com.app.springapp.repository.UserDAO;
 import com.app.springapp.service.ChatService;
 import com.app.springapp.service.CommunityAuthService;
+import com.app.springapp.util.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -16,8 +21,8 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,13 +34,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ChatService chatService;
     private final ObjectMapper objectMapper;
+    private final CommunityAuthService communityAuthService;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final UserDAO userDAO;
 
     // chatRoomId → 해당 방에 연결된 세션 목록
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
-    private final CommunityAuthService communityAuthService;
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        UserDTO userDTO = extractUserFromHandshake(session);
+        if (userDTO == null) {
+            session.close(CloseStatus.NOT_ACCEPTABLE);
+            return;
+        }
+        session.getAttributes().put("user", userDTO);
+
         Long chatRoomId = extractChatRoomId(session);
         roomSessions.computeIfAbsent(chatRoomId, k -> ConcurrentHashMap.newKeySet()).add(session);
         log.info("WebSocket 연결 - 채팅방: {}, 세션: {}", chatRoomId, session.getId());
@@ -43,37 +57,69 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        Long chatRoomId = extractChatRoomId(session);
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-        ChatRequestDTO chatRequestDTO = objectMapper.readValue(message.getPayload(), ChatRequestDTO.class);
+        UserDTO userDTO = (UserDTO) session.getAttributes().get("user");
+        if (userDTO == null) {
+            session.close(CloseStatus.NOT_ACCEPTABLE);
+            return;
+        }
 
-        log.info("사용자가 메세지 전송 시도");
-        log.info("메세지: {}", chatRequestDTO);
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(userDTO, null, List.of());
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // DB 저장 — 내부적으로 CommunityAuthServiceImpl.getUserId() = 2L(더미) 사용
-//        Long id = chatService.writeChatMessage(chatRoomId, chatRequestDTO);
+        try {
+            Long chatRoomId = extractChatRoomId(session);
+            communityAuthService.checkUserValidity(communityAuthService.getUserId());
 
-//        DB 에서 다시 해당 채팅 아이디에 해당 하는 메세지 불러와서 반환 하는거 생각하기
-//        ChatDTO chatDTO = chatService.loadChatMessageById(id);
+            ChatRequestDTO chatRequestDTO = objectMapper.readValue(message.getPayload(), ChatRequestDTO.class);
+            ChatDTO chatDTO = chatService.playRealTimeChat(chatRoomId, chatRequestDTO);
 
-//        메세지 작성 및 작성한 메세지 쿼리로 불러오는 트랜젝션
-        ChatDTO chatDTO = chatService.playRealTimeChat(chatRoomId, chatRequestDTO);
+            Map<String, Object> broadcastData = new HashMap<>();
+            broadcastData.put("id", chatDTO.getId());
+            broadcastData.put("chatContent", chatDTO.getChatContent());
+            broadcastData.put("chatCreateAt", chatDTO.getChatCreateAt());
+            broadcastData.put("chatType", chatDTO.getChatType());
+            broadcastData.put("userNickname", chatDTO.getUserNickname());
+            broadcastData.put("userProfile", chatDTO.getUserProfile());
+            broadcastData.put("chatRoomId", chatRoomId);
 
-        // 브로드캐스트 메시지 구성
-        Map<String, Object> broadcastData = new HashMap<>();
-//        채팅 메세지의 id 반환
-        broadcastData.put("id", chatDTO.getId());
-        broadcastData.put("chatContent", chatDTO.getChatContent());
-        broadcastData.put("chatCreateAt", chatDTO.getChatCreateAt());
-        broadcastData.put("chatType", chatDTO.getChatType());
-        broadcastData.put("userNickname", chatDTO.getUserNickname());
-        broadcastData.put("userProfile", chatDTO.getUserProfile());
-        broadcastData.put("chatRoomId", chatRoomId);
+            broadcast(chatRoomId, session, broadcastData);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
 
-        log.info("타 사용자 한테도 전달");
+    private UserDTO extractUserFromHandshake(WebSocketSession session) {
+        try {
+            List<String> cookieHeaders = session.getHandshakeHeaders().get("cookie");
+            if (cookieHeaders == null || cookieHeaders.isEmpty()) return null;
 
-        broadcast(chatRoomId, session, broadcastData);
+            String accessToken = null;
+            for (String header : cookieHeaders) {
+                for (String part : header.split(";")) {
+                    String[] kv = part.trim().split("=", 2);
+                    if (kv.length == 2 && "accessToken".equals(kv[0].trim())) {
+                        accessToken = kv[1].trim();
+                        break;
+                    }
+                }
+                if (accessToken != null) break;
+            }
+            if (accessToken == null) return null;
+
+            Claims claims = jwtTokenUtil.parseToken(accessToken);
+            String userEmail = (String) claims.get("userEmail");
+            String socialUserProvider = (String) claims.get("socialUserProvider");
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUserEmail(userEmail);
+            userDTO.setSocialUserProvider(SocialProvider.fromValue(socialUserProvider));
+
+            return userDAO.findUserByUserEmailAndSocialUserProvider(userDTO).orElse(null);
+        } catch (Exception e) {
+            log.warn("WebSocket 인증 실패: {}", e.getMessage());
+            return null;
+        }
     }
 
     @Override

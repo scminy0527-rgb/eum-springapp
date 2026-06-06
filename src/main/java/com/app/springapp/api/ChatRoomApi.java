@@ -41,28 +41,6 @@ public class ChatRoomApi {
                 .body(ApiResponseDTO.of(true, "채팅방 생성 성공", id));
     }
 
-//    채팅방 정보 불러오기
-    @GetMapping("/{chatRoomId}")
-    @Operation(summary = "채팅방 정보", description = "채팅방 정보 불러오기")
-    @ApiResponse(responseCode = "200", description = "채팅방 정보 불러오기 성공")
-    @ApiResponse(responseCode = "400", description = "채팅방 정보 불러오기 실패")
-    @Parameter(
-            name = "chatRoomId",
-            description = "채팅방 아이디",
-            example = "1",
-            required = true,
-            in = ParameterIn.PATH,
-            schema = @Schema(type = "number")
-    )
-    public ResponseEntity<ApiResponseDTO> getChatRoomInfo(
-            @PathVariable Long chatRoomId
-    ){
-        ChatRoomResponseDTO chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponseDTO.of(true, "채팅방 정보 불러오기 성공", chatRoomInfo));
-    }
-
 //    최초 1회 채팅방 참여중인 회원 불러오기
     @GetMapping("/{chatRoomId}/users")
     @Operation(summary = "채팅방 내 유저 불러오기", description = "채팅방 내 참여중인 유저 목록 불러오기")

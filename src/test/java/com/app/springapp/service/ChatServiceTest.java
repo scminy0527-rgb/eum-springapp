@@ -23,7 +23,7 @@ public class ChatServiceTest {
 //    테스트: 예
     @Test
     public void loadAllChatRoomMessageTest() {
-        chatService.loadAllChatRoomMessage(1L)
+        chatService.loadAllChatRoomMessage(1L, 1L)
                 .stream()
                 .forEach((chat) -> log.info(chat.toString()));
     }
@@ -39,9 +39,10 @@ public class ChatServiceTest {
 //    테스트 결과: 예
     @Test
     public void isUserInChatRoomTest(){
-        ChatRequestDTO chatRequestDTO = new ChatRequestDTO();
+        Long chatRoomId = 3L;
+        Long userId = 1L;
 
-        boolean result = chatService.isUserInChatRoom(2L);
+        boolean result = chatService.isUserInChatRoom(chatRoomId, userId);
         log.info("결과: {}", result);
     }
 
@@ -50,11 +51,13 @@ public class ChatServiceTest {
     @Test
     public void writeChatRoomMessageTest() {
         Long chatRoomId = 3L;
+        Long userId = 1L;
+
         ChatRequestDTO chatRequestDTO = new ChatRequestDTO();
         chatRequestDTO.setChatContent("전 귀가 안들려요");
         chatRequestDTO.setChatType("텍스트");
 
-        chatService.writeChatMessage(chatRoomId, chatRequestDTO);
+        chatService.writeChatMessage(chatRoomId, userId, chatRequestDTO);
     }
 
 //    모든 채팅방 보여주는 서비스

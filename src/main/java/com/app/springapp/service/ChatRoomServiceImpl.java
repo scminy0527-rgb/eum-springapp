@@ -67,9 +67,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 //    채팅방 정보 불러오기
     @Override
-    public ChatRoomResponseDTO getChatRoomInfo(Long id) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
+    public ChatRoomResponseDTO getChatRoomInfo(Long id, Long userId) {
+//        Long userId = communityAuthService.getUserId();
+//        communityAuthService.checkUserValidity(userId);
 
         Map<String,Object> filter = new HashMap<>();
         filter.put("id", id);

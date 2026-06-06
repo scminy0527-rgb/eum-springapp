@@ -49,12 +49,12 @@ public class ChatRoomServiceTest {
     public void getChatRoomInfoTest() {
         Long chatRoomId = 3L;
         log.info("시나리오1: 존재하는 방 id = {}", chatRoomId);
-        ChatRoomResponseDTO chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
+        ChatRoomResponseDTO chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId, 2L);
         log.info(chatRoomInfo.toString());
 
         chatRoomId = 100L;
         log.info("시나리오2: 존재하지 않는 방 id = {}", chatRoomId);
-        chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId);
+        chatRoomInfo = chatRoomService.getChatRoomInfo(chatRoomId, 2L);
         log.info(chatRoomInfo.toString());
     }
 
