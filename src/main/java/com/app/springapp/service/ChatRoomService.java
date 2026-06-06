@@ -15,7 +15,7 @@ public interface ChatRoomService {
     public void joinChatRoom(Long chatRoomId);
 
 //    채팅방의 정보 불러오기
-    public ChatRoomResponseDTO getChatRoomInfo(Long id);
+    public ChatRoomResponseDTO getChatRoomInfo(Long id, Long userId);
 
 //    채팅방 내 참여중인 유저 목록 불러오기
     public List<ChatUserResponseDTO> getChatRoomUsers(Long chatRoomId);
