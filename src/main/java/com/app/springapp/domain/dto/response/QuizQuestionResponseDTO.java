@@ -5,6 +5,7 @@ import com.app.springapp.domain.dto.QuizQuestionDTO;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @Data
@@ -20,6 +21,8 @@ public class QuizQuestionResponseDTO {
     private LocalDateTime quizQuestionCreateAt;
     @Schema(description = "수어 단어 번호", example = "1")
     private Long wordsId;
+    @Schema(description = "문제 보기 목록")
+    private List<QuizChoiceResponseDTO> choices;
 
     public static QuizQuestionResponseDTO from(QuizQuestionDTO dto) {
         QuizQuestionResponseDTO res = new QuizQuestionResponseDTO();
