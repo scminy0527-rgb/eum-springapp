@@ -21,7 +21,8 @@ public class CommentServiceTest {
     @Test
     public void getAllPostCommentsTest(){
         Long postId = 1L;
-        List<CommentResponseDTO> comments = commentService.getAllPostComments(postId);
+        Long userId = 1L;
+        List<CommentResponseDTO> comments = commentService.getAllPostComments(postId, userId);
         comments.forEach(comment -> {
             log.info(comment.toString());
         });

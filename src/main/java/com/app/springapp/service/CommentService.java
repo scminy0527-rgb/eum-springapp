@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface CommentService {
-    public List<CommentResponseDTO> getAllPostComments(Long postId);
+    public List<CommentResponseDTO> getAllPostComments(Long postId, Long userId);
 
 //    유저가 남긴 댓글 조회 (페이지네이션)
     public Map<String, Object> getUserWrittenComments(Long userId, Map<String, Object> req);

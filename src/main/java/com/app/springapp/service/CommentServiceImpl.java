@@ -29,8 +29,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserExpService userExpService;
 
     @Override
-    public List<CommentResponseDTO> getAllPostComments(Long postId) {
-        Long userId = communityAuthService.getUserId();
+    public List<CommentResponseDTO> getAllPostComments(Long postId, Long userId) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("postId", postId);

@@ -49,8 +49,9 @@ public class PostServiceTest {
     @Test
     public void getPostTest(){
         Long id=1L;
+        Long userId=1L;
 
-        log.info(postService.getPost(id).toString());
+        log.info(postService.getPost(id, userId).toString());
     }
 
 //    유저의 특정 게시글 불러오게 하기
@@ -91,7 +92,7 @@ public class PostServiceTest {
         postRequestDTO.setPostTag("자유게시판");
         Long userId = 3L;
 
-        postService.writePost(postRequestDTO);
+        postService.writePost(userId, postRequestDTO);
     }
 
 //    게시글 접근권한 테스트
@@ -108,18 +109,20 @@ public class PostServiceTest {
     @Test
     public void updatePostTest(){
         Long id = 21L;
+        Long userId = 1L;
         PostRequestDTO postRequestDTO = new PostRequestDTO();
         postRequestDTO.setPostTitle("점자란");
         postRequestDTO.setPostContent("만국 공통 입니다.");
 
-        postService.updatePost(id, postRequestDTO);
+        postService.updatePost(userId, id, postRequestDTO);
     }
 
 //    게시글 삭제 테스트
     @Test
     public void deletePostTest(){
         Long id = 1L;
-        postService.deletePost(id);
+        Long userId = 1L;
+        postService.deletePost(userId, id);
     }
 
 //    게시글 조회수 증가 테스트
@@ -133,13 +136,15 @@ public class PostServiceTest {
     @Test
     public void increasePostLikeCountTest(){
         Long id = 19L;
-        postService.increasePostLikeCount(id);
+        Long userId = 1L;
+        postService.increasePostLikeCount(userId, id);
     }
 
 //    게시글 좋아요 취소테스트
     @Test
     public void cancelPostLikeTest(){
         Long id = 2L;
-        postService.cancelPostLike(id);
+        Long userId = 1L;
+        postService.cancelPostLike(userId, id);
     }
 }

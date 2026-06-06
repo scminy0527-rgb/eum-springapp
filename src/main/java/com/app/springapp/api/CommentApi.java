@@ -4,6 +4,8 @@ import com.app.springapp.domain.dto.request.CommentRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.CommentResponseDTO;
 import com.app.springapp.service.CommentService;
+import com.app.springapp.util.JwtTokenUtil;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -24,6 +26,7 @@ import java.util.Map;
 public class CommentApi {
 
     private final CommentService commentService;
+    private final JwtTokenUtil jwtTokenUtil;
 
 //    게시글 내 댓글 조회 api
     @GetMapping("/{postId}")
@@ -39,9 +42,19 @@ public class CommentApi {
             schema = @Schema(type = "number")
     )
     public ResponseEntity<ApiResponseDTO> getAllPostComments(
-            @PathVariable Long postId
+            @PathVariable Long postId,
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ){
-        List<CommentResponseDTO> comments = commentService.getAllPostComments(postId);
+        Long userId = null;
+        if (accessToken != null) {
+            try {
+                Claims claims = jwtTokenUtil.parseToken(accessToken);
+                userId = Long.parseLong((String) claims.get("id"));
+            } catch (Exception e) {
+                // 토큰이 유효하지 않으면 비로그인으로 처리
+            }
+        }
+        List<CommentResponseDTO> comments = commentService.getAllPostComments(postId, userId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "댓글 불러오기 성공", comments));
