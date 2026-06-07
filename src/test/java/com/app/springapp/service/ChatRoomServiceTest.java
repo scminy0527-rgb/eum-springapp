@@ -20,7 +20,8 @@ public class ChatRoomServiceTest {
     @Test
     public void joinChatRoomTest() {
         Long chatRoomId = 3L;
-        chatRoomService.joinChatRoom(chatRoomId);
+        Long userId = 1L;
+        chatRoomService.joinChatRoom(chatRoomId, userId);
     }
 
 //    채팅방 생성 테스트
@@ -30,8 +31,9 @@ public class ChatRoomServiceTest {
         chatRoomRequestDTO.setChatRoomName("채팅방 이름입니다.");
         chatRoomRequestDTO.setChatRoomType("그룹");
         chatRoomRequestDTO.setChatRoomProfile("default.jpg");
+        Long userId = 1L;
 
-        chatRoomService.createChatRoom(chatRoomRequestDTO);
+        chatRoomService.createChatRoom(chatRoomRequestDTO,  userId);
     }
 
 //    채팅방 참여 중인 유저 불러오기 테스트
@@ -64,8 +66,9 @@ public class ChatRoomServiceTest {
         filters.put("userId", 1L);
         filters.put("offset", 0);
         filters.put("size", 10);
+        Long userId = 1L;
 
-        Map<String, Object> result = chatRoomService.getJoinedChatRooms(1);
+        Map<String, Object> result = chatRoomService.getJoinedChatRooms(1, userId);
         log.info(result.toString());
     }
 
@@ -78,13 +81,15 @@ public class ChatRoomServiceTest {
         chatRoomRequestDTO.setChatRoomLimit(65);
         chatRoomRequestDTO.setChatRoomProfile("default.jpg");
         Long chatRoomId = 5L;
+        Long userId = 1L;
 
-        chatRoomService.updateChatRoomInfo(chatRoomId, chatRoomRequestDTO);
+        chatRoomService.updateChatRoomInfo(chatRoomId, chatRoomRequestDTO,  userId);
     }
 
 //    채팅방 소프트삭제 테스트
     @Test
     public void softDeleteChatRoomTest() {
-        chatRoomService.softDeleteChatRoom(5L);
+        Long userId = 1L;
+        chatRoomService.softDeleteChatRoom(5L, userId);
     }
 }

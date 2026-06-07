@@ -21,7 +21,8 @@ public class CommentServiceTest {
     @Test
     public void getAllPostCommentsTest(){
         Long postId = 1L;
-        List<CommentResponseDTO> comments = commentService.getAllPostComments(postId);
+        Long userId = 1L;
+        List<CommentResponseDTO> comments = commentService.getAllPostComments(postId, userId);
         comments.forEach(comment -> {
             log.info(comment.toString());
         });
@@ -45,7 +46,8 @@ public class CommentServiceTest {
         CommentRequestDTO commentRequestDTO = new CommentRequestDTO();
         commentRequestDTO.setCommentContent("댓글 달기 단위테스트");
         Long postId = 1L;
-        commentService.writePostComment(postId, commentRequestDTO);
+        Long userId = 1L;
+        commentService.writePostComment(postId, userId, commentRequestDTO);
     }
 
 //    대댓글 달기 테스트
@@ -57,8 +59,9 @@ public class CommentServiceTest {
         Long postId = 4L;
 //        Long postId = 100L;
         Long commentId = 1L;
+        Long userId = 1L;
 
-        commentService.writePostReply(postId, commentId, commentRequestDTO);
+        commentService.writePostReply(postId, commentId, userId, commentRequestDTO);
     }
 
 //    댓글 수정 테스트
@@ -73,7 +76,8 @@ public class CommentServiceTest {
 
 //        case 1-1. 자신이 작성한 대댓글 수정
         Long postId = 42L;
-        commentService.updateComment(postId, commentRequestDTO);
+        Long userId = 2L;
+        commentService.updateComment(postId, userId, commentRequestDTO);
 
 //        case 2. 자신이 작성하지 아니한 댓글을 수정 (정상 작동)
 //        Long commentId = 1L;
@@ -95,14 +99,16 @@ public class CommentServiceTest {
 
 //        자신이 작성한 댓글 중 대댓글 있는거 삭제 (정상 작동)
         Long commentId = 1L;
-        commentService.deleteComment(commentId);
+        Long userId = 2L;
+        commentService.deleteComment(commentId, userId);
     }
 
 //    댓글 좋아요 테스트
     @Test
     public void addCommentLikeTest(){
         Long commentId = 1L;
-        commentService.addCommentLike(commentId);
+        Long userId = 2L;
+        commentService.addCommentLike(commentId, userId);
     }
 
 //    댓글 좋아요 취소 테스트 (통과)
@@ -111,6 +117,7 @@ public class CommentServiceTest {
 //        기존: 35개
 
         Long commentId = 19L;
-        commentService.cancelCommentLike(commentId);
+        Long userId = 2L;
+        commentService.cancelCommentLike(commentId,  userId);
     }
 }

@@ -7,22 +7,22 @@ import java.util.List;
 import java.util.Map;
 
 public interface CommentService {
-    public List<CommentResponseDTO> getAllPostComments(Long postId);
+    public List<CommentResponseDTO> getAllPostComments(Long postId, Long userId);
 
 //    유저가 남긴 댓글 조회 (페이지네이션)
     public Map<String, Object> getUserWrittenComments(Long userId, Map<String, Object> req);
 
-    public void writePostComment(Long postId, CommentRequestDTO commentRequestDTO);
+    public void writePostComment(Long postId, Long userId, CommentRequestDTO commentRequestDTO);
 
-    public void writePostReply(Long postId, Long commentId, CommentRequestDTO commentRequestDTO);
+    public void writePostReply(Long postId, Long commentId, Long userId, CommentRequestDTO commentRequestDTO);
 
-    public void updateComment(Long commentId, CommentRequestDTO commentRequestDTO);
+    public void updateComment(Long commentId, Long userId, CommentRequestDTO commentRequestDTO);
 
-    public void deleteComment(Long commentId);
+    public void deleteComment(Long commentId, Long userId);
 
 //    댓글 좋아요 남기기
-    public void addCommentLike(Long commentId);
+    public void addCommentLike(Long commentId, Long userId);
 
 //    댓글 좋아요 취소
-    public void cancelCommentLike(Long commentId);
+    public void cancelCommentLike(Long commentId, Long userId);
 }

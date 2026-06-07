@@ -27,16 +27,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatUserDAO chatMemberDAO;
     private final ChatRoomDAO chatRoomDAO;
     private final ChatUserDAO chatUserDAO;
-    private final CommunityAuthService communityAuthService;
+//    private final CommunityAuthService communityAuthService;
     private final PostService postService;
 
     //    채팅방 방 생성
     @Override
-    public Long createChatRoom(ChatRoomRequestDTO chatRoomRequestDTO) {
-        Long userId = communityAuthService.getUserId();
-        if(userId == null || userId == 0L){
-            throw new ChatException(HttpStatus.UNAUTHORIZED, "채팅방 생성 권한이 없습니다.");
-        }
+    public Long createChatRoom(ChatRoomRequestDTO chatRoomRequestDTO, Long userId) {
         ChatRoomVO chatRoomVO = ChatRoomVO.from(chatRoomRequestDTO);
         chatRoomVO.setUserId(userId);
 
@@ -56,8 +52,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 //    유저가 채팅방에 참여
     @Override
-    public void joinChatRoom(Long chatRoomId) {
-        Long userId = communityAuthService.getUserId();
+    public void joinChatRoom(Long chatRoomId, Long userId) {
         ChatUserVO chatMemberVO = new ChatUserVO();
         chatMemberVO.setChatRoomId(chatRoomId);
         chatMemberVO.setUserId(userId);
@@ -68,8 +63,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 //    채팅방 정보 불러오기
     @Override
     public ChatRoomResponseDTO getChatRoomInfo(Long id, Long userId) {
-//        Long userId = communityAuthService.getUserId();
-//        communityAuthService.checkUserValidity(userId);
 
         Map<String,Object> filter = new HashMap<>();
         filter.put("id", id);
@@ -93,12 +86,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 //    사용자가 참여 중인 채팅방 페이지네이션 조회
     @Override
-    public Map<String, Object> getJoinedChatRooms(int page) {
+    public Map<String, Object> getJoinedChatRooms(int page, Long userId) {
         Map<String, Object> filters = new HashMap<>();
         int size = 10;
         int offset = (page - 1) * size;
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
         filters.put("offset", offset);
         filters.put("size", size);
         filters.put("userId", userId);
@@ -124,10 +115,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 //    채팅방 정보 수정
     @Override
-    public void updateChatRoomInfo(Long id, ChatRoomRequestDTO chatRoomRequestDTO) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
+    public void updateChatRoomInfo(Long id, ChatRoomRequestDTO chatRoomRequestDTO, Long userId) {
         ChatRoomVO chatRoomVO = ChatRoomVO.from(chatRoomRequestDTO);
         chatRoomVO.setId(id);
         chatRoomVO.setUserId(userId);
@@ -137,10 +125,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 //    채팅방 삭제
     @Override
-    public void softDeleteChatRoom(Long id) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
+    public void softDeleteChatRoom(Long id, Long userId) {
         ChatRoomVO chatRoomVO = new ChatRoomVO();
         chatRoomVO.setId(id);
         chatRoomVO.setUserId(userId);

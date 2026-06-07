@@ -4,6 +4,7 @@ import com.app.springapp.domain.dto.NoticeDTO;
 import com.app.springapp.domain.vo.NoticeVO;
 import com.app.springapp.exception.UserException;
 import com.app.springapp.repository.NoticeDAO;
+import com.app.springapp.repository.UserDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,25 @@ import java.util.List;
 public class NoticeServiceImpl implements NoticeService {
 
     private final NoticeDAO noticeDAO;
+    private final UserDAO userDAO;                    // ← 추가
+    private final NotificationService notificationService;  // ← 추가
 
     @Override
     public void save(NoticeDTO noticeDTO) {
         NoticeVO noticeVO = NoticeVO.from(noticeDTO);
         noticeDAO.save(noticeVO);
+
+        // 전체 유저에게 알림 전송
+        List<Long> userIds = userDAO.findAllUserIds();
+        for (Long userId : userIds) {
+            notificationService.send(
+                    userId,
+                    "NOTICE",
+                    "[공지] " + noticeDTO.getNoticeTitle(),
+                    noticeDTO.getNoticeContent(),
+                    "/customservice/notice/" + noticeVO.getId()
+            );
+        }
     }
 
     @Override

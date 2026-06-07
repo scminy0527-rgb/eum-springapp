@@ -71,6 +71,13 @@ public class UserServiceImpl implements UserService {
         return new ApiResponseDTO(true, "유저 조회 성공", userResponseDTO);
     }
 
+    // 이메일 중복 체크
+    @Override
+    public ApiResponseDTO checkEmailExists(String email) {
+        boolean exists = userDAO.existsUserByEmail(email);
+        return ApiResponseDTO.of(true, "이메일 중복 체크 완료", exists);
+    }
+
     // 이메일 찾기
     @Override
     public ApiResponseDTO findEmail(String userName) {

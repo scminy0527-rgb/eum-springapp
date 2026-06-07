@@ -12,8 +12,8 @@ public class CommentReportRequestDTO {
     private String commentReportTitle;
     @Schema(description = "신고 내용", example = "욕설이 포함된 댓글입니다.", required = true)
     private String commentReportDetail;
-    @Schema(description = "신고자 유저 번호", example = "1", required = true)
-    private Long userId;
+//    @Schema(description = "신고자 유저 번호", example = "1", required = true)
+//    private Long userId;
     @Schema(description = "신고 대상 댓글 번호", example = "1", required = true)
     private Long commentId;
 }

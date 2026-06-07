@@ -6,7 +6,9 @@ import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.domain.dto.response.ChatResponseDTO;
 import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import com.app.springapp.domain.vo.ChatRoomVO;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,4 +30,7 @@ public interface ChatService {
 
 //    모든 채팅방들을 불러와주기 (페이지네이션)
     public Map<String, Object> loadAllChatRoom(Map<String, Object> req);
+
+//    채팅 이미지 업로드 후 URL 반환
+    public String uploadChatImage(MultipartFile file) throws IOException;
 }

@@ -26,4 +26,7 @@ public interface UserAttendanceMapper {
 
     // 기간별 출석 날짜 조회
     public List<LocalDate> selectAttendanceDatesByPeriod(Long userId, LocalDate startDate, LocalDate endDate);
+
+    // 마지막 출석일 조회
+    public LocalDate selectLastAttendanceDate(Long userId);
 }

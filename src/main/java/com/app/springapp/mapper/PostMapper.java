@@ -45,4 +45,7 @@ public interface PostMapper {
 
 //    게시글 삭제 (소프트 삭제)
     public void updatePostIsDeleted(PostVO postVO);
+
+
+    public Long selectOwnerIdByPostId(Long postId);
 }

@@ -62,4 +62,8 @@ public class CommentDAO {
     public int isParentComment(Long commentId) {
         return commentMapper.isParentComment(commentId);
     }
+
+    public Long findOwnerIdByCommentId(Long commentId) {
+        return commentMapper.selectOwnerIdByCommentId(commentId);
+    }
 }

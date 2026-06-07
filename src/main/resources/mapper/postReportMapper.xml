@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.PostReportMapper">
+    <insert id="insert" parameterType="PostReportVO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_POST_REPORT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_POST_REPORT (ID, POST_REPORT_TITLE, POST_REPORT_DETAIL, USER_ID, POST_ID)
+        VALUES (#{id}, #{postReportTitle}, #{postReportDetail}, #{userId}, #{postId})
+    </insert>
+</mapper>

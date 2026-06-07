@@ -11,6 +11,8 @@
                TEST_LIMIT,
                TEST_LOCATION,
                TEST_PRICE,
+               TEST_RECEIPT_START,
+               TEST_RECEIPT_END,
                TEST_IS_DELETED
         FROM TBL_TEST
         WHERE TEST_IS_DELETED = 0
@@ -26,6 +28,8 @@
                TEST_LIMIT,
                TEST_LOCATION,
                TEST_PRICE,
+               TEST_RECEIPT_START,
+               TEST_RECEIPT_END,
                TEST_IS_DELETED
         FROM TBL_TEST
         WHERE ID = #{id}

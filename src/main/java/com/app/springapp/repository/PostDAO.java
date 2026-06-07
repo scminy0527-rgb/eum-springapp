@@ -77,4 +77,9 @@ public class PostDAO {
     public void updatePostIsDeleted(PostVO postVO) {
         postMapper.updatePostIsDeleted(postVO);
     }
+
+// 게시글 작성자 ID 조회
+    public Long findOwnerIdByPostId(Long postId) {
+        return postMapper.selectOwnerIdByPostId(postId);
+    }
 }

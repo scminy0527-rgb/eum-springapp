@@ -40,6 +40,13 @@ public class UserApi {
         return ResponseEntity.ok(userService.me(userDTO.getId()));
     }
 
+    // 이메일 중복 체크
+    @GetMapping("/email/exists")
+    @Operation(summary = "이메일 중복 체크", description = "해당 이메일로 가입된 계정이 있는지 확인")
+    public ResponseEntity<ApiResponseDTO> checkEmailExists(@RequestParam String email) {
+        return ResponseEntity.ok(userService.checkEmailExists(email));
+    }
+
     // 이메일 찾기
     @GetMapping("/email")
     @Operation(summary = "이메일 찾기", description = "이름으로 가입된 이메일 조회")

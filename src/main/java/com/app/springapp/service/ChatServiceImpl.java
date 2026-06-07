@@ -15,9 +15,15 @@ import com.app.springapp.repository.ChatRoomDAO;
 import com.app.springapp.repository.ChatUserDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +41,9 @@ public class ChatServiceImpl implements ChatService {
 //    private final CommunityAuthService communityAuthService;
     private final ChatUserDAO chatUserDAO;
     private final CommunityAuthService communityAuthService;
+
+    @Value("${file.upload.inquire}")
+    private String inquireUploadPath;
 
     //    채팅 메세지 관련
     //    채팅방 내 모든 메세지 불러오기
@@ -74,7 +83,7 @@ public class ChatServiceImpl implements ChatService {
 
         try {
             if(!isJoined) {
-                chatRoomService.joinChatRoom(chatRoomId);
+                chatRoomService.joinChatRoom(chatRoomId, userId);
             }
             chatDAO.save(chatVO);
             id = chatVO.getId();
@@ -124,5 +133,17 @@ public class ChatServiceImpl implements ChatService {
         result.put("roomCounts", roomCounts);
 
         return result;
+    }
+
+    @Override
+    public String uploadChatImage(MultipartFile file) throws IOException {
+        String chatUploadPath = inquireUploadPath + File.separator + "chat";
+        File dir = new File(chatUploadPath);
+        if (!dir.exists()) dir.mkdirs();
+
+        String savedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        file.transferTo(new File(chatUploadPath + File.separator + savedName));
+
+        return "/uploads/inquire/chat/" + savedName;
     }
 }

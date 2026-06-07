@@ -12,8 +12,8 @@ public class PostReportRequestDTO {
     private String postReportTitle;
     @Schema(description = "신고 내용", example = "욕설 및 혐오 표현이 포함된 게시글입니다.", required = true)
     private String postReportDetail;
-    @Schema(description = "신고자 유저 번호", example = "1", required = true)
-    private Long userId;
+//    @Schema(description = "신고자 유저 번호", example = "1", required = true)
+//    private Long userId;
     @Schema(description = "신고 대상 게시글 번호", example = "1", required = true)
     private Long postId;
 }

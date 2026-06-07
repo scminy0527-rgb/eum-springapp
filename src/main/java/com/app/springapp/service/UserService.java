@@ -16,6 +16,9 @@ public interface UserService {
     // 프로필 사진 수정
     public ApiResponseDTO updatePicture(UserVO userVO);
 
+    // 이메일 중복 체크
+    public ApiResponseDTO checkEmailExists(String email);
+
     // 이메일 찾기
     public ApiResponseDTO findEmail(String userName);
 

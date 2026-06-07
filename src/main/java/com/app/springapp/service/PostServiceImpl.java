@@ -26,10 +26,12 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = {Exception.class, PostException.class})
 public class PostServiceImpl implements PostService {
     private final PostDAO postDAO;
-    private final CommunityAuthService communityAuthService;
+//    private final CommunityAuthService communityAuthService;
     private final PostLikeDAO postLikeDAO;
     private final CommentDAO commentDAO;
     private final UserExpService userExpService;
+    private final NotificationService notificationService;
+
 
     @Override
     public Map<String, Object> getAllPosts(Map<String, Object> req) {
@@ -63,9 +65,7 @@ public class PostServiceImpl implements PostService {
 
 //    특정 게시글 조회
     @Override
-    public PostSelectResponseDTO getPost(Long id) {
-        Long userId = communityAuthService.getUserId();
-
+    public PostSelectResponseDTO getPost(Long id, Long userId) {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(id);
         postDTO.setUserId(userId);
@@ -147,9 +147,7 @@ public class PostServiceImpl implements PostService {
 
 //    게시글 작성
     @Override
-    public void writePost(PostRequestDTO postRequestDTO) {
-        Long userId = communityAuthService.getUserId();
-
+    public void writePost(Long userId, PostRequestDTO postRequestDTO) {
         PostVO postVO = PostVO.from(postRequestDTO);
         postVO.setUserId(userId);
 
@@ -165,8 +163,7 @@ public class PostServiceImpl implements PostService {
 
 //    게시글 수정
     @Override
-    public void updatePost(Long id, PostRequestDTO postRequestDTO) {
-        Long userId = communityAuthService.getUserId();
+    public void updatePost(Long userId, Long id, PostRequestDTO postRequestDTO) {
         PostVO postVO = PostVO.from(postRequestDTO);
         postVO.setId(id);
         postVO.setUserId(userId);
@@ -180,8 +177,7 @@ public class PostServiceImpl implements PostService {
 
 //    게시글 삭제 (게시글에 있는 모든 댓글도 삭제)
     @Override
-    public void deletePost(Long id) {
-        Long userId = communityAuthService.getUserId();
+    public void deletePost(Long userId, Long id) {
         if(canTouchPost(id, userId)){
             PostVO postVO = new PostVO();
             postVO.setId(id);
@@ -220,18 +216,25 @@ public class PostServiceImpl implements PostService {
 
 //    게시글 좋아요 증가 시키기
     @Override
-    public void increasePostLikeCount(Long postId) {
-        Long userId = communityAuthService.getUserId();
-
-//        유효성 검증
-        communityAuthService.checkUserValidity(userId);
-
+    public void increasePostLikeCount(Long userId, Long postId) {
         PostLikeVO postLikeVO = new PostLikeVO();
         postLikeVO.setPostId(postId);
         postLikeVO.setUserId(userId);
 
         try {
             postLikeDAO.save(postLikeVO);
+
+            // 게시글 작성자에게 좋아요 알림 (본인 제외)
+            Long postOwnerId = postDAO.findOwnerIdByPostId(postId);
+            if (postOwnerId != null && !postOwnerId.equals(userId)) {
+                notificationService.send(
+                        postOwnerId,
+                        "COMMUNITY_LIKE",
+                        "게시글에 좋아요가 달렸어요! ❤️",
+                        "회원님의 게시글에 좋아요가 달렸습니다.",
+                        "/community/post/" + postId
+                );
+            }
         } catch (Exception e) {
             throw new PostException(HttpStatus.BAD_REQUEST, "해당 게시글에 좋아요 할 수 없습니다.");
         }
@@ -239,10 +242,7 @@ public class PostServiceImpl implements PostService {
 
 //    게시글 좋아요 삭제
     @Override
-    public void cancelPostLike(Long postId) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
+    public void cancelPostLike(Long userId, Long postId) {
         PostLikeVO postLikeVO = new PostLikeVO();
         postLikeVO.setPostId(postId);
         postLikeVO.setUserId(userId);

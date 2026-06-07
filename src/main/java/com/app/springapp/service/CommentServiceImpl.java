@@ -7,6 +7,8 @@ import com.app.springapp.domain.vo.CommentVO;
 import com.app.springapp.exception.CommentException;
 import com.app.springapp.repository.CommentDAO;
 import com.app.springapp.repository.CommentLikeDAO;
+
+import com.app.springapp.repository.PostDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,13 +26,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommentServiceImpl implements CommentService {
     private final CommentDAO commentDAO;
-    private final CommunityAuthService communityAuthService;
     private final CommentLikeDAO commentLikeDAO;
     private final UserExpService userExpService;
+    private final NotificationService notificationService;
+    private final PostDAO postDAO;
 
     @Override
-    public List<CommentResponseDTO> getAllPostComments(Long postId) {
-        Long userId = communityAuthService.getUserId();
+    public List<CommentResponseDTO> getAllPostComments(Long postId, Long userId) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("postId", postId);
@@ -77,29 +79,33 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void writePostComment(Long postId, CommentRequestDTO commentRequestDTO) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
+    public void writePostComment(Long postId, Long userId, CommentRequestDTO commentRequestDTO) {
         CommentVO commentVO = CommentVO.from(commentRequestDTO);
         commentVO.setPostId(postId);
         commentVO.setUserId(userId);
 
         try {
             commentDAO.save(commentVO);
-
-            //  댓글 작성 경험치 지급
             userExpService.addCommentExp(userId, commentVO.getId());
+
+            // 게시글 작성자에게 알림 (본인 댓글 제외)
+            Long postOwnerId = postDAO.findOwnerIdByPostId(postId);
+            if (postOwnerId != null && !postOwnerId.equals(userId)) {
+                notificationService.send(
+                        postOwnerId,
+                        "COMMUNITY_REPLY",
+                        "새 댓글이 달렸어요!",
+                        "회원님의 게시글에 댓글이 달렸습니다.",
+                        "/community/post/" + postId
+                );
+            }
         } catch (Exception e) {
             throw new CommentException(HttpStatus.BAD_REQUEST, "댓글 작성 실패");
         }
     }
 
     @Override
-    public void writePostReply(Long postId, Long commentId, CommentRequestDTO commentRequestDTO) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
+    public void writePostReply(Long postId, Long commentId, Long userId, CommentRequestDTO commentRequestDTO) {
         CommentVO parentCheck = new CommentVO();
         parentCheck.setId(commentId);
         parentCheck.setPostId(postId);
@@ -115,18 +121,26 @@ public class CommentServiceImpl implements CommentService {
 
         try {
             commentDAO.save(commentVO);
-
-            //        대댓글 작성 경험치 지급
             userExpService.addCommentExp(userId, commentVO.getId());
+
+            // 원댓글 작성자에게 알림 (본인 대댓글 제외)
+            Long commentOwnerId = commentDAO.findOwnerIdByCommentId(commentId);
+            if (commentOwnerId != null && !commentOwnerId.equals(userId)) {
+                notificationService.send(
+                        commentOwnerId,
+                        "COMMUNITY_REPLY",
+                        "새 대댓글이 달렸어요!",
+                        "회원님의 댓글에 대댓글이 달렸습니다.",
+                        "/community/post/" + postId
+                );
+            }
         } catch (Exception e) {
             throw new CommentException(HttpStatus.BAD_REQUEST, "대댓글 작성 실패");
         }
     }
 
     @Override
-    public void updateComment(Long commentId, CommentRequestDTO commentRequestDTO) {
-        Long userId = communityAuthService.getUserId();
-
+    public void updateComment(Long commentId, Long userId, CommentRequestDTO commentRequestDTO) {
         CommentVO commentVO = new CommentVO();
         commentVO.setId(commentId);
         commentVO.setUserId(userId);
@@ -140,9 +154,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long commentId) {
-        Long userId = communityAuthService.getUserId();
-
+    public void deleteComment(Long commentId, Long userId) {
         CommentVO commentVO = new CommentVO();
         commentVO.setId(commentId);
         commentVO.setUserId(userId);
@@ -161,16 +173,25 @@ public class CommentServiceImpl implements CommentService {
 
 //    댓글 좋아요 남기기
     @Override
-    public void addCommentLike(Long commentId) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
-        CommentLikeVO  commentLikeVO = new CommentLikeVO();
+    public void addCommentLike(Long commentId, Long userId) {
+        CommentLikeVO commentLikeVO = new CommentLikeVO();
         commentLikeVO.setCommentId(commentId);
         commentLikeVO.setUserId(userId);
 
         try {
             commentLikeDAO.save(commentLikeVO);
+
+            // 댓글 작성자에게 좋아요 알림 (본인 제외)
+            Long commentOwnerId = commentDAO.findOwnerIdByCommentId(commentId);
+            if (commentOwnerId != null && !commentOwnerId.equals(userId)) {
+                notificationService.send(
+                        commentOwnerId,
+                        "COMMUNITY_LIKE",
+                        "댓글에 좋아요가 달렸어요! ❤️",
+                        "회원님의 댓글에 좋아요가 달렸습니다.",
+                        "/community"
+                );
+            }
         } catch (Exception e) {
             throw new CommentException(HttpStatus.BAD_REQUEST, "댓글 좋아요 추가 실패");
         }
@@ -178,10 +199,7 @@ public class CommentServiceImpl implements CommentService {
 
 //    좋아요 취소
     @Override
-    public void cancelCommentLike(Long commentId) {
-        Long userId = communityAuthService.getUserId();
-        communityAuthService.checkUserValidity(userId);
-
+    public void cancelCommentLike(Long commentId, Long userId) {
 //        DAO 에 전달 할 VO 제작
         CommentLikeVO commentLikeVO = new CommentLikeVO();
         commentLikeVO.setCommentId(commentId);

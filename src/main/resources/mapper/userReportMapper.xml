@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.UserReportMapper">
+    <insert id="insert" parameterType="UserReportVO">
+        <selectKey resultType="Long" keyProperty="id" order="BEFORE">
+            SELECT SEQ_USER_REPORT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_USER_REPORT (ID, USER_REPORT_TITLE, USER_REPORT_DETAIL, USER_ID, REPORTING_USER_ID)
+        VALUES (#{id}, #{userReportTitle}, #{userReportDetail}, #{userId}, #{reportingUserId})
+    </insert>
+</mapper>

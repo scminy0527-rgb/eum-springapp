@@ -23,6 +23,10 @@ public class TestDTO {
     private String testLocation;
     @Schema(description = "시험 응시료", example = "50000")
     private int testPrice;
+    @Schema(description = "접수 시작일", example = "2024-05-01T00:00:00")
+    private LocalDateTime testReceiptStart;
+    @Schema(description = "접수 종료일", example = "2024-05-14T23:59:59")
+    private LocalDateTime testReceiptEnd;
     @Schema(description = "삭제 여부 (0: 미삭제, 1: 삭제)", example = "0")
     private int testIsDeleted;
 }

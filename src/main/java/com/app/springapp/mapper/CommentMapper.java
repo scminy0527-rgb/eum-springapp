@@ -32,4 +32,6 @@ public interface CommentMapper {
     public void updateDeleteByPostId(Long postId);
 
     public int isParentComment(Long commentId);
+
+    public Long selectOwnerIdByCommentId(Long commentId);
 }
