@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.springapp.mapper.NotificationMapper">
+
+    <insert id="insert" parameterType="NotificationDTO">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT SEQ_NOTIFICATION.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TBL_NOTIFICATION (
+        ID, NOTIFICATION_TYPE, NOTIFICATION_NAME, NOTIFICATION_CONTENT,
+        NOTIFICATION_URL, USER_ID
+        ) VALUES (
+        #{id}, #{notificationType}, #{notificationName}, #{notificationContent},
+        #{notificationUrl}, #{userId}
+        )
+    </insert>
+
+    <select id="selectAllByUserId" parameterType="Long" resultType="NotificationDTO">
+        SELECT ID, NOTIFICATION_TYPE, NOTIFICATION_NAME, NOTIFICATION_CONTENT,
+               NOTIFICATION_URL, NOTIFICATION_IS_READ, NOTIFICATION_READ_AT,
+               NOTIFICATION_IS_DELETED, NOTIFICATION_CREATE_AT, USER_ID
+        FROM TBL_NOTIFICATION
+        WHERE USER_ID = #{userId}
+          AND NOTIFICATION_IS_DELETED = 0
+        ORDER BY NOTIFICATION_CREATE_AT DESC
+    </select>
+
+    <select id="countUnread" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM TBL_NOTIFICATION
+        WHERE USER_ID = #{userId}
+          AND NOTIFICATION_IS_READ = 0
+          AND NOTIFICATION_IS_DELETED = 0
+    </select>
+
+    <update id="markAsRead" parameterType="Long">
+        UPDATE TBL_NOTIFICATION
+        SET NOTIFICATION_IS_READ = 1,
+            NOTIFICATION_READ_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
+    </update>
+
+    <update id="markAllAsRead" parameterType="Long">
+        UPDATE TBL_NOTIFICATION
+        SET NOTIFICATION_IS_READ = 1,
+            NOTIFICATION_READ_AT = CURRENT_TIMESTAMP
+        WHERE USER_ID = #{userId}
+          AND NOTIFICATION_IS_READ = 0
+    </update>
+
+    <update id="softDelete" parameterType="Long">
+        UPDATE TBL_NOTIFICATION
+        SET NOTIFICATION_IS_DELETED = 1
+        WHERE ID = #{id}
+    </update>
+
+</mapper>

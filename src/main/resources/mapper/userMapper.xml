@@ -79,4 +79,7 @@
         UPDATE TBL_USER SET USER_PASSWORD = #{newPassword} WHERE USER_EMAIL = #{userEmail}
     </update>
 
+    <select id="selectAllUserIds" resultType="Long">
+        SELECT ID FROM TBL_USER
+    </select>
 </mapper>

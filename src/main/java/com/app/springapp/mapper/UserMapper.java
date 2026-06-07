@@ -5,6 +5,8 @@ import com.app.springapp.domain.vo.UserVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     // 유저 추가
@@ -27,4 +29,6 @@ public interface UserMapper {
     public boolean existsUserByEmail(@Param("userEmail") String userEmail);
     // 비밀번호 재설정
     public void updatePasswordByEmail(@Param("userEmail") String userEmail, @Param("newPassword") String newPassword);
+    // 전체 유저 ID 조회
+    public List<Long> selectAllUserIds();
 }

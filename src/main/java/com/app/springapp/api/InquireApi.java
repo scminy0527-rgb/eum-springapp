@@ -4,6 +4,7 @@ import com.app.springapp.domain.dto.InquireDTO;
 import com.app.springapp.domain.dto.request.InquireUpdateRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
 import com.app.springapp.service.InquireService;
+import com.app.springapp.service.NotificationService;
 import com.app.springapp.util.JwtTokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class InquireApi {
 
     private final InquireService inquireService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final NotificationService notificationService;
 
     // 문의 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -124,6 +126,17 @@ public class InquireApi {
 
         inquireDTO.setId(id);
         inquireService.update(inquireDTO);
+
+        // 문의 작성자에게 알림 전송
+        InquireDTO original = inquireService.findInquireById(id);
+        notificationService.send(
+                original.getUserId(),
+                "INQUIRY_ANSWER",
+                "문의 답변 도착",
+                "회원님의 문의에 답변이 등록되었습니다.",
+                "/customservice/result"
+        );
+
         return ResponseEntity.ok(ApiResponseDTO.of(true, "답변 등록 성공"));
     }
 

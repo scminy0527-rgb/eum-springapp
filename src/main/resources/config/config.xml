@@ -61,6 +61,7 @@
         <typeAlias type="com.app.springapp.domain.dto.ReviewDTO" alias="ReviewDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.PaymentDTO" alias="PaymentDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.UserExpHistoryDTO" alias="UserExpHistoryDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.NotificationDTO" alias="NotificationDTO"/>
 
 
         <!-- Request DTO Alias -->
