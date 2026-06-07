@@ -10,6 +10,9 @@ public interface WordsService {
     // 학습별 단어 목록 조회
     public List<WordsResponseDTO> getWordsByEduId(Long eduId);
 
+    // 학습별 랜덤 단어 목록 조회
+    public List<WordsResponseDTO> getRandomWordsByEduId(Long eduId, int limit);
+
     // 단어 상세 조회
     public WordsResponseDTO getWordById(Long id);
 

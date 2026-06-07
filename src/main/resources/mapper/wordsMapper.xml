@@ -13,6 +13,26 @@
         ORDER BY TEWM.ID ASC
     </select>
 
+    <!-- 학습별 랜덤 단어 목록 조회: 학습-단어 매핑 번호 기준으로 랜덤 추출 -->
+    <select id="selectRandomByEduId" resultType="WordsResponseDTO">
+        SELECT TEWM.ID AS EDU_WORD_MAP_ID,
+               TBW.ID, TBW.WORDS_TITLE, TBW.WORDS_DETAIL, TBW.WORDS_IMAGE, TBW.WORDS_TYPE, TBW.EDU_VIDEO_ID, TBW.SIGN_WORD_ID
+        FROM TBL_EDU_WORD_MAP TEWM
+            JOIN TBL_WORDS TBW
+              ON TEWM.WORDS_ID = TBW.ID
+        WHERE TEWM.ID IN (
+            SELECT ID
+            FROM (
+                SELECT ID
+                FROM TBL_EDU_WORD_MAP
+                WHERE EDU_ID = #{eduId}
+                ORDER BY DBMS_RANDOM.VALUE()
+            )
+            WHERE ROWNUM <![CDATA[<=]]> #{limit}
+        )
+        ORDER BY TEWM.ID ASC
+    </select>
+
     <!-- 단어 상세 조회 -->
     <select id="select" parameterType="Long" resultType="WordsResponseDTO">
         SELECT ID, WORDS_TITLE, WORDS_DETAIL, WORDS_IMAGE, WORDS_TYPE, EDU_VIDEO_ID, SIGN_WORD_ID

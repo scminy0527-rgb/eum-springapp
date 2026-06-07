@@ -7,6 +7,11 @@
 -- 3. Swagger에서 GET /api/words/edu/1 확인
 -- 4. eduId 1, 2, 3에 각각 5개씩 나오면 완료
 
+-- OpenAPI 학습 단어 초기 등록용 seed SQL
+-- 현재는 /study/admin 관리자 화면에서 학습 단어를 등록할 수 있고
+-- 다만 팀원 로컬 DB 초기 세팅이나 동일한 테스트 데이터 복구가 필요할 때 이 파일 실행하기
+-- 실행 전 POST /api/sign-words/sync로 TBL_SIGN_WORD 동기화 먼저 ↓
+
 -- 팀원들이 실행할 순서
 -- 1. Swagger: POST /api/sign-words/sync -> 1 ~ 299 execute
 -- 2. DB: seed_edu_openapi.sql 전체 실행

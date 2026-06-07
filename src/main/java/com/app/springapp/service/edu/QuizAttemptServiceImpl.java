@@ -27,6 +27,7 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
     private final QuizAttemptDAO quizAttemptDAO;
     private final QuizAttemptDetailDAO quizAttemptDetailDAO;
     private final QuizChoiceDAO quizChoiceDAO;
+    private final RewardService rewardService;
 
     // 퀴즈 제출 및 채점
     @Override
@@ -63,6 +64,16 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
 
         quizAttemptVO.setQuizAttemptScore(score);
         quizAttemptDAO.updateScore(quizAttemptVO);
+
+        // 퀴즈 완료 보상 지급
+        if (score >= Math.ceil(totalCount / 2.0)) {
+            rewardService.grantReward(
+                    requestDTO.getUserId(),
+                    "QUIZ",
+                "CHAPTER_DONE",
+                    quizAttemptVO.getId()
+            );
+        }
 
         return quizAttemptDAO.findById(quizAttemptVO.getId())
                 .orElseThrow(() -> new EduException("퀴즈 응시 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));

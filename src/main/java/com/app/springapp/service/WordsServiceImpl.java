@@ -25,6 +25,14 @@ public class WordsServiceImpl implements WordsService {
         return wordsDAO.findWordsByEduId(eduId);
     }
 
+    // 학습별 랜덤 단어 목록 조회
+    @Override
+    public List<WordsResponseDTO> getRandomWordsByEduId(Long eduId, int limit) {
+        // 문제 추가 limit
+        int safeLimit = limit <= 0 ? 5 : Math.min(limit, 20);
+        return wordsDAO.findRandomWordsByEduId(eduId, safeLimit);
+    }
+
     // 단어 상세 조회
     @Override
     public WordsResponseDTO getWordById(Long id) {

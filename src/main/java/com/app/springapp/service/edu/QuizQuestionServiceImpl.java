@@ -2,6 +2,7 @@ package com.app.springapp.service.edu;
 
 import com.app.springapp.domain.dto.response.QuizQuestionResponseDTO;
 import com.app.springapp.exception.EduException;
+import com.app.springapp.repository.QuizChoiceDAO;
 import com.app.springapp.repository.QuizQuestionDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -17,11 +19,18 @@ import java.util.List;
 @Transactional(rollbackFor = {Exception.class})
 public class QuizQuestionServiceImpl implements QuizQuestionService {
     private final QuizQuestionDAO quizQuestionDAO;
+    private final QuizChoiceDAO quizChoiceDAO;
 
-    // 퀴즈별 문제 목록 조회
+    // 문제별 보기 목록을 포함해서 퀴즈 문제를 조회
     @Override
     public List<QuizQuestionResponseDTO> getQuestionsByQuizId(Long quizId) {
-        return quizQuestionDAO.findQuestionsByQuizId(quizId);
+        List<QuizQuestionResponseDTO> questions = quizQuestionDAO.findQuestionsByQuizId(quizId);
+
+        questions.forEach(question ->
+                question.setChoices(quizChoiceDAO.findChoicesByQuestionId(question.getId()))
+        );
+
+        return questions;
     }
 
     // 문제 상세 조회

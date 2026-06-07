@@ -19,6 +19,11 @@ public class WordsDAO {
         return wordsMapper.selectByEduId(eduId);
     }
 
+    // 학습별 랜덤 단어 목록 조회
+    public List<WordsResponseDTO> findRandomWordsByEduId(Long eduId, int limit) {
+        return wordsMapper.selectRandomByEduId(eduId, limit);
+    }
+
     // 단어 상세 조회
     public Optional<WordsResponseDTO> findWordById(Long id) {
         return Optional.ofNullable(wordsMapper.select(id));
