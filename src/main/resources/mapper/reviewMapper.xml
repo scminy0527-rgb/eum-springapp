@@ -8,18 +8,18 @@
     </insert>
 
     <!-- 후기 전체 조회 (유저 정보 JOIN) -->
-    <select id="selectAllReviews" resultType="com.app.springapp.domain.dto.response.ReviewResponseDTO">
+    <select id="selectAllReviews" resultType="ReviewResponseDTO">
         SELECT
             REVIEW.REVIEW_ID       AS reviewId,
-            USERS.USER_NICKNAME   AS userNickname,
-            USERS.USER_PROFILE    AS userProfile,
-            USERS.USER_JOB        AS userJob,
+            USERS.USER_NICKNAME    AS userNickname,
+            USERS.USER_PROFILE     AS userProfile,
+            USERS.USER_JOB         AS userJob,
             REVIEW.REVIEW_RATING   AS reviewRating,
             REVIEW.REVIEW_TAGS     AS reviewTags,
             REVIEW.REVIEW_CONTENT  AS reviewContent,
             TO_CHAR(REVIEW.REVIEW_DATE, 'YYYY-MM-DD') AS reviewDate
         FROM TBL_REVIEW REVIEW
                  JOIN TBL_USER USERS ON REVIEW.USER_ID = USERS.ID
-        ORDER BY REVIEW.REVIEW_DATE DESC
+        ORDER BY REVIEW.REVIEW_RATING DESC, REVIEW.REVIEW_DATE DESC  /* ← 평점+최신순 */
     </select>
 </mapper>

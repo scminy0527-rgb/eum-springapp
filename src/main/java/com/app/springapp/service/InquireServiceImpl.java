@@ -6,11 +6,17 @@ import com.app.springapp.exception.UserException;
 import com.app.springapp.repository.InquireDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(rollbackFor = {Exception.class})
@@ -63,5 +69,29 @@ public class InquireServiceImpl implements InquireService {
         inquireDAO.updateContent(inquireDTO);
     }
 
+    @Value("${file.upload.inquire}")
+    private String uploadPath;
+
+    @Override
+    public void saveWithFile(InquireDTO inquireDTO, List<MultipartFile> files) throws IOException {
+        log.info("files: {}", files);
+        if (files != null && !files.isEmpty()) {
+            File dir = new File(uploadPath);
+            if (!dir.exists()) dir.mkdirs();
+
+            List<String> urls = new ArrayList<>();
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String savedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                    file.transferTo(new File(uploadPath + File.separator + savedName));
+                    urls.add("/uploads/inquire/" + savedName);
+                }
+            }
+            // 쉼표로 구분해서 저장
+            inquireDTO.setInquireFileUrl(String.join(",", urls));
+            log.info("저장할 fileUrl: {}", inquireDTO.getInquireFileUrl());
+        }
+        inquireDAO.save(InquireVO.from(inquireDTO));
+    }
 
 }

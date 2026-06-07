@@ -111,6 +111,7 @@ public class SignWordServiceImpl implements SignWordService {
     @Cacheable(value = "todaySignWords", key = "T(java.time.LocalDate).now().toString()", unless = "#result == null || #result.isEmpty()")
     @Override
     public List<SignWordResponseDTO> getTodaySignWords() {
+//        long seed = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+09:00")); // 1분뒤 뱐걍
         long seed = LocalDate.now().toEpochDay();
         List<SignWordResponseDTO> allWords = getSignWords();
         Collections.shuffle(allWords, new Random(seed));
@@ -136,9 +137,10 @@ public class SignWordServiceImpl implements SignWordService {
     }
 
     // 자정마다 자동 초기화
+//    @Scheduled(cron = "0 */1 * * * *") // 1분마다 캐쉬 초기화
     @Scheduled(cron = "0 0 0 * * *")
     public void scheduledClearCache() {
-        log.warn("=== 캐시 자동 초기화 실행 ===");
+//        log.warn("=== 캐시 자동 초기화 실행 ===");
         redisTemplate.delete("todaySignWords::" + LocalDate.now().toString());
     }
 

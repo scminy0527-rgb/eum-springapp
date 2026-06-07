@@ -8,9 +8,12 @@ import com.app.springapp.util.JwtTokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +27,15 @@ public class InquireApi {
     private final JwtTokenUtil jwtTokenUtil;
 
     // 문의 등록
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "문의 등록")
     public ResponseEntity<ApiResponseDTO> save(
-            @RequestBody InquireDTO inquireDTO,
-            @CookieValue(name = "accessToken", required = false) String accessToken) {
+            @RequestPart("inquireType") String inquireType,
+            @RequestPart("inquireTitle") String inquireTitle,
+            @RequestPart("inquireContent") String inquireContent,
+            @RequestPart("inquireEmail") String inquireEmail,
+            @RequestPart(value = "file", required = false) List<MultipartFile> files,
+            @CookieValue(name = "accessToken", required = false) String accessToken) throws IOException {
 
         if (accessToken == null) {
             return ResponseEntity.status(401).body(ApiResponseDTO.of(false, "인증 실패"));
@@ -36,9 +43,15 @@ public class InquireApi {
 
         Map<String, Object> claims = jwtTokenUtil.parseToken(accessToken);
         Long userId = Long.parseLong((String) claims.get("id"));
-        inquireDTO.setUserId(userId);
 
-        inquireService.save(inquireDTO);
+        InquireDTO inquireDTO = new InquireDTO();
+        inquireDTO.setUserId(userId);
+        inquireDTO.setInquireType(inquireType);
+        inquireDTO.setInquireTitle(inquireTitle);
+        inquireDTO.setInquireContent(inquireContent);
+        inquireDTO.setInquireEmail(inquireEmail);
+
+        inquireService.saveWithFile(inquireDTO, files);
         return ResponseEntity.ok(ApiResponseDTO.of(true, "문의 등록 성공"));
     }
 

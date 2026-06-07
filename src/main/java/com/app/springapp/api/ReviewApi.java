@@ -41,8 +41,13 @@ public class ReviewApi {
     }
 
     @GetMapping("/reviews")
-    @Operation(summary = "후기 전체 조회", description = "메인 페이지에 표시할 전체 후기 목록을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @Operation(summary = "오늘의 후기 조회", description = "날짜 기반으로 매일 바뀌는 후기 목록을 조회합니다.")
+    public ResponseEntity<List<ReviewResponseDTO>> getTodayReviews() {
+        return ResponseEntity.ok(reviewService.getTodayReviews());
+    }
+
+    @GetMapping("/reviews/all")
+    @Operation(summary = "후기 전체 조회", description = "후기 전체 페이지에 표시할 전체 목록을 조회합니다.")
     public ResponseEntity<List<ReviewResponseDTO>> getAllReviews() {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
