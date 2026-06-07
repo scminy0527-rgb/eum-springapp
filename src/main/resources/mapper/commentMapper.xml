@@ -101,4 +101,8 @@
         WHERE ID = #{commentId} AND COMMENT_ID IS NULL AND COMMENT_IS_DELETED = 0
     </select>
 
+    <select id="selectOwnerIdByCommentId" parameterType="Long" resultType="Long">
+        SELECT USER_ID FROM TBL_COMMENT WHERE ID = #{commentId}
+    </select>
+
 </mapper>

@@ -6,6 +6,7 @@ import com.app.springapp.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -61,5 +62,10 @@ public class UserDAO {
     // 비밀번호 재설정
     public void updatePasswordByEmail(String userEmail, String newPassword) {
         userMapper.updatePasswordByEmail(userEmail, newPassword);
+    }
+
+    // 전체 유저 조회
+    public List<Long> findAllUserIds() {
+        return userMapper.selectAllUserIds();
     }
 }

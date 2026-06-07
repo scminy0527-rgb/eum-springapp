@@ -62,4 +62,11 @@
         ORDER BY USER_ATTENDANCE_DATE ASC
     </select>
 
+    <!-- 마지막 출석일 조회 -->
+    <select id="selectLastAttendanceDate" parameterType="Long" resultType="java.time.LocalDate">
+        SELECT MAX(USER_ATTENDANCE_DATE)
+        FROM TBL_USER_ATTENDANCE
+        WHERE USER_ID = #{userId}
+    </select>
+
 </mapper>

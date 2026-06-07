@@ -30,6 +30,8 @@ public class PostServiceImpl implements PostService {
     private final PostLikeDAO postLikeDAO;
     private final CommentDAO commentDAO;
     private final UserExpService userExpService;
+    private final NotificationService notificationService;
+
 
     @Override
     public Map<String, Object> getAllPosts(Map<String, Object> req) {
@@ -221,6 +223,18 @@ public class PostServiceImpl implements PostService {
 
         try {
             postLikeDAO.save(postLikeVO);
+
+            // 게시글 작성자에게 좋아요 알림 (본인 제외)
+            Long postOwnerId = postDAO.findOwnerIdByPostId(postId);
+            if (postOwnerId != null && !postOwnerId.equals(userId)) {
+                notificationService.send(
+                        postOwnerId,
+                        "COMMUNITY_LIKE",
+                        "게시글에 좋아요가 달렸어요! ❤️",
+                        "회원님의 게시글에 좋아요가 달렸습니다.",
+                        "/community/post/" + postId
+                );
+            }
         } catch (Exception e) {
             throw new PostException(HttpStatus.BAD_REQUEST, "해당 게시글에 좋아요 할 수 없습니다.");
         }
