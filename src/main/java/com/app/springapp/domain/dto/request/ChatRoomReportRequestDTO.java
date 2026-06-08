@@ -12,8 +12,8 @@ public class ChatRoomReportRequestDTO {
     private String chatRoomReportTitle;
     @Schema(description = "신고 내용", example = "불법 정보가 공유되는 채팅방입니다.", required = true)
     private String chatRoomReportDetail;
-    @Schema(description = "신고자 유저 번호", example = "1", required = true)
-    private Long userId;
+//    @Schema(description = "신고자 유저 번호", example = "1", required = true)
+//    private Long userId;
     @Schema(description = "신고 대상 채팅방 번호", example = "1", required = true)
     private Long chatRoomId;
 }
