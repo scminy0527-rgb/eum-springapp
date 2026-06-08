@@ -1,9 +1,12 @@
 package com.app.springapp.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.List;
 
 //  XML 파싱용 수어 단어 DTO
 @Data
@@ -39,4 +42,10 @@ public class SignWordXmlItemDTO {
     @JacksonXmlProperty(localName = "url")
     @Schema(description = "수어 원본 페이지 주소")
     private String url;
+
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty(localName = "item")
+    @Schema(description = "수어 OpenAPI item 목록")
+    private List<SignWordXmlItemDTO> item;
+
 }

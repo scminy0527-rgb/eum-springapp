@@ -15,11 +15,11 @@ import java.util.List;
 public class SignWordXmlBodyDTO {
 
     @JacksonXmlElementWrapper(useWrapping = false) //  items -> 큰 박스
-    @JacksonXmlProperty(localName = "item") // 큰 박스 -> item을 리스트로 담음
-    @Schema(description = "수어 단어 목록")
-    private List<SignWordXmlItemDTO> items;
+    @JacksonXmlProperty(localName = "items") // 큰 박스 -> item을 리스트로 담음
+    @Schema(description = "수어 OpenAPI items 목록")
+    private SignWordXmlItemDTO items;
 
     @JacksonXmlProperty(localName = "totalCount")
-    @Schema(description = "전체 수어 단어 개수", example = "299")
+    @Schema(description = "전체 수어 데이터 개수", example = "3753")
     private int totalCount;
 }

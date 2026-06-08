@@ -106,6 +106,18 @@ public class EduWordMapServiceImpl implements EduWordMapService {
         SignWordResponseDTO signWord = signWordDAO.findById(requestDTO.getSignWordId())
                 .orElseThrow(() -> new EduException("수어 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
 
+        String signWordDetail = signWord.getSignWordDescription() != null && !signWord.getSignWordDescription().isBlank()
+                ? signWord.getSignWordDescription()
+                : "수어 설명이 준비되지 않았습니다.";
+
+        String signWordImage = signWord.getSignWordThumbnailUrl() != null && !signWord.getSignWordThumbnailUrl().isBlank()
+                        ? signWord.getSignWordThumbnailUrl()
+                        : signWord.getSignWordImages();
+
+        if (signWordImage == null || signWordImage.isBlank()) {
+            signWordImage = "default.jpg";
+        }
+
         Long wordsId;
 
         // 이미 같은 OpenAPI 수어로 만든 학습 단어가 있는지 확인
@@ -120,7 +132,7 @@ public class EduWordMapServiceImpl implements EduWordMapService {
             if (signWord.getSignWordVideoUrl() != null && !signWord.getSignWordVideoUrl().isBlank()) {
                 EduVideoVO eduVideoVO = new EduVideoVO();
                 eduVideoVO.setEduVideoTitle(signWord.getSignWordTitle() + " 수어 영상");
-                eduVideoVO.setEduVideoDetail(signWord.getSignWordDescription());
+                eduVideoVO.setEduVideoDetail(signWordDetail);
                 eduVideoVO.setEduVideoType("openapi");
                 eduVideoVO.setEduVideoUrl(signWord.getSignWordVideoUrl());
 
@@ -131,12 +143,8 @@ public class EduWordMapServiceImpl implements EduWordMapService {
             // OpenAPI 수어 데이터를 학습 단어로 등록
             WordsVO wordsVO = new WordsVO();
             wordsVO.setWordsTitle(signWord.getSignWordTitle());
-            wordsVO.setWordsDetail(signWord.getSignWordDescription());
-            wordsVO.setWordsImage(
-                    signWord.getSignWordThumbnailUrl() != null && !signWord.getSignWordThumbnailUrl().isBlank()
-                            ? signWord.getSignWordThumbnailUrl()
-                            : signWord.getSignWordImages()
-            );
+            wordsVO.setWordsDetail(signWordDetail);
+            wordsVO.setWordsImage(signWordImage);
             wordsVO.setWordsType(requestDTO.getWordsType());
             wordsVO.setEduVideoId(eduVideoId);
             wordsVO.setSignWordId(requestDTO.getSignWordId());
