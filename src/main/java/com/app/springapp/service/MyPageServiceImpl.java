@@ -250,7 +250,32 @@ public class MyPageServiceImpl implements MyPageService {
         Map<String, Object> data = (Map<String, Object>) response.getData();
         String uploadedUrl = String.valueOf(data.get("uploadedUrl"));
 
-        myPageDAO.updateUserProfile(uploadedUrl, userId);
+        //    프로필 이미지는 화면 출력용 썸네일 경로를 저장
+        String thumbnailUrl = convertProfileThumbnailUrl(uploadedUrl);
+
+        myPageDAO.updateUserProfile(thumbnailUrl, userId);
+    }
+
+    //    원본 이미지 경로를 썸네일 이미지 경로로 변경
+    private String convertProfileThumbnailUrl(String uploadedUrl) {
+        if (uploadedUrl == null || uploadedUrl.isBlank()) {
+            return uploadedUrl;
+        }
+
+        int lastSlashIndex = uploadedUrl.lastIndexOf("/");
+
+        if (lastSlashIndex < 0) {
+            return uploadedUrl.startsWith("t_") ? uploadedUrl : "t_" + uploadedUrl;
+        }
+
+        String dirPath = uploadedUrl.substring(0, lastSlashIndex + 1);
+        String fileName = uploadedUrl.substring(lastSlashIndex + 1);
+
+        if (fileName.startsWith("t_")) {
+            return uploadedUrl;
+        }
+
+        return dirPath + "t_" + fileName;
     }
 
     //    프로필 사진 기본 이미지로 변경
