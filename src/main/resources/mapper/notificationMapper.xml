@@ -61,4 +61,12 @@
           AND NOTIFICATION_TYPE = #{type}
           AND NOTIFICATION_IS_READ = 0
     </update>
+
+    <select id="countUnreadByUserIdAndType" resultType="int">
+        SELECT COUNT(*) FROM TBL_NOTIFICATION
+        WHERE USER_ID = #{userId}
+          AND NOTIFICATION_TYPE = #{type}
+          AND NOTIFICATION_IS_READ = 0
+          AND NOTIFICATION_IS_DELETED = 0
+    </select>
 </mapper>

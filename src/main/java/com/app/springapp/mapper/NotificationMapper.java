@@ -15,4 +15,5 @@ public interface NotificationMapper {
     public void markAllAsRead(Long userId);
     public void softDelete(Long id);
     public void updateAllReadByUserIdAndType(@Param("userId") Long userId, @Param("type") String type);
+    public int countUnreadByUserIdAndType(@Param("userId") Long userId, @Param("type") String type);
 }

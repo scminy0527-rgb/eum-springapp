@@ -39,4 +39,8 @@ public class NotificationDAO {
     public void markAllReadByUserIdAndType(Long userId, String type) {
         notificationMapper.updateAllReadByUserIdAndType(userId, type);
     }
+
+    public int countUnreadByUserIdAndType(Long userId, String type) {
+        return notificationMapper.countUnreadByUserIdAndType(userId, type);
+    }
 }

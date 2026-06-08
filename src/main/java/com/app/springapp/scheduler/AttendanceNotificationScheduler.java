@@ -1,5 +1,6 @@
 package com.app.springapp.scheduler;
 
+import com.app.springapp.repository.NotificationDAO;
 import com.app.springapp.repository.ReviewDAO;
 import com.app.springapp.repository.UserDAO;
 import com.app.springapp.service.NotificationService;
@@ -21,6 +22,7 @@ public class AttendanceNotificationScheduler {
     private final UserAttendanceMapper userAttendanceMapper;
     private final NotificationService notificationService;
     private final ReviewDAO reviewDAO;
+    private final NotificationDAO notificationDAO;
 
     // 매일 오전 10시에 실행
     @Scheduled(cron = "0 0 10 * * *")
@@ -48,23 +50,26 @@ public class AttendanceNotificationScheduler {
     }
 
 //    @Scheduled(cron = "0 0 10 * * *")
-    @Scheduled(cron = "0 */1 * * * *")
-    public void sendReviewReminder() {
-        log.info("리뷰 알림 스케줄러 실행");
-        List<Long> userIds = userDAO.findAllUserIds();
+@Scheduled(cron = "0 */1 * * * *")
+public void sendReviewReminder() {
+    log.info("리뷰 알림 스케줄러 실행");
+    List<Long> userIds = userDAO.findAllUserIds();
 
-        for (Long userId : userIds) {
-            LocalDate lastReviewDate = reviewDAO.findLastReviewDate(userId);
+    for (Long userId : userIds) {
+        // 이미 안읽은 REVIEW 알림이 있으면 스킵
+        int unreadReview = notificationDAO.countUnreadByUserIdAndType(userId, "REVIEW");
+        if (unreadReview > 0) continue;  // ← 추가
 
-            // 한 번도 리뷰 안 쓴 경우 or 7일 이상 지난 경우
-            if (lastReviewDate == null ||
-                    java.time.temporal.ChronoUnit.DAYS.between(lastReviewDate, LocalDate.now()) >= 7) {
-                notificationService.send(
-                        userId,
-                        "REVIEW",
-                        "후기를 작성해주세요! ⭐",
-                        "수업은 어떠셨나요? 후기를 남겨주세요.",
-                        null
+        LocalDate lastReviewDate = reviewDAO.findLastReviewDate(userId);
+
+        if (lastReviewDate == null ||
+                java.time.temporal.ChronoUnit.DAYS.between(lastReviewDate, LocalDate.now()) >= 7) {
+            notificationService.send(
+                    userId,
+                    "REVIEW",
+                    "후기를 작성해주세요! ⭐",
+                    "수업은 어떠셨나요? 후기를 남겨주세요.",
+                    null
                 );
             }
         }
