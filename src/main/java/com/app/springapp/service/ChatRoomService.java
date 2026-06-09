@@ -31,5 +31,6 @@ public interface ChatRoomService {
 //    채팅방 삭제 (soft 삭제)
     public void softDeleteChatRoom(Long chatRoomId, Long userId);
 
-//    채팅방 검색
+//    1:1 채팅방 조회 또는 생성
+    public Long getOrCreateDirectRoom(Long userId, Long targetUserId);
 }

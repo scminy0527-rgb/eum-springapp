@@ -90,9 +90,10 @@ public class PostServiceTest {
         postRequestDTO.setPostTitle("수어로 노래를 불렀어요");
         postRequestDTO.setPostContent("수어로도 노래를 할 수 있는게 신기해요");
         postRequestDTO.setPostTag("자유게시판");
-        Long userId = 3L;
+        Long userId = 1L;
 
-        postService.writePost(userId, postRequestDTO);
+        Long id = postService.writePost(userId, postRequestDTO);
+        log.info("작성된 글 아이디: {}", id);
     }
 
 //    게시글 접근권한 테스트

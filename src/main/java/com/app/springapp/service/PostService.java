@@ -20,7 +20,7 @@ public interface PostService {
     public Map<String, Object> getUserLikedPosts(Long userId, Map<String, Object> filters);
 
 //    게시글 작성
-    public void writePost(Long userId, PostRequestDTO postRequestDTO);
+    public Long writePost(Long userId, PostRequestDTO postRequestDTO);
 
 //    게시글 수정
     public void updatePost(Long userId, Long id, PostRequestDTO postRequestDTO);

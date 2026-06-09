@@ -30,7 +30,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 //    private final CommunityAuthService communityAuthService;
     private final PostService postService;
 
-    //    채팅방 방 생성
+    //    채팅방 방 생성 (빈 그룹 채팅방)
     @Override
     public Long createChatRoom(ChatRoomRequestDTO chatRoomRequestDTO, Long userId) {
         ChatRoomVO chatRoomVO = ChatRoomVO.from(chatRoomRequestDTO);
@@ -130,5 +130,31 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomVO.setId(id);
         chatRoomVO.setUserId(userId);
         chatRoomDAO.updateChatRoomIsDeleteById(chatRoomVO);
+    }
+
+//    1:1 채팅방 조회 또는 생성
+    @Override
+    public Long getOrCreateDirectRoom(Long userId, Long targetUserId) {
+        return chatRoomDAO.findDirectRoom(userId, targetUserId).orElseGet(() -> {
+            ChatRoomVO chatRoomVO = new ChatRoomVO();
+            chatRoomVO.setChatRoomType("개인");
+            chatRoomVO.setChatRoomProfile("default.jpg");
+            chatRoomVO.setChatRoomLimit(2);
+            chatRoomVO.setUserId(userId);
+            chatRoomDAO.save(chatRoomVO);
+            Long chatRoomId = chatRoomVO.getId();
+
+            ChatUserVO myUser = new ChatUserVO();
+            myUser.setChatRoomId(chatRoomId);
+            myUser.setUserId(userId);
+            chatUserDAO.save(myUser);
+
+            ChatUserVO targetUser = new ChatUserVO();
+            targetUser.setChatRoomId(chatRoomId);
+            targetUser.setUserId(targetUserId);
+            chatUserDAO.save(targetUser);
+
+            return chatRoomId;
+        });
     }
 }

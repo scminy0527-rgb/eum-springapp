@@ -147,15 +147,17 @@ public class PostServiceImpl implements PostService {
 
 //    게시글 작성
     @Override
-    public void writePost(Long userId, PostRequestDTO postRequestDTO) {
+    public Long writePost(Long userId, PostRequestDTO postRequestDTO) {
         PostVO postVO = PostVO.from(postRequestDTO);
         postVO.setUserId(userId);
 
         try {
             postDAO.save(postVO);
+            Long id = postVO.getId();
 
             //  게시글 작성 경험치 지급
             userExpService.addPostExp(userId, postVO.getId());
+            return id;
         } catch (Exception e) {
             throw new PostException(HttpStatus.BAD_REQUEST, "게시글 작성 실패");
         }

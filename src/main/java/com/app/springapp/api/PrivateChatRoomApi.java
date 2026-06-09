@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +27,25 @@ import java.util.Map;
 public class PrivateChatRoomApi {
 
     private final ChatRoomService chatRoomService;
+
+    //    1:1 채팅방 조회 또는 생성
+    @PostMapping("/direct")
+    @Operation(summary = "1:1 채팅방 시작", description = "대상 유저와의 1:1 채팅방을 가져오거나 없으면 생성 (로그인 필요)")
+    @ApiResponse(responseCode = "200", description = "1:1 채팅방 ID 반환")
+    @ApiResponse(responseCode = "401", description = "인증 실패")
+    public ResponseEntity<ApiResponseDTO> getOrCreateDirectRoom(
+            @RequestBody Map<String, Long> body,
+            Authentication authentication
+    ) {
+        UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+        Long userId = userDTO.getId();
+        Long targetUserId = body.get("targetUserId");
+
+        Long chatRoomId = chatRoomService.getOrCreateDirectRoom(userId, targetUserId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "1:1 채팅방 준비 완료", chatRoomId));
+    }
 
     //    채팅방 정보 불러오기
     @GetMapping("/{chatRoomId}")

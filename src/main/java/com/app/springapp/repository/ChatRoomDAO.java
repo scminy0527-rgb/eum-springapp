@@ -55,4 +55,9 @@ public class ChatRoomDAO {
     public void updateChatRoomIsDeleteById(ChatRoomVO chatRoomVO){
         chatRoomMapper.updateChatRoomIsDeleteById(chatRoomVO);
     }
+
+//    두 유저 간 1:1 채팅방 조회
+    public Optional<Long> findDirectRoom(Long userId, Long targetUserId){
+        return Optional.ofNullable(chatRoomMapper.selectDirectRoom(userId, targetUserId));
+    }
 }

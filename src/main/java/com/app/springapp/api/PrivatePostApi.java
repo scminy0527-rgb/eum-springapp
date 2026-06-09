@@ -32,11 +32,11 @@ public class PrivatePostApi {
     ) {
         UserDTO userDTO = (UserDTO) authentication.getPrincipal();
         Long userId = userDTO.getId();
+        Long id = postService.writePost(userId, postRequestDTO);
 
-        postService.writePost(userId, postRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseDTO.of(true, "게시글 작성 성공"));
+                .body(ApiResponseDTO.of(true, "게시글 작성 성공", id));
     }
 
     @PutMapping("/{id}")

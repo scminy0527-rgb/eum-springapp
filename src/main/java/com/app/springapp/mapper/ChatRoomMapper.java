@@ -10,6 +10,8 @@ import java.util.Map;
 
 @Mapper
 public interface ChatRoomMapper {
+//    두 유저 간 1:1 채팅방 조회
+    public Long selectDirectRoom(@Param("userId") Long userId, @Param("targetUserId") Long targetUserId);
 //    채팅방 목록 전체 또는 특정 채팅방 조회 (id null → 전체, id 값 있음 → 단건)
     public List<ChatRoomDTO> select(Map<String, Object> filter);
 

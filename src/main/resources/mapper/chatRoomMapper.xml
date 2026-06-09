@@ -28,7 +28,7 @@
             FROM TBL_CHAT_USER
             GROUP BY CHAT_ROOM_ID
         ) TBU ON TBC.ID = TBU.CHAT_ROOM_ID
-        WHERE TBC.CHAT_ROOM_IS_DELETED = 0
+        WHERE TBC.CHAT_ROOM_IS_DELETED = 0 AND CHAT_ROOM_TYPE = '그룹'
         <if test="keyword != null and keyword != ''">
             AND (TBC.CHAT_ROOM_NAME LIKE '%' || #{keyword} || '%'
             OR TBC.CHAT_ROOM_DETAIL LIKE '%' || #{keyword} || '%')
@@ -52,6 +52,18 @@
         WHERE TCU.USER_ID = #{userId} AND VCR.CHAT_ROOM_IS_DELETED = 0
         ORDER BY TCU.CHAT_LAST_READ_AT DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="selectDirectRoom" resultType="Long">
+        SELECT TCU1.CHAT_ROOM_ID
+        FROM TBL_CHAT_USER TCU1
+        JOIN TBL_CHAT_USER TCU2 ON TCU1.CHAT_ROOM_ID = TCU2.CHAT_ROOM_ID
+        JOIN TBL_CHAT_ROOM TBC ON TCU1.CHAT_ROOM_ID = TBC.ID
+        WHERE TCU1.USER_ID = #{userId}
+          AND TCU2.USER_ID = #{targetUserId}
+          AND TBC.CHAT_ROOM_TYPE = '개인'
+          AND TBC.CHAT_ROOM_IS_DELETED = 0
+        FETCH FIRST 1 ROWS ONLY
     </select>
 
     <insert id="insert" parameterType="ChatRoomVO">
