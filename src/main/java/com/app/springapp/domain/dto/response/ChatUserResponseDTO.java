@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class ChatUserResponseDTO {
     @Schema(description = "채팅 멤버 번호", example = "1")
     private Long id;
+    private Long userId;
     private Long chatRoomId;
     private String userNickname;
     private String userProfile;
@@ -21,6 +22,7 @@ public class ChatUserResponseDTO {
     public static ChatUserResponseDTO from(ChatUserDTO dto) {
         ChatUserResponseDTO res = new ChatUserResponseDTO();
         res.setId(dto.getId());
+        res.setUserId(dto.getUserId());
         res.setChatRoomId(dto.getChatRoomId());
         res.setUserNickname(dto.getUserNickname());
         res.setUserProfile(dto.getUserProfile());

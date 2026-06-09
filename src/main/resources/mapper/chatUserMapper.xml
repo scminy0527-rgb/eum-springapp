@@ -12,7 +12,7 @@
 
     <select id="selectByChatRoomId" parameterType="Long" resultType="ChatUserDTO">
         SELECT
-            TCU.ID, TCU.CHAT_ROOM_ID,
+            TCU.ID, TCU.USER_ID, TCU.CHAT_ROOM_ID,
             TBU.USER_NICKNAME, TBU.USER_PROFILE, TBU.USER_EMAIL, TBU.USER_EXP
         FROM TBL_CHAT_USER TCU
         JOIN TBL_USER TBU ON TCU.USER_ID = TBU.ID
