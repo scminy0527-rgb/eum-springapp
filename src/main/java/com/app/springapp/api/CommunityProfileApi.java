@@ -22,6 +22,7 @@ public class CommunityProfileApi {
     private final CommunityProfileService communityProfileService;
     private final JwtTokenUtil jwtTokenUtil;
 
+//    접속을 한 유저 프로필 페이지의 유저 정보 불러오는 api
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDTO> getUserInfo(
             @PathVariable long id,

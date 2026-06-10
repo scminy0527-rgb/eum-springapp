@@ -30,4 +30,15 @@ public class PrivateFollowApi {
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "유저 팔로우 성공"));
     }
+
+//    유저 팔로우 취소하기
+    @GetMapping("/cancel/{followingId}")
+    public ResponseEntity<ApiResponseDTO> cancelFollow(
+            @PathVariable Long followingId,
+            Authentication authentication
+    ){
+        Long userId = ((UserDTO)  authentication.getPrincipal()).getId();
+        return null;
+
+    }
 }

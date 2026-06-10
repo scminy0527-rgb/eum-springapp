@@ -14,4 +14,9 @@ public class FollowDAO {
     public void save(FollowVO followVO) {
         followMapper.insert(followVO);
     }
+
+//    팔로우 취소
+    public void remove(FollowVO followVO) {
+        followMapper.deleteByFollowerIdAndFollowingId(followVO);
+    }
 }

@@ -8,4 +8,9 @@
         INSERT INTO TBL_FOLLOW (ID, FOLLOW_TYPE,  FOLLOWER_ID, FOLLOWING_ID)
         VALUES (#{id}, '일반', #{followerId}, #{followingId})
     </insert>
+
+    <delete id="deleteByFollowerIdAndFollowingId" parameterType="FollowVO">
+        DELETE FROM TBL_FOLLOW
+        WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
+    </delete>
 </mapper>

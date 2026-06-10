@@ -18,4 +18,6 @@
         ) TBF ON TBU.ID = TBF.FOLLOWING_ID
         WHERE ID = #{id}
     </select>
+
+
 </mapper>

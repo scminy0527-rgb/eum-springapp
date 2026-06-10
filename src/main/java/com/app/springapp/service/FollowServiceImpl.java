@@ -13,6 +13,7 @@ public class FollowServiceImpl implements FollowService {
 
     private final FollowDAO followDAO;
 
+//    유저 팔로우 하기
     @Override
     public void userFollow(Long userId, Long followingId) {
         FollowVO followVO = new FollowVO();
@@ -20,5 +21,15 @@ public class FollowServiceImpl implements FollowService {
         followVO.setFollowingId(followingId);
 
         followDAO.save(followVO);
+    }
+
+//    유저 팔로우 취소
+    @Override
+    public void cancelFollow(Long userId, Long followingId) {
+        FollowVO followVO = new FollowVO();
+        followVO.setFollowerId(userId);
+        followVO.setFollowingId(followingId);
+
+        followDAO.remove(followVO);
     }
 }
