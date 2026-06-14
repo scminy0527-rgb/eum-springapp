@@ -129,13 +129,13 @@
         <selectKey resultType="Long" keyProperty="id" order="BEFORE">
             SELECT SEQ_POST.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_POST (ID, POST_TITLE, POST_CONTENT, POST_TAG, USER_ID)
-        VALUES (#{id}, #{postTitle}, #{postContent}, #{postTag}, #{userId})
+        INSERT INTO TBL_POST (ID, POST_TITLE, POST_CONTENT, POST_TAG, USER_ID, POST_PROFILE)
+        VALUES (#{id}, #{postTitle}, #{postContent}, #{postTag}, #{userId}, #{postProfile})
     </insert>
 
     <update id="update" parameterType="PostVO">
         UPDATE TBL_POST
-        SET POST_TITLE = #{postTitle}, POST_CONTENT = #{postContent}, POST_TAG = #{postTag}
+        SET POST_TITLE = #{postTitle}, POST_CONTENT = #{postContent}, POST_TAG = #{postTag}, POST_PROFILE = #{postProfile}
         WHERE ID = #{id} AND USER_ID = #{userId}
     </update>
 
