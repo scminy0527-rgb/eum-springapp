@@ -16,12 +16,14 @@ public class PostVO {
     private String postTag;
     private boolean postIsDeleted;
     private Long userId;
+    private String postProfile;
 
     public static PostVO from(PostRequestDTO postRequestDTO) {
         PostVO postVO = new PostVO();
         postVO.setPostTitle(postRequestDTO.getPostTitle());
         postVO.setPostContent(postRequestDTO.getPostContent());
         postVO.setPostTag(postRequestDTO.getPostTag());
+        postVO.setPostProfile(postRequestDTO.getPostProfile());
         return postVO;
     }
 

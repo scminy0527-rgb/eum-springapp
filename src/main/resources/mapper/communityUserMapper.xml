@@ -19,5 +19,22 @@
         WHERE ID = #{id}
     </select>
 
-
+    <!-- 유저 전체 페이지네이션 조회 -->
+    <select id="selectAll" parameterType="map" resultType="com.app.springapp.domain.dto.CommunityUserDTO">
+        SELECT
+            TBU.ID, TBU.USER_EMAIL, TBU.USER_PASSWORD, TBU.USER_PROFILE, TBU.USER_NAME, TBU.USER_CREATE_AT,
+            TBU.USER_NICKNAME, TBU.USER_ROLE, TBU.USER_BIRTH, TBU.USER_INTRO, TBU.USER_JOB,
+            VUA.POST_COUNT, VUA.POST_LIKE_COUNT, VUA.COMMENT_COUNT, VUA.GET_LIKE_COUNT,
+            NVL2(FOLLOWING_ID, 1, 0) AS IS_FOLLOW,
+            CASE WHEN TBU.ID = #{userId} THEN 1 ELSE 0 END AS IS_ME
+        FROM TBL_USER TBU
+        JOIN VW_USER_ACTIVITY VUA ON TBU.ID = VUA.USER_ID
+        LEFT JOIN (
+            SELECT FOLLOWER_ID, FOLLOWING_ID
+            FROM TBL_FOLLOW
+            WHERE FOLLOWER_ID = #{userId}
+        ) TBF ON TBU.ID = TBF.FOLLOWING_ID
+        ORDER BY TBU.ID DESC
+        OFFSET 0 ROWS FETCH NEXT 4 ROWS ONLY
+    </select>
 </mapper>

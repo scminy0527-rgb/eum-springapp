@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/api/community-profile")
@@ -44,5 +45,28 @@ public class CommunityProfileApi {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "커뮤니티 유저 프로필 정보 로드 성공", communityUserResponseDTO));
+    }
+
+//    모든 유저를 불러오는 개념
+    @GetMapping("")
+    public ResponseEntity<ApiResponseDTO> getRecentUsers(
+            @CookieValue(value = "accessToken", required = false) String accessToken
+    ){
+        Long userId = null;
+        Map<String,Object> req = new HashMap<>();
+        if (accessToken != null) {
+            try {
+                Claims claims = jwtTokenUtil.parseToken(accessToken);
+                userId = Long.parseLong((String) claims.get("id"));
+            } catch (Exception e) {
+                // 토큰이 유효하지 않으면 비로그인으로 처리
+            }
+        }
+        req.put("userId", userId);
+        List<CommunityUserResponseDTO> userList = communityProfileService.getUsers(req);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "유저 정보 반환 성공", userList));
     }
 }

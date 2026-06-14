@@ -50,12 +50,14 @@ public class PostApi {
     public ResponseEntity<ApiResponseDTO> getAllPosts(
             @RequestParam(required = false, defaultValue = "") String postTag,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "") String keyword
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(required = false, defaultValue = "latest") String order
     ){
         Map<String,Object> map = new HashMap<>();
         map.put("postTag",postTag);
         map.put("page",page);
         map.put("keyword",keyword);
+        map.put("order",order);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "게시글 목록 불러오기 성공", postService.getAllPosts(map)));
