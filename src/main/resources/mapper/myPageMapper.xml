@@ -129,25 +129,27 @@
     <!-- ===================================================== -->
 
     <!-- 정보수정 화면 회원 정보 조회 -->
-    <select id="selectUserInfoById" parameterType="Long" resultType="com.app.springapp.domain.dto.response.MyPageProfileResponseDTO">
+    <select id="selectUserInfoById" parameterType="Long" resultType="myPageProfileResponseDTO">
         SELECT
             TU.ID AS id,
+            TU.USER_EMAIL AS userEmail,
             TU.USER_NAME AS userName,
+            TU.USER_PHONE_NUM AS userPhoneNum,
             TU.USER_NICKNAME AS userNickname,
+            TU.USER_PROFILE AS userProfile,
             TU.USER_INTRO AS userIntro,
             TU.USER_JOB AS userJob,
             TU.USER_ADDRESS AS userAddress,
-            TU.USER_EMAIL AS userEmail,
-            TU.USER_PHONE_NUM AS userPhoneNum,
             TU.USER_EXP AS userExp,
-            TU.USER_PROFILE AS userProfile,
             TU.USER_CREATE_AT AS userCreateAt,
             TU.USER_ROLE AS userRole,
             CASE
-                WHEN TSU.ID IS NOT NULL THEN 1
+                WHEN TSU.ID IS NOT NULL
+                    AND UPPER(TSU.SOCIAL_USER_PROVIDER) IN ('GOOGLE', 'KAKAO', 'NAVER')
+                    THEN 1
                 ELSE 0
                 END AS socialUser,
-            TSU.SOCIAL_USER_PROVIDER AS socialMemberProvider
+            NVL(TSU.SOCIAL_USER_PROVIDER, 'LOCAL') AS socialMemberProvider
         FROM TBL_USER TU
                  LEFT JOIN TBL_SOCIAL_USER TSU
                            ON TU.ID = TSU.USER_ID
@@ -159,6 +161,7 @@
         SELECT COUNT(ID)
         FROM TBL_SOCIAL_USER
         WHERE USER_ID = #{userId}
+          AND UPPER(SOCIAL_USER_PROVIDER) IN ('GOOGLE', 'KAKAO', 'NAVER')
     </select>
 
     <!-- 닉네임 중복 검사 -->
