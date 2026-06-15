@@ -297,11 +297,11 @@ public class MyPageServiceImpl implements MyPageService {
 
         String savedPassword = myPageDAO.findUserPasswordByUserId(userId);
 
-        if (!passwordEncoder.matches(currentPassword, savedPassword)) {
+        if (!currentPassword.equals(savedPassword) && !passwordEncoder.matches(currentPassword, savedPassword)) {
             throw new MyPageException("현재 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 
-        myPageDAO.updateUserPassword(passwordEncoder.encode(newPassword), userId);
+        myPageDAO.updateUserPassword(newPassword, userId);
     }
 
     // 회원탈퇴
