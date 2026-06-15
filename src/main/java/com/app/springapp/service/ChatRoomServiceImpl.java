@@ -1,6 +1,7 @@
 package com.app.springapp.service;
 
 import com.app.springapp.domain.dto.ChatUserDTO;
+import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.domain.dto.request.ChatRoomRequestDTO;
 import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import com.app.springapp.domain.dto.response.ChatRoomUserResponseDTO;
@@ -10,6 +11,7 @@ import com.app.springapp.domain.vo.ChatRoomVO;
 import com.app.springapp.exception.ChatException;
 import com.app.springapp.repository.ChatUserDAO;
 import com.app.springapp.repository.ChatRoomDAO;
+import com.app.springapp.repository.UserDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatUserDAO chatMemberDAO;
     private final ChatRoomDAO chatRoomDAO;
     private final ChatUserDAO chatUserDAO;
+    private final UserDAO userDAO;
 //    private final CommunityAuthService communityAuthService;
     private final PostService postService;
 
@@ -136,7 +139,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     public Long getOrCreateDirectRoom(Long userId, Long targetUserId) {
         return chatRoomDAO.findDirectRoom(userId, targetUserId).orElseGet(() -> {
+            String myNickname = userDAO.findUserById(userId)
+                    .map(UserDTO::getUserNickname).orElse("사용자");
+            String targetNickname = userDAO.findUserById(targetUserId)
+                    .map(UserDTO::getUserNickname).orElse("사용자");
+
             ChatRoomVO chatRoomVO = new ChatRoomVO();
+            chatRoomVO.setChatRoomName(myNickname + " & " + targetNickname);
             chatRoomVO.setChatRoomType("개인");
             chatRoomVO.setChatRoomProfile("default.jpg");
             chatRoomVO.setChatRoomLimit(2);
