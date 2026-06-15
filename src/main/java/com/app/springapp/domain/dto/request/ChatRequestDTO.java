@@ -12,4 +12,6 @@ public class ChatRequestDTO {
     private String chatContent;
     @Schema(description = "채팅 타입", example = "텍스트", required = true)
     private String chatType;
+    @Schema(description = "수어 keypoints", required = false)
+    private Object keypoints;
 }

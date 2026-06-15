@@ -52,7 +52,6 @@ public class AttendanceNotificationScheduler {
 //    @Scheduled(cron = "0 0 10 * * *")
 @Scheduled(cron = "0 */1 * * * *")
 public void sendReviewReminder() {
-    log.info("리뷰 알림 스케줄러 실행");
     List<Long> userIds = userDAO.findAllUserIds();
 
     for (Long userId : userIds) {

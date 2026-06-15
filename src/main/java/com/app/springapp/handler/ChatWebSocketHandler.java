@@ -72,7 +72,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             communityAuthService.checkUserValidity(communityAuthService.getUserId());
 
             ChatRequestDTO chatRequestDTO = objectMapper.readValue(message.getPayload(), ChatRequestDTO.class);
+            log.info("메시지 수신 - chatType: {}, keypoints 있음: {}", chatRequestDTO.getChatType(), chatRequestDTO.getKeypoints() != null);
             ChatDTO chatDTO = chatService.playRealTimeChat(chatRoomId, chatRequestDTO);
+            log.info("DB 저장 완료 - chatId: {}", chatDTO.getId());
 
             Map<String, Object> broadcastData = new HashMap<>();
             broadcastData.put("id", chatDTO.getId());
@@ -83,7 +85,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             broadcastData.put("userProfile", chatDTO.getUserProfile());
             broadcastData.put("chatRoomId", chatRoomId);
 
+            if ("수어".equals(chatRequestDTO.getChatType())) {
+                broadcastData.put("keypoints", chatRequestDTO.getKeypoints());
+            }
+
             broadcast(chatRoomId, session, broadcastData);
+
         } finally {
             SecurityContextHolder.clearContext();
         }

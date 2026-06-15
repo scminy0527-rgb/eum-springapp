@@ -23,6 +23,11 @@ public class TestApplyDAO {
         return testApplyMapper.countByTestId(testId);
     }
 
+    // 특정 유저가 특정 시험에 이미 접수했는지 확인
+    public boolean existsByUserIdAndTestId(Long userId, Long testId) {
+        return testApplyMapper.countByUserIdAndTestId(userId, testId) > 0;
+    }
+
     // 접수 취소
     public void deleteById(Long id, Long userId) {
         testApplyMapper.deleteById(id, userId);
