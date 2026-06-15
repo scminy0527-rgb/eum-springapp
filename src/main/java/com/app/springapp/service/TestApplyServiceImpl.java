@@ -53,6 +53,11 @@ public class TestApplyServiceImpl implements TestApplyService {
         TestDTO test = testDAO.findById(testApplyDTO.getTestId())
                 .orElseThrow(() -> new UserException("존재하지 않는 시험입니다.", HttpStatus.NOT_FOUND));
 
+        // 중복 접수 체크
+        if (testApplyDAO.existsByUserIdAndTestId(testApplyDTO.getUserId(), testApplyDTO.getTestId())) {
+            throw new UserException("이미 접수한 시험입니다.", HttpStatus.CONFLICT);
+        }
+
         // 현재 신청 인원 조회
         int currentCount = testApplyDAO.countByTestId(testApplyDTO.getTestId());
 

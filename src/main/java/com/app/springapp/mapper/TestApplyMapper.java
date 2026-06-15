@@ -15,6 +15,9 @@ public interface TestApplyMapper {
     // 특정 시험의 현재 신청 인원 수 조회
     int countByTestId(Long testId);
 
+    // 특정 유저가 특정 시험에 이미 접수했는지 확인
+    int countByUserIdAndTestId(@Param("userId") Long userId, @Param("testId") Long testId);
+
     // 접수 취소
     void deleteById(@Param("id") Long id, @Param("userId") Long userId);
 
