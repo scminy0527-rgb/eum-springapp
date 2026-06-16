@@ -1,5 +1,6 @@
 package com.app.springapp.service.edu;
 
+import com.app.springapp.domain.dto.response.EduStartCompleteResponseDTO;
 import com.app.springapp.domain.dto.response.EduStartResponseDTO;
 import com.app.springapp.domain.vo.EduStartVO;
 import com.app.springapp.exception.EduException;
@@ -37,12 +38,31 @@ public class EduStartServiceImpl implements EduStartService {
 
     // 학습 세션 완료 처리
     @Override
-    public void completeEduStart(Long userId, Long eduId, int eduStartTime) {
+    public EduStartCompleteResponseDTO completeEduStart(Long userId, Long eduId, int eduStartTime) {
         if (!eduStartDAO.existsIncompleteEduStart(userId, eduId)) {
             startEdu(userId, eduId);
         }
 
         eduStartDAO.updateCompleted(userId, eduId, eduStartTime);
+
+        EduStartResponseDTO completedEduStart = eduStartDAO.findLatestCompletedByUserIdAndEduId(userId, eduId);
+        if (completedEduStart == null) {
+            throw new EduException("완료된 학습 세션을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+        }
+
+        int correctCount = completedEduStart.getEduStartCorrectCount();
+        int totalCount = completedEduStart.getEduStartTotalCount();
+        int accuracy = totalCount == 0 ? 0 : Math.round((float) correctCount / totalCount * 100);
+        int exp = correctCount * 20;
+
+        return EduStartCompleteResponseDTO
+                .builder()
+                .correctCount(correctCount)
+                .totalCount(totalCount)
+                .accuracy(accuracy)
+                .spentTime(completedEduStart.getEduStartTime())
+                .exp(exp)
+                .build();
     }
 
     // 학습 세션 완료 여부 조회

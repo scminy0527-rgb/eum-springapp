@@ -45,6 +45,22 @@
         )
     </update>
 
+    <!-- 사용자의 특정 학습 최신 완료 세션 조회 -->
+    <select id="selectLatestCompletedByUserIdAndEduId" resultType="EduStartResponseDTO">
+        SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT,
+               EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT, EDU_START_TIME, EDU_START_COMPLETED_AT
+        FROM (
+                 SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT,
+                        EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT, EDU_START_TIME, EDU_START_COMPLETED_AT
+                 FROM TBL_EDU_START
+                 WHERE USER_ID = #{userId}
+                   AND EDU_ID = #{eduId}
+                   AND EDU_START_IS_COMPLETED = 1
+                 ORDER BY EDU_START_COMPLETED_AT DESC, ID DESC
+             )
+        WHERE ROWNUM = 1
+    </select>
+
     <!-- 학습 세션 문제 풀이 결과 반영 -->
     <update id="updateProgress">
         UPDATE TBL_EDU_START

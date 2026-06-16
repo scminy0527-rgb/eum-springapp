@@ -28,6 +28,11 @@ public class EduStartDAO {
         eduStartMapper.updateCompleted(userId, eduId, eduStartTime);
     }
 
+    // 사용자의 특정 학습 최신 완료 세션 조회
+    public EduStartResponseDTO findLatestCompletedByUserIdAndEduId(Long userId, Long eduId) {
+        return eduStartMapper.selectLatestCompletedByUserIdAndEduId(userId, eduId);
+    }
+
     // 학습 세션 문제 풀이 결과 반영
     public void updateProgress(Long id, int isCorrect) {
         eduStartMapper.updateProgress(id, isCorrect);

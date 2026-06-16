@@ -3,6 +3,7 @@ package com.app.springapp.api;
 import com.app.springapp.domain.dto.UserDTO;
 import com.app.springapp.domain.dto.request.EduStartProgressRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
+import com.app.springapp.domain.dto.response.EduStartCompleteResponseDTO;
 import com.app.springapp.service.edu.EduStartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -79,11 +80,12 @@ public class EduStartApi {
             @PathVariable Long eduId,
             @RequestParam int eduStartTime
     ) {
-        eduStartService.completeEduStart(userId, eduId, eduStartTime);
+        EduStartCompleteResponseDTO result =
+                eduStartService.completeEduStart(userId, eduId, eduStartTime);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponseDTO.of(true, "학습 시작 기록 완료 처리 성공", null));
+                .body(ApiResponseDTO.of(true, "학습 세션 완료 처리 성공", result));
     }
 
 

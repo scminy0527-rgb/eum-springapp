@@ -26,6 +26,10 @@ public class EduStartResponseDTO {
     private int eduStartCompletedCount;
     @Schema(description = "현재 학습 세션에서 맞힌 문제 수", example = "2")
     private int eduStartCorrectCount;
+    @Schema(description = "학습 세션 소요 시간: 초 단위", example = "140")
+    private int eduStartTime;
+    @Schema(description = "학습 완료 일시", example = "2026-06-16T15:06:48")
+    private LocalDateTime eduStartCompletedAt;
 
     public static EduStartResponseDTO from(EduStartDTO dto) {
         EduStartResponseDTO res = new EduStartResponseDTO();
@@ -37,6 +41,8 @@ public class EduStartResponseDTO {
         res.setEduStartTotalCount(dto.getEduStartTotalCount());
         res.setEduStartCompletedCount(dto.getEduStartCompletedCount());
         res.setEduStartCorrectCount(dto.getEduStartCorrectCount());
+        res.setEduStartTime(dto.getEduStartTime());
+        res.setEduStartCompletedAt(dto.getEduStartCompletedAt());
         return res;
     }
 }
