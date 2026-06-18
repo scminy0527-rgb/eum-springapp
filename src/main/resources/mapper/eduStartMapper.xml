@@ -89,4 +89,18 @@
           AND EDU_START_IS_COMPLETED = 0
     </select>
 
+    <!-- 학습 문제별 정답 저장 -->
+    <insert id="insertProgressDetail">
+        INSERT INTO TBL_EDU_START_DETAIL (
+            ID,
+            EDU_START_ID,
+            EDU_START_DETAIL_IS_CORRECT
+        )
+        VALUES (
+                   SEQ_EDU_START_DETAIL.NEXTVAL,
+                   #{eduStartId},
+                   #{isCorrect}
+               )
+    </insert>
+
 </mapper>

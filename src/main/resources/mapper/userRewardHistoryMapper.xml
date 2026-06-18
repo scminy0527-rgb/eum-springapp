@@ -49,4 +49,14 @@
         WHERE USER_ID = #{userId}
     </delete>
 
+    <!-- 학습 보상 EXP 조회 -->
+    <select id="sumLearnRewardExpByUserId" parameterType="Long" resultType="int">
+        SELECT NVL(SUM(TURH.USER_REWARD_EXP), 0)
+        FROM TBL_USER_REWARD_HISTORY TURH
+                 JOIN TBL_REWARD_POLICY TRP
+                      ON TURH.REWARD_POLICY_ID = TRP.ID
+        WHERE TURH.USER_ID = #{userId}
+          AND TRP.REWARD_TYPE = 'LEARN'
+    </select>
+
 </mapper>

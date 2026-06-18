@@ -210,4 +210,36 @@
              ) SUMMARY_DATA
     </select>
 
+    <!-- AI 학습 분석 문제별 정답 매핑 -->
+    <resultMap id="learningAnalysisAnswerMap" type="LearningAnalysisAnswerResponseDTO">
+        <result property="questionNumber" column="QUESTION_NUMBER"/>
+        <result property="isCorrect" column="IS_CORRECT"/>
+    </resultMap>
+
+    <!-- AI 학습 분석 문제별 정답 조회 -->
+    <select id="selectLearningAnalysisAnswerListByAttemptId" parameterType="Long" resultMap="learningAnalysisAnswerMap">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY TQAD.ID ASC) AS QUESTION_NUMBER,
+            CASE
+                WHEN TQAD.QUIZ_ATTEMPT_DETAIL_IS_CORRECT = 1 THEN 1
+                ELSE 0
+                END AS IS_CORRECT
+        FROM TBL_QUIZ_ATTEMPT_DETAIL TQAD
+        WHERE TQAD.QUIZ_ATTEMPT_ID = #{quizAttemptId}
+        ORDER BY TQAD.ID ASC
+    </select>
+
+    <!-- AI 학습 분석 학습 문제별 정답 조회 -->
+    <select id="selectLearningAnalysisEduAnswerListByEduStartId" parameterType="Long" resultMap="learningAnalysisAnswerMap">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY TESD.ID ASC) AS QUESTION_NUMBER,
+            CASE
+                WHEN TESD.EDU_START_DETAIL_IS_CORRECT = 1 THEN 1
+                ELSE 0
+                END AS IS_CORRECT
+        FROM TBL_EDU_START_DETAIL TESD
+        WHERE TESD.EDU_START_ID = #{eduStartId}
+        ORDER BY TESD.ID ASC
+    </select>
+
 </mapper>

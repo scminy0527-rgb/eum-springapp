@@ -117,6 +117,9 @@
         <typeAlias type="com.app.springapp.domain.dto.request.ReviewRequestDTO" alias="ReviewRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.MyPageCertificateApplyRequestDTO" alias="MyPageCertificateApplyRequestDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.request.QuizStartRequestDTO" alias="QuizStartRequestDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.request.LearningAnalysisAnswerRequestDTO" alias="LearningAnalysisAnswerRequestDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.request.LearningAnalysisResultRequestDTO" alias="LearningAnalysisResultRequestDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.request.LearningAnalysisRequestDTO" alias="LearningAnalysisRequestDTO"/>
 
 
         <!-- Response DTO Alias -->
@@ -190,6 +193,11 @@
         <typeAlias type="com.app.springapp.domain.dto.response.AddressSearchResponseDTO" alias="AddressSearchResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.MyPageCertificateApplyCompleteResponseDTO" alias="MyPageCertificateApplyCompleteResponseDTO"/>
         <typeAlias type="com.app.springapp.domain.dto.response.SignWordWeeklyRecommendationResponseDTO" alias="SignWordWeeklyRecommendationResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.LearningAnalysisAnswerResponseDTO" alias="LearningAnalysisAnswerResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.LearningAnalysisReportResponseDTO" alias="LearningAnalysisReportResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.LearningOverallAnalysisResponseDTO" alias="LearningOverallAnalysisResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.LearningIndividualAnalysisResponseDTO" alias="LearningIndividualAnalysisResponseDTO"/>
+        <typeAlias type="com.app.springapp.domain.dto.response.LearningAnalysisResponseDTO" alias="LearningAnalysisResponseDTO"/>
 
 
         <!-- VO Alias -->

@@ -83,11 +83,12 @@ public class EduStartServiceImpl implements EduStartService {
 
     // 학습 세션 문제 풀이 결과 반영
     @Override
-    public void recordProgress(Long userId, Long eduId, int isCorrect) {
+    public void recordProgress(Long userId, Long eduId, int questionNumber, int isCorrect) {
         EduStartResponseDTO eduStart = eduStartDAO.findByUserIdAndEduId(userId, eduId)
                 .orElseThrow(() -> new EduException("진행 중인 학습 세션을 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
 
         eduStartDAO.updateProgress(eduStart.getId(), isCorrect);
+        eduStartDAO.saveProgressDetail(eduStart.getId(), questionNumber, isCorrect);
     }
 
 }

@@ -47,4 +47,9 @@ public class EduStartDAO {
     public boolean existsIncompleteEduStart(Long userId, Long eduId) {
         return eduStartMapper.countIncompleteByUserIdAndEduId(userId, eduId) > 0;
     }
+
+    // 학습 문제별 정답 저장
+    public void saveProgressDetail(Long eduStartId, int questionNumber, int isCorrect) {
+        eduStartMapper.insertProgressDetail(eduStartId, questionNumber, isCorrect);
+    }
 }

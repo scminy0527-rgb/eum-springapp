@@ -17,6 +17,7 @@ public interface EduStartService {
     public int claimRoadmapReward(Long userId, Long eduId);
 
     // 학습 세션 문제 풀이 결과 반영
-    public void recordProgress(Long userId, Long eduId, int isCorrect);
+    public void recordProgress(Long userId, Long eduId, int questionNumber, int isCorrect);
+
 
 }

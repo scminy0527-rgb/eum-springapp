@@ -27,4 +27,7 @@ public interface EduStartMapper {
 
     // 학습 세션 문제 풀이 결과 반영
     public void updateProgress(Long id, int isCorrect);
+
+    // 학습 문제별 정답 저장
+    public void insertProgressDetail(Long eduStartId, int questionNumber, int isCorrect);
 }

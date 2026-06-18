@@ -142,7 +142,7 @@ public class EduStartApi {
             @PathVariable Long eduId,
             @RequestBody EduStartProgressRequestDTO requestDTO
     ) {
-        eduStartService.recordProgress(userId, eduId, requestDTO.getIsCorrect());
+        eduStartService.recordProgress(userId, eduId, requestDTO.getQuestionNumber(), requestDTO.getIsCorrect());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
