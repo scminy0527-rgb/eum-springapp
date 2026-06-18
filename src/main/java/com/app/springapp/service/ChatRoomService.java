@@ -3,7 +3,9 @@ package com.app.springapp.service;
 import com.app.springapp.domain.dto.request.ChatRoomRequestDTO;
 import com.app.springapp.domain.dto.response.ChatRoomResponseDTO;
 import com.app.springapp.domain.dto.response.ChatUserResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,4 +35,7 @@ public interface ChatRoomService {
 
 //    1:1 채팅방 조회 또는 생성
     public Long getOrCreateDirectRoom(Long userId, Long targetUserId);
+
+//    채팅방 프로필 이미지 로컬 저장
+    public String uploadChatRoomProfile(MultipartFile file) throws IOException;
 }

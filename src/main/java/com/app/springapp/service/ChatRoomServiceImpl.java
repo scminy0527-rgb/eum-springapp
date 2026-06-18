@@ -13,19 +13,28 @@ import com.app.springapp.repository.ChatUserDAO;
 import com.app.springapp.repository.ChatRoomDAO;
 import com.app.springapp.repository.UserDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor = {Exception.class})
 @RequiredArgsConstructor
 public class ChatRoomServiceImpl implements ChatRoomService {
+
+    @Value("${file.upload.inquire}")
+    private String inquireUploadPath;
+
     private final ChatUserDAO chatMemberDAO;
     private final ChatRoomDAO chatRoomDAO;
     private final ChatUserDAO chatUserDAO;
@@ -125,6 +134,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomDAO.update(chatRoomVO);
     }
 
+
+//    채팅방 프로필 이미지 로컬 저장
+    @Override
+    public String uploadChatRoomProfile(MultipartFile file) throws IOException {
+        String profileUploadPath = inquireUploadPath + File.separator + "chat-room";
+        File dir = new File(profileUploadPath);
+        if (!dir.exists()) dir.mkdirs();
+
+        String savedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        file.transferTo(new File(profileUploadPath + File.separator + savedName));
+
+        return "/uploads/inquire/chat-room/" + savedName;
+    }
 
 //    채팅방 삭제
     @Override

@@ -13,9 +13,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import java.util.List;
 import java.util.Map;
@@ -72,6 +76,18 @@ public class PrivateChatRoomApi {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "채팅방 정보 불러오기 성공", chatRoomInfo));
+    }
+
+    //    채팅방 프로필 이미지 업로드
+    @PostMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "채팅방 프로필 이미지 업로드", description = "이미지를 서버에 저장하고 URL을 반환합니다. (로그인 필요)")
+    @ApiResponse(responseCode = "200", description = "이미지 업로드 성공")
+    @ApiResponse(responseCode = "401", description = "인증 실패")
+    public ResponseEntity<ApiResponseDTO> uploadChatRoomProfile(
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        String url = chatRoomService.uploadChatRoomProfile(file);
+        return ResponseEntity.ok(ApiResponseDTO.of(true, "프로필 이미지 업로드 성공", url));
     }
 
     //    채팅방 생성
