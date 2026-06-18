@@ -42,4 +42,9 @@ public class UserRewardHistoryDAO {
     public void deleteByUserId(Long userId) {
         userRewardHistoryMapper.deleteByUserId(userId);
     }
+
+    // 학습 보상 EXP 조회
+    public int findLearnRewardExpByUserId(Long userId) {
+        return userRewardHistoryMapper.sumLearnRewardExpByUserId(userId);
+    }
 }

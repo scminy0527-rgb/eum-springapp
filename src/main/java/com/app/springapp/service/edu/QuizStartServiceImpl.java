@@ -41,4 +41,15 @@ public class QuizStartServiceImpl implements QuizStartService {
 
         quizStartDAO.save(quizStartVO);
     }
+
+    // 퀴즈 진행 문제 수 증가
+    @Override
+    public void updateProgress(Long userId, Long quizId, int totalCount, int isCorrect) {
+        quizStartDAO.findByUserIdAndQuizId(userId, quizId)
+                .orElseThrow(() -> new EduException("퀴즈 시작 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+
+        quizStartDAO.updateProgress(userId, quizId, totalCount, isCorrect);
+    }
+
+
 }

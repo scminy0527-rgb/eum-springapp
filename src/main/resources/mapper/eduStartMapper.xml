@@ -4,9 +4,9 @@
 
     <!-- 사용자의 특정 학습 최신 미완료 시작 기록 조회 -->
     <select id="selectByUserIdAndEduId" resultType="EduStartResponseDTO">
-        SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED
+        SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT, EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT
         FROM (
-            SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED
+            SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT, EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT
             FROM TBL_EDU_START
             WHERE USER_ID = #{userId}
                 AND EDU_ID = #{eduId}
@@ -21,26 +21,54 @@
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT SEQ_EDU_START.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_EDU_START(ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED)
-        VALUES(#{id}, CURRENT_TIMESTAMP, #{userId}, #{eduId}, 0)
+        INSERT INTO TBL_EDU_START(ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT, EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT)
+        VALUES(#{id}, CURRENT_TIMESTAMP, #{userId}, #{eduId}, 0, #{eduStartTotalCount}, #{eduStartCompletedCount}, #{eduStartCorrectCount})
     </insert>
 
     <!-- 사용자의 특정 학습 최신 미완료 시작 기록 완료 처리 -->
     <update id="updateCompleted">
         UPDATE TBL_EDU_START
-        SET EDU_START_IS_COMPLETED = 1
+        SET EDU_START_IS_COMPLETED = 1,
+            EDU_START_COMPLETED_AT = CURRENT_TIMESTAMP,
+            EDU_START_TIME = #{eduStartTime}
         WHERE ID = (
             SELECT ID
             FROM (
-                SELECT ID
-                FROM TBL_EDU_START
-                WHERE USER_ID = #{userId}
-                    AND EDU_ID = #{eduId}
-                    AND EDU_START_IS_COMPLETED = 0
-                ORDER BY EDU_START_AT DESC
-            )
+                     SELECT ID
+                     FROM TBL_EDU_START
+                     WHERE USER_ID = #{userId}
+                       AND EDU_ID = #{eduId}
+                       AND EDU_START_IS_COMPLETED = 0
+                     ORDER BY EDU_START_AT DESC
+                 )
             WHERE ROWNUM = 1
         )
+    </update>
+
+    <!-- 사용자의 특정 학습 최신 완료 세션 조회 -->
+    <select id="selectLatestCompletedByUserIdAndEduId" resultType="EduStartResponseDTO">
+        SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT,
+               EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT, EDU_START_TIME, EDU_START_COMPLETED_AT
+        FROM (
+                 SELECT ID, EDU_START_AT, USER_ID, EDU_ID, EDU_START_IS_COMPLETED, EDU_START_TOTAL_COUNT,
+                        EDU_START_COMPLETED_COUNT, EDU_START_CORRECT_COUNT, EDU_START_TIME, EDU_START_COMPLETED_AT
+                 FROM TBL_EDU_START
+                 WHERE USER_ID = #{userId}
+                   AND EDU_ID = #{eduId}
+                   AND EDU_START_IS_COMPLETED = 1
+                 ORDER BY EDU_START_COMPLETED_AT DESC, ID DESC
+             )
+        WHERE ROWNUM = 1
+    </select>
+
+    <!-- 학습 세션 문제 풀이 결과 반영 -->
+    <update id="updateProgress">
+        UPDATE TBL_EDU_START
+        SET EDU_START_COMPLETED_COUNT = EDU_START_COMPLETED_COUNT + 1,
+            EDU_START_CORRECT_COUNT = EDU_START_CORRECT_COUNT + #{isCorrect}
+        WHERE ID = #{id}
+          AND EDU_START_IS_COMPLETED = 0
+          AND EDU_START_COMPLETED_COUNT &lt; EDU_START_TOTAL_COUNT
     </update>
 
     <!-- 학습 세션 완료 여부 조회 -->
@@ -60,5 +88,19 @@
           AND EDU_ID = #{eduId}
           AND EDU_START_IS_COMPLETED = 0
     </select>
+
+    <!-- 학습 문제별 정답 저장 -->
+    <insert id="insertProgressDetail">
+        INSERT INTO TBL_EDU_START_DETAIL (
+            ID,
+            EDU_START_ID,
+            EDU_START_DETAIL_IS_CORRECT
+        )
+        VALUES (
+                   SEQ_EDU_START_DETAIL.NEXTVAL,
+                   #{eduStartId},
+                   #{isCorrect}
+               )
+    </insert>
 
 </mapper>

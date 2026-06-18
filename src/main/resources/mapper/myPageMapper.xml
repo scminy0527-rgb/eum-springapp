@@ -97,31 +97,21 @@
         ORDER BY USER_ATTENDANCE_DATE DESC
     </select>
 
-    <!-- 학습 현황 조회: 시작한 학습 기준으로 진행률 계산 -->
+    <!-- 학습 현황 조회: 시작한 학습 세션 기준으로 진행률 계산 -->
     <select id="selectStudyStatusListByUserId" parameterType="Long" resultType="MyPageStudyStatusResponseDTO">
         SELECT
-            TE.ID AS id,
+            TES.ID AS id,
             TE.EDU_TITLE AS eduTitle,
             CASE
-                WHEN COUNT(DISTINCT TEWM.ID) = 0 THEN 0
-                ELSE ROUND(
-                        COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END)
-                            / COUNT(DISTINCT TEWM.ID) * 100
-                     )
+                WHEN NVL(TES.EDU_START_TOTAL_COUNT, 0) = 0 THEN 0
+                ELSE ROUND(TES.EDU_START_COMPLETED_COUNT / TES.EDU_START_TOTAL_COUNT * 100)
                 END AS progress
         FROM TBL_EDU_START TES
                  JOIN TBL_EDU TE
                       ON TES.EDU_ID = TE.ID
-                 JOIN TBL_EDU_WORD_MAP TEWM
-                      ON TE.ID = TEWM.EDU_ID
-                 LEFT JOIN TBL_WORD_STUDY TWS
-                           ON TEWM.ID = TWS.EDU_WORD_MAP_ID
-                               AND TWS.USER_ID = TES.USER_ID
         WHERE TES.USER_ID = #{userId}
           AND TE.EDU_IS_DELETED = 0
-        GROUP BY TE.ID, TE.EDU_TITLE, TES.EDU_START_AT
-        ORDER BY TES.EDU_START_AT DESC, TE.ID ASC
-            FETCH FIRST 3 ROWS ONLY
+        ORDER BY TES.EDU_START_AT DESC, TES.ID DESC
     </select>
 
     <!-- ===================================================== -->
@@ -143,6 +133,7 @@
             TU.USER_EXP AS userExp,
             TU.USER_CREATE_AT AS userCreateAt,
             TU.USER_ROLE AS userRole,
+            TU.USER_EMAIL_CHANGED_AT AS userEmailChangedAt,
             CASE
                 WHEN TSU.ID IS NOT NULL
                     AND UPPER(TSU.SOCIAL_USER_PROVIDER) IN ('GOOGLE', 'KAKAO', 'NAVER')
@@ -174,14 +165,25 @@
     <!-- 기본 프로필 수정 -->
     <update id="updateUserBasicInfo" parameterType="map">
         UPDATE TBL_USER
-        SET USER_NICKNAME = #{requestDTO.userNickname}, USER_INTRO = #{requestDTO.userIntro}, USER_JOB = #{requestDTO.userJob}, USER_ADDRESS = #{requestDTO.userAddress}
+        SET USER_NAME = #{requestDTO.userName},
+            USER_NICKNAME = #{requestDTO.userNickname},
+            USER_INTRO = #{requestDTO.userIntro},
+            USER_JOB = #{requestDTO.userJob},
+            USER_ADDRESS = #{requestDTO.userAddress}
         WHERE ID = #{userId}
     </update>
 
     <!-- 계정 정보 수정 -->
     <update id="updateUserAccountInfo" parameterType="map">
         UPDATE TBL_USER
-        SET USER_PHONE_NUM = #{requestDTO.userPhoneNum}
+        SET USER_EMAIL = #{requestDTO.userEmail},
+            USER_PHONE_NUM = #{requestDTO.userPhoneNum},
+            USER_EMAIL_CHANGED_AT =
+                CASE
+                    WHEN USER_EMAIL != #{requestDTO.userEmail}
+                        THEN SYSDATE
+                    ELSE USER_EMAIL_CHANGED_AT
+                    END
         WHERE ID = #{userId}
     </update>
 

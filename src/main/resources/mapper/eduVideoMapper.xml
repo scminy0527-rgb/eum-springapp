@@ -4,9 +4,23 @@
 
     <!-- 수어 영상 상세 조회 -->
     <select id="select" parameterType="Long" resultType="EduVideoResponseDTO">
-        SELECT ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE, EDU_VIDEO_URL, EDU_VIDEO_CREATE_AT
+        SELECT ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE, EDU_VIDEO_URL, EDU_VIDEO_THUMBNAIL_URL, EDU_VIDEO_CREATE_AT
         FROM TBL_EDU_VIDEO
         WHERE ID = #{id}
+    </select>
+
+    <!-- 동화 영상 랜덤 조회 -->
+    <select id="selectRandomFairyTaleVideo" resultType="EduVideoResponseDTO">
+        SELECT ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE,
+               EDU_VIDEO_URL, EDU_VIDEO_THUMBNAIL_URL, EDU_VIDEO_CREATE_AT
+        FROM (
+                 SELECT ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE,
+                        EDU_VIDEO_URL, EDU_VIDEO_THUMBNAIL_URL, EDU_VIDEO_CREATE_AT
+                 FROM TBL_EDU_VIDEO
+                 WHERE EDU_VIDEO_TYPE = 'fairy_tale'
+                 ORDER BY DBMS_RANDOM.VALUE()
+             )
+        WHERE ROWNUM = 1
     </select>
 
     <!-- 관리자용 -->
@@ -15,14 +29,15 @@
         <selectKey keyProperty="id" resultType="Long" order="BEFORE">
             SELECT SEQ_EDU_VIDEO.NEXTVAL FROM DUAL
         </selectKey>
-        INSERT INTO TBL_EDU_VIDEO(ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE, EDU_VIDEO_URL)
-        VALUES(#{id}, #{eduVideoTitle}, #{eduVideoDetail}, #{eduVideoType}, #{eduVideoUrl})
+        INSERT INTO TBL_EDU_VIDEO(ID, EDU_VIDEO_TITLE, EDU_VIDEO_DETAIL, EDU_VIDEO_TYPE, EDU_VIDEO_URL, EDU_VIDEO_THUMBNAIL_URL)
+        VALUES(#{id}, #{eduVideoTitle}, #{eduVideoDetail}, #{eduVideoType}, #{eduVideoUrl}, #{eduVideoThumbnailUrl})
     </insert>
 
     <!-- 수어 영상 수정 -->
     <update id="update" parameterType="EduVideoVO">
         UPDATE TBL_EDU_VIDEO
-        SET EDU_VIDEO_TITLE = #{eduVideoTitle}, EDU_VIDEO_DETAIL = #{eduVideoDetail}, EDU_VIDEO_TYPE = #{eduVideoType}, EDU_VIDEO_URL = #{eduVideoUrl}
+        SET EDU_VIDEO_TITLE = #{eduVideoTitle}, EDU_VIDEO_DETAIL = #{eduVideoDetail},
+            EDU_VIDEO_TYPE = #{eduVideoType}, EDU_VIDEO_URL = #{eduVideoUrl}, EDU_VIDEO_THUMBNAIL_URL = #{eduVideoThumbnailUrl}
         WHERE ID = #{id}
     </update>
 

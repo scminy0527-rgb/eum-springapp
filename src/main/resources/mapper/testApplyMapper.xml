@@ -37,6 +37,13 @@
           AND TEST_ID = #{testId}
     </select>
 
+    <!-- 시험 결과 존재 여부 확인 -->
+    <select id="countResultByApplyId" resultType="int">
+        SELECT COUNT(*)
+        FROM TBL_TEST_RESULT
+        WHERE TEST_APPLY_ID = #{id}
+    </select>
+
     <!-- 접수 취소 (본인 것만) -->
     <delete id="deleteById">
         DELETE FROM TBL_TEST_APPLY

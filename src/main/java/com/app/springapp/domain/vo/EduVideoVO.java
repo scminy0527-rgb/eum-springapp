@@ -12,5 +12,6 @@ public class EduVideoVO {
     private String eduVideoDetail;
     private String eduVideoType;
     private String eduVideoUrl;
+    private String eduVideoThumbnailUrl;
     private LocalDateTime eduVideoCreateAt;
 }

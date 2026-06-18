@@ -18,8 +18,11 @@ public interface TestApplyMapper {
     // 특정 유저가 특정 시험에 이미 접수했는지 확인
     int countByUserIdAndTestId(@Param("userId") Long userId, @Param("testId") Long testId);
 
+    // 시험 결과 존재 여부 확인
+    int countResultByApplyId(@Param("id") Long id);
+
     // 접수 취소
-    void deleteById(@Param("id") Long id, @Param("userId") Long userId);
+    int deleteById(@Param("id") Long id, @Param("userId") Long userId);
 
     // 내 접수 목록 조회
     List<TestApplyDTO> selectByUserId(Long userId);

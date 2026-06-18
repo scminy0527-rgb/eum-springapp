@@ -23,6 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class EduVideoApi {
     private final EduVideoService eduVideoService;
 
+    @GetMapping("/fairy-tales/random")
+    @Operation(summary = "동화 영상 랜덤 조회", description = "학습 메인 화면에 표시할 동화 영상을 랜덤으로 1개 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "동화 영상 랜덤 조회 성공")
+    @ApiResponse(responseCode = "404", description = "등록된 동화 영상 없음")
+    public ResponseEntity<ApiResponseDTO> getRandomFairyTaleVideo() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "동화 영상 랜덤 조회 성공", eduVideoService.getRandomFairyTaleVideo()));
+    }
+
+
     @GetMapping("/{id}")
     @Operation(summary = "수어 영상 상세 조회", description = "수어 영상 번호로 영상 상세 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수어 영상 상세 조회 성공")

@@ -26,4 +26,7 @@ public interface UserRewardHistoryMapper {
     // 회원 탈퇴 시 사용자 보상 지급 이력 삭제
     public void deleteByUserId(Long userId);
 
+    // 학습 보상 EXP 조회
+    public int sumLearnRewardExpByUserId(Long userId);
+
 }

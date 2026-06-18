@@ -7,10 +7,12 @@ import com.app.springapp.domain.dto.response.QuizAttemptResponseDTO;
 import com.app.springapp.domain.dto.response.QuizChoiceResponseDTO;
 import com.app.springapp.domain.vo.QuizAttemptDetailVO;
 import com.app.springapp.domain.vo.QuizAttemptVO;
+import com.app.springapp.domain.vo.QuizStartVO;
 import com.app.springapp.exception.EduException;
 import com.app.springapp.repository.QuizAttemptDAO;
 import com.app.springapp.repository.QuizAttemptDetailDAO;
 import com.app.springapp.repository.QuizChoiceDAO;
+import com.app.springapp.repository.QuizStartDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,13 +29,25 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
     private final QuizAttemptDAO quizAttemptDAO;
     private final QuizAttemptDetailDAO quizAttemptDetailDAO;
     private final QuizChoiceDAO quizChoiceDAO;
+    private final QuizStartDAO quizStartDAO;
     private final RewardService rewardService;
 
     // 퀴즈 제출 및 채점
     @Override
     public QuizAttemptResponseDTO submitQuiz(Long quizId, QuizSubmitRequestDTO requestDTO) {
-        int totalCount = requestDTO.getAnswers().size();
-        int score = 0;
+        QuizStartVO quizStartVO = quizStartDAO
+                .findByUserIdAndQuizId(requestDTO.getUserId(), quizId)
+                .orElse(null);
+
+        int submittedAnswerCount = requestDTO.getAnswers().size();
+
+        int totalCount = quizStartVO != null && quizStartVO.getQuizStartCompletedCount() > 0
+                ? quizStartVO.getQuizStartCompletedCount()
+                : submittedAnswerCount;
+
+        int score = quizStartVO != null && quizStartVO.getQuizStartCompletedCount() > 0
+                ? quizStartVO.getQuizStartCorrectCount()
+                : 0;
 
         QuizAttemptVO quizAttemptVO = new QuizAttemptVO();
         quizAttemptVO.setUserId(requestDTO.getUserId());
@@ -50,8 +64,10 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
 
             int isCorrect = correctChoice.getId().equals(answer.getQuizChoiceId()) ? 1 : 0;
 
-            if (isCorrect == 1) {
-                score++;
+            if (quizStartVO == null || quizStartVO.getQuizStartCompletedCount() == 0) {
+                if (isCorrect == 1) {
+                    score++;
+                }
             }
 
             QuizAttemptDetailVO detailVO = new QuizAttemptDetailVO();

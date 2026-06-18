@@ -15,5 +15,8 @@ public interface QuizStartMapper {
     // 퀴즈 시작 시간 갱신
     public void updateStartAt(Long userId, Long quizId);
 
+    // 퀴즈 진행 문제 수 증가
+    public void updateProgress(Long userId, Long quizId, int totalCount, int isCorrect);
+
 
 }

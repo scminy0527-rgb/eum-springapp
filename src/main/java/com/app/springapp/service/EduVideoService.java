@@ -8,6 +8,9 @@ public interface EduVideoService {
     // 수어 영상 상세 조회
     public EduVideoResponseDTO getEduVideoById(Long id);
 
+    // 동화 영상 랜덤 조회
+    public EduVideoResponseDTO getRandomFairyTaleVideo();
+
     // 관리자용
     // 수어 영상 등록
     public void saveEduVideo(EduVideoVO eduVideoVO);

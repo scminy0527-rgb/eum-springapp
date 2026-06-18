@@ -18,6 +18,11 @@ public class EduVideoDAO {
         return Optional.ofNullable(eduVideoMapper.select(id));
     }
 
+    // 동화 영상 랜덤 조회
+    public Optional<EduVideoResponseDTO> findRandomFairyTaleVideo() {
+        return Optional.ofNullable(eduVideoMapper.selectRandomFairyTaleVideo());
+    }
+
     // 관리자용
     // 수어 영상 등록
     public void save(EduVideoVO eduVideoVO) {
@@ -28,4 +33,6 @@ public class EduVideoDAO {
     public void update(EduVideoVO eduVideoVO) {
         eduVideoMapper.update(eduVideoVO);
     }
+
+
 }

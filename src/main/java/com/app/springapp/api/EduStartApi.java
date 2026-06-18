@@ -1,7 +1,9 @@
 package com.app.springapp.api;
 
 import com.app.springapp.domain.dto.UserDTO;
+import com.app.springapp.domain.dto.request.EduStartProgressRequestDTO;
 import com.app.springapp.domain.dto.response.ApiResponseDTO;
+import com.app.springapp.domain.dto.response.EduStartCompleteResponseDTO;
 import com.app.springapp.service.edu.EduStartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -65,12 +67,25 @@ public class EduStartApi {
             example = "1",
             schema = @Schema(type = "number")
     )
-    public ResponseEntity<ApiResponseDTO> completeEduStart(@PathVariable Long userId, @PathVariable Long eduId) {
-        eduStartService.completeEduStart(userId, eduId);
+    @Parameter(
+            name = "eduStartTime",
+            description = "학습 풀이 시간: 초 단위",
+            required = true,
+            in = ParameterIn.QUERY,
+            example = "120",
+            schema = @Schema(type = "number")
+    )
+    public ResponseEntity<ApiResponseDTO> completeEduStart(
+            @PathVariable Long userId,
+            @PathVariable Long eduId,
+            @RequestParam int eduStartTime
+    ) {
+        EduStartCompleteResponseDTO result =
+                eduStartService.completeEduStart(userId, eduId, eduStartTime);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponseDTO.of(true, "학습 세션 완료 처리 성공", null));
+                .body(ApiResponseDTO.of(true, "학습 세션 완료 처리 성공", result));
     }
 
 
@@ -101,6 +116,39 @@ public class EduStartApi {
                 .status(HttpStatus.OK)
                 .body(ApiResponseDTO.of(true, "학습 세션 완료 여부 조회 성공", completed));
     }
+
+    @PostMapping("/users/{userId}/edus/{eduId}/progress")
+    @Operation(summary = "학습 세션 문제 풀이 결과 반영", description = "진행 중인 학습 세션에 푼 문제 수와 정답 수를 반영합니다.")
+    @ApiResponse(responseCode = "200", description = "학습 세션 문제 풀이 결과 반영 성공")
+    @ApiResponse(responseCode = "404", description = "진행 중인 학습 세션을 찾을 수 없음")
+    @Parameter(
+            name = "userId",
+            description = "유저 번호",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1",
+            schema = @Schema(type = "number")
+    )
+    @Parameter(
+            name = "eduId",
+            description = "학습 번호",
+            required = true,
+            in = ParameterIn.PATH,
+            example = "1",
+            schema = @Schema(type = "number")
+    )
+    public ResponseEntity<ApiResponseDTO> recordProgress(
+            @PathVariable Long userId,
+            @PathVariable Long eduId,
+            @RequestBody EduStartProgressRequestDTO requestDTO
+    ) {
+        eduStartService.recordProgress(userId, eduId, requestDTO.getQuestionNumber(), requestDTO.getIsCorrect());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponseDTO.of(true, "학습 세션 문제 풀이 결과 반영 성공", null));
+    }
+
 
     @PostMapping("/users/{userId}/edus/{eduId}/roadmap-reward")
     @Operation(summary = "학습 로드맵 이벤트 보상 수령", description = "완료한 학습의 로드맵 이벤트 보상을 수령합니다.")

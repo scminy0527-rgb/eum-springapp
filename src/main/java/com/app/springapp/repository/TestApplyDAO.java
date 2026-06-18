@@ -28,9 +28,14 @@ public class TestApplyDAO {
         return testApplyMapper.countByUserIdAndTestId(userId, testId) > 0;
     }
 
+    // 시험 결과 존재 여부 확인
+    public boolean hasResult(Long id) {
+        return testApplyMapper.countResultByApplyId(id) > 0;
+    }
+
     // 접수 취소
-    public void deleteById(Long id, Long userId) {
-        testApplyMapper.deleteById(id, userId);
+    public int deleteById(Long id, Long userId) {
+        return testApplyMapper.deleteById(id, userId);
     }
 
     // 내 접수 목록 조회

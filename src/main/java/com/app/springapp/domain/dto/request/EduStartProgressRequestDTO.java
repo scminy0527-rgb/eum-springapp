@@ -4,16 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-@Component
 @Data
-@Schema(description = "퀴즈 시작 요청 DTO")
-public class QuizStartRequestDTO {
-
-    @Schema(description = "유저 번호", example = "1")
-    private Long userId;
-
-    @Schema(description = "전체 문제 수", example = "5")
-    private int totalCount;
+@Component
+@Schema(description = "학습 세션 문제 정답 결과 요청 DTO")
+public class EduStartProgressRequestDTO {
+    @Schema(description = "문제 번호", example = "1")
+    private int questionNumber;
 
     @Schema(description = "정답 여부: 정답이면 1, 오답이면 0", example = "1")
     private int isCorrect;

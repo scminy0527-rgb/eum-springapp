@@ -12,4 +12,6 @@ public class QuizStartVO {
     private LocalDateTime quizStartAt;
     private Long userId;
     private Long quizId;
+    private int quizStartCompletedCount;
+    private int quizStartCorrectCount;
 }

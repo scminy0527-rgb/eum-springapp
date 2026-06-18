@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -218,20 +219,34 @@ public class MyPageServiceImpl implements MyPageService {
     public void updateUserAccountInfo(MyPageEditRequestDTO requestDTO, Long userId) {
         MyPageProfileResponseDTO userInfo = getUserInfo(userId);
 
-        if (isSocialUser(userId) && !userInfo.getUserEmail().equals(requestDTO.getUserEmail())) {
+        boolean emailChanged = !userInfo.getUserEmail().equals(requestDTO.getUserEmail());
+
+        if (isSocialUser(userId) && emailChanged) {
             throw new MyPageException("소셜 로그인 회원은 이메일을 변경할 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
 
+        if (emailChanged
+                && userInfo.getUserEmailChangedAt() != null
+                && userInfo.getUserEmailChangedAt().isAfter(LocalDateTime.now().minusMonths(1))) {
+            throw new MyPageException("이메일은 1개월에 1번만 변경할 수 있습니다.", HttpStatus.BAD_REQUEST);
+        }
+
         if (!userInfo.getUserPhoneNum().equals(requestDTO.getUserPhoneNum())) {
-            boolean phoneCheck = authService.verifyUserPhoneVerificationCode(requestDTO.getUserPhoneNum(), requestDTO.getPhoneCode());
+            boolean phoneCheck = authService.verifyUserPhoneVerificationCode(
+                    requestDTO.getUserPhoneNum(),
+                    requestDTO.getPhoneCode()
+            );
 
             if (!phoneCheck) {
                 throw new MyPageException("휴대폰 인증이 필요합니다.", HttpStatus.BAD_REQUEST);
             }
         }
 
-        if (!userInfo.getUserEmail().equals(requestDTO.getUserEmail())) {
-            boolean emailCheck = authService.verifyUserEmailVerificationCode(requestDTO.getUserEmail(), requestDTO.getEmailCode());
+        if (emailChanged) {
+            boolean emailCheck = authService.verifyUserEmailVerificationCode(
+                    requestDTO.getUserEmail(),
+                    requestDTO.getEmailCode()
+            );
 
             if (!emailCheck) {
                 throw new MyPageException("이메일 인증이 필요합니다.", HttpStatus.BAD_REQUEST);

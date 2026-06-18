@@ -2,193 +2,244 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.springapp.mapper.MyPageLearningMapper">
 
-    <!-- 마이페이지 학습현황 조회: 시작했지만 아직 완료하지 않은 학습/퀴즈 -->
+    <!-- 마이페이지 학습현황 조회: 아직 완료하지 않은 학습/퀴즈 세션 -->
     <select id="selectLearningStatusListByUserId" parameterType="Long" resultType="MyPageLearningStatusResponseDTO">
-        SELECT STATUS.eduId, STATUS.eduTitle, STATUS.progress, STATUS.studyTime, STATUS.recentStudyAt, STATUS.learningType
+        SELECT
+            STATUS.eduId,
+            STATUS.eduTitle,
+            STATUS.progress,
+            STATUS.completedCount,
+            STATUS.studyTime,
+            STATUS.recentStudyAt,
+            STATUS.learningType,
+            STATUS.studyPath
         FROM (
-                SELECT
-                    TE.ID AS eduId,
-                    TE.EDU_TITLE AS eduTitle,
-                    CASE
-                        WHEN COUNT(DISTINCT TEWM.ID) = 0 THEN 0
-                        ELSE ROUND(
-                                COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END)
-                                / COUNT(DISTINCT TEWM.ID) * 100
-                            )
-                        END AS progress,
-                        NVL(
-                            ROUND(
-                                (
-                                    CAST(NVL(MAX(TWS.WORD_STUDY_UPDATE_AT), SYSDATE) AS DATE)
-                                    - CAST(TES.EDU_START_AT AS DATE)
-                                ) * 24 * 60 * 60
-                            ),
-                            0
-                        ) AS studyTime,
-                        CAST(MAX(NVL(TWS.WORD_STUDY_UPDATE_AT, TES.EDU_START_AT)) AS TIMESTAMP) AS recentStudyAt,
-                        'LEARN' AS learningType
-                FROM TBL_EDU_START TES
-                        JOIN TBL_EDU TE
-                            ON TES.EDU_ID = TE.ID
-                        JOIN TBL_EDU_WORD_MAP TEWM
-                            ON TE.ID = TEWM.EDU_ID
-                        LEFT JOIN TBL_WORD_STUDY TWS
-                                ON TEWM.ID = TWS.EDU_WORD_MAP_ID
-                                    AND TWS.USER_ID = TES.USER_ID
-                                    AND TWS.USER_ID = TES.USER_ID
-                                    AND TWS.WORD_STUDY_UPDATE_AT >= TES.EDU_START_AT
-                WHERE TES.USER_ID = #{userId}
-                    AND TE.EDU_IS_DELETED = 0
-                    AND TES.EDU_START_IS_COMPLETED = 0
-                    AND TES.ID = (
-                        SELECT MAX(TES2.ID)
-                        FROM TBL_EDU_START TES2
-                        WHERE TES2.USER_ID = TES.USER_ID
-                            AND TES2.EDU_ID = TES.EDU_ID
-                            AND TES2.EDU_START_IS_COMPLETED = 0
-                    )
-                GROUP BY TE.ID, TE.EDU_TITLE, TES.EDU_START_AT
-                HAVING COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END) &lt; COUNT(DISTINCT TEWM.ID)
+                 SELECT
+                     TE.ID AS eduId,
+                     TE.EDU_TITLE AS eduTitle,
+                     CASE
+                         WHEN TES.EDU_START_TOTAL_COUNT = 0 THEN 0
+                         ELSE ROUND(TES.EDU_START_COMPLETED_COUNT / TES.EDU_START_TOTAL_COUNT * 100)
+                         END AS progress,
+                     TES.EDU_START_COMPLETED_COUNT AS completedCount,
+                     NVL(
+                             ROUND(
+                                     (
+                                         CAST(MAX(NVL(TWS.WORD_STUDY_UPDATE_AT, TES.EDU_START_AT)) AS DATE)
+                                             - CAST(TES.EDU_START_AT AS DATE)
+                                         ) * 24 * 60 * 60
+                             ),
+                             0
+                     ) AS studyTime,
+                     CAST(MAX(NVL(TWS.WORD_STUDY_UPDATE_AT, TES.EDU_START_AT)) AS TIMESTAMP) AS recentStudyAt,
+                     'LEARN' AS learningType,
+                     '/study/learn/quiz/greeting' AS studyPath
+                 FROM TBL_EDU_START TES
+                          JOIN TBL_EDU TE
+                               ON TES.EDU_ID = TE.ID
+                          LEFT JOIN TBL_EDU_WORD_MAP TEWM
+                                    ON TE.ID = TEWM.EDU_ID
+                          LEFT JOIN TBL_WORD_STUDY TWS
+                                    ON TEWM.ID = TWS.EDU_WORD_MAP_ID
+                                        AND TWS.USER_ID = TES.USER_ID
+                                        AND TWS.WORD_STUDY_UPDATE_AT &gt;= TES.EDU_START_AT
+                 WHERE TES.USER_ID = #{userId}
+                   AND TE.EDU_IS_DELETED = 0
+                   AND TES.EDU_START_IS_COMPLETED = 0
+                   AND TES.ID = (
+                     SELECT MAX(TES2.ID)
+                     FROM TBL_EDU_START TES2
+                     WHERE TES2.USER_ID = TES.USER_ID
+                       AND TES2.EDU_ID = TES.EDU_ID
+                       AND TES2.EDU_START_IS_COMPLETED = 0
+                 )
+                 GROUP BY
+                     TES.ID,
+                     TE.ID,
+                     TE.EDU_TITLE,
+                     TES.EDU_START_AT,
+                     TES.EDU_START_TOTAL_COUNT,
+                     TES.EDU_START_COMPLETED_COUNT
 
-                UNION ALL
+                 UNION ALL
 
-                SELECT
-                    TQ.ID AS eduId,
-                    TQ.QUIZ_TITLE AS eduTitle,
-                    0 AS progress,
-                    ROUND((CAST(SYSDATE AS DATE) - CAST(TQS.QUIZ_START_AT AS DATE)) * 24 * 60 * 60) AS studyTime,
-                    CAST(TQS.QUIZ_START_AT AS TIMESTAMP) AS recentStudyAt,
-                    'QUIZ' AS learningType
-                FROM TBL_QUIZ_START TQS
-                         JOIN TBL_QUIZ TQ
-                              ON TQS.QUIZ_ID = TQ.ID
-                WHERE TQS.USER_ID = #{userId}
-                  AND NOT EXISTS (
-                    SELECT 1
-                    FROM TBL_QUIZ_ATTEMPT TQA
-                    WHERE TQA.USER_ID = TQS.USER_ID
-                      AND TQA.QUIZ_ID = TQS.QUIZ_ID
-                      AND TQA.QUIZ_ATTEMPT_CREATE_AT > TQS.QUIZ_START_AT
-                )
-            ) STATUS
+                 SELECT
+                     TQ.ID AS eduId,
+                     TQ.QUIZ_TITLE AS eduTitle,
+                     CASE
+                         WHEN COUNT(TQQ.ID) = 0 THEN 0
+                         ELSE ROUND(TQS.QUIZ_START_COMPLETED_COUNT / COUNT(TQQ.ID) * 100)
+                         END AS progress,
+                     TQS.QUIZ_START_COMPLETED_COUNT AS completedCount,
+                     NVL(
+                             ROUND(
+                                     (CAST(SYSDATE AS DATE) - CAST(TQS.QUIZ_START_AT AS DATE)) * 24 * 60 * 60
+                             ),
+                             0
+                     ) AS studyTime,
+                     CAST(TQS.QUIZ_START_AT AS TIMESTAMP) AS recentStudyAt,
+                     'QUIZ' AS learningType,
+                     CASE
+                         WHEN TQ.ID = 1 THEN '/study/chapter/sign-history'
+                         WHEN TQ.ID = 2 THEN '/study/chapter/sos'
+                         WHEN TQ.ID = 3 THEN '/study/chapter/morse'
+                         ELSE '/study/chapter'
+                         END AS studyPath
+                 FROM TBL_QUIZ_START TQS
+                          JOIN TBL_QUIZ TQ
+                               ON TQS.QUIZ_ID = TQ.ID
+                          JOIN TBL_QUIZ_EDU TQE
+                               ON TQ.ID = TQE.QUIZ_ID
+                          JOIN TBL_QUIZ_QUESTION TQQ
+                               ON TQE.QUIZ_QUESTION_ID = TQQ.ID
+                 WHERE TQS.USER_ID = #{userId}
+                   AND NOT EXISTS (
+                     SELECT 1
+                     FROM TBL_QUIZ_ATTEMPT TQA
+                     WHERE TQA.USER_ID = TQS.USER_ID
+                       AND TQA.QUIZ_ID = TQS.QUIZ_ID
+                       AND TQA.QUIZ_ATTEMPT_CREATE_AT &gt;= TQS.QUIZ_START_AT
+                 )
+                 GROUP BY
+                     TQ.ID,
+                     TQ.QUIZ_TITLE,
+                     TQS.QUIZ_START_COMPLETED_COUNT,
+                     TQS.QUIZ_START_AT
+                 HAVING TQS.QUIZ_START_COMPLETED_COUNT &lt; COUNT(TQQ.ID)
+             ) STATUS
         ORDER BY STATUS.recentStudyAt DESC, STATUS.eduId ASC
     </select>
 
-    <!-- 마이페이지 학습결과 조회: 완료된 학습과 챕터 퀴즈 응시 결과를 함께 조회 -->
+
+    <!-- 마이페이지 학습결과 조회: 완료된 학습/퀴즈 세션 -->
     <select id="selectLearningResultListByUserId" parameterType="Long" resultType="MyPageLearningResultResponseDTO">
-        SELECT RESULT.quizAttemptId, RESULT.quizId, RESULT.quizTitle, RESULT.correctCount, RESULT.totalCount,
-               RESULT.spentTime, RESULT.accuracy, RESULT.quizAttemptCreateAt, RESULT.resultType, RESULT.resultPath
+        SELECT
+            RESULT.quizAttemptId,
+            RESULT.quizId,
+            RESULT.quizTitle,
+            RESULT.correctCount,
+            RESULT.totalCount,
+            RESULT.spentTime,
+            RESULT.accuracy,
+            RESULT.quizAttemptCreateAt,
+            RESULT.resultType,
+            RESULT.resultPath
         FROM (
-            SELECT
-                TES.ID AS quizAttemptId,
-                TE.ID AS quizId,
-                TE.EDU_TITLE AS quizTitle,
-                COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END) AS correctCount,
-                5 AS totalCount,
-                NVL(
-                    ROUND(
-                        (
-                            CAST(MAX(TWS.WORD_STUDY_UPDATE_AT) AS DATE)
-                            - CAST(TES.EDU_START_AT AS DATE)
-                        ) * 24 * 60 * 60
-                    ),
-                    0
-                ) AS  spentTime,
-                CASE
-                    WHEN COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END) > 5 THEN 100
-                    ELSE ROUND(COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END) / 5 * 100)
-                END AS accuracy,
-                CAST(MAX(TWS.WORD_STUDY_UPDATE_AT) AS TIMESTAMP) AS quizAttemptCreateAt,
-                'LEARN' AS resultType,
-                '/study/learn' AS resultPath
-            FROM TBL_EDU_START TES
-                    JOIN TBL_EDU TE
-                        ON TES.EDU_ID = TE.ID
-                    JOIN TBL_EDU_WORD_MAP TEWM
-                        ON TE.ID = TEWM.EDU_ID
-                    LEFT JOIN TBL_WORD_STUDY TWS
-                              ON TEWM.ID = TWS.EDU_WORD_MAP_ID
-                                AND TWS.USER_ID = TES.USER_ID
-            WHERE TES.USER_ID = #{userId}
-                AND TE.EDU_IS_DELETED = 0
-                AND TES.EDU_START_IS_COMPLETED = 1
-            GROUP BY TES.ID, TE.ID, TE.EDU_TITLE, TES.EDU_START_AT
-            HAVING COUNT(DISTINCT TEWM.ID) > 0
+                 SELECT
+                     TES.ID AS quizAttemptId,
+                     TE.ID AS quizId,
+                     TE.EDU_TITLE AS quizTitle,
+                     TES.EDU_START_CORRECT_COUNT AS correctCount,
+                     TES.EDU_START_TOTAL_COUNT AS totalCount,
+                     TES.EDU_START_TIME AS spentTime,
+                     CASE
+                         WHEN TES.EDU_START_TOTAL_COUNT = 0 THEN 0
+                         ELSE ROUND(TES.EDU_START_CORRECT_COUNT / TES.EDU_START_TOTAL_COUNT * 100)
+                         END AS accuracy,
+                     CAST(NVL(TES.EDU_START_COMPLETED_AT, TES.EDU_START_AT) AS TIMESTAMP) AS quizAttemptCreateAt,
+                     'LEARN' AS resultType,
+                     '/study/learn' AS resultPath
+                 FROM TBL_EDU_START TES
+                          JOIN TBL_EDU TE
+                               ON TES.EDU_ID = TE.ID
+                 WHERE TES.USER_ID = #{userId}
+                   AND TE.EDU_IS_DELETED = 0
+                   AND TES.EDU_START_IS_COMPLETED = 1
 
-            UNION ALL
+                 UNION ALL
 
-            SELECT
-                TQA.ID AS quizAttemptId,
-                TQ.ID AS quizId, TQ.QUIZ_TITLE AS quizTitle,
-                TQA.QUIZ_ATTEMPT_SCORE AS correctCount, TQA.QUIZ_ATTEMPT_TOTAL_COUNT AS totalCount, TQA.QUIZ_ATTEMPT_TIME AS spentTime,
-                CASE
-                    WHEN TQA.QUIZ_ATTEMPT_TOTAL_COUNT = 0 THEN 0
-                    ELSE ROUND(TQA.QUIZ_ATTEMPT_SCORE / TQA.QUIZ_ATTEMPT_TOTAL_COUNT * 100)
-                END AS accuracy,
-                CAST(TQA.QUIZ_ATTEMPT_CREATE_AT AS TIMESTAMP) AS quizAttemptCreateAt,
-                'QUIZ' AS resultType,
-                CASE TQ.ID
-                    WHEN 1 THEN '/study/chapter/sign-history/result'
-                    WHEN 2 THEN '/study/chapter/sos/result'
-                    WHEN 3 THEN '/study/chapter/morse/result'
-                    ELSE '/study/chapter'
-                    END AS resultPath
-            FROM TBL_QUIZ_ATTEMPT TQA
-                     JOIN TBL_QUIZ TQ
-                          ON TQA.QUIZ_ID = TQ.ID
-            WHERE TQA.USER_ID = #{userId}
-        ) RESULT
+                 SELECT
+                     TQA.ID AS quizAttemptId,
+                     TQ.ID AS quizId,
+                     TQ.QUIZ_TITLE AS quizTitle,
+                     TQA.QUIZ_ATTEMPT_SCORE AS correctCount,
+                     TQA.QUIZ_ATTEMPT_TOTAL_COUNT AS totalCount,
+                     TQA.QUIZ_ATTEMPT_TIME AS spentTime,
+                     CASE
+                         WHEN TQA.QUIZ_ATTEMPT_TOTAL_COUNT = 0 THEN 0
+                         ELSE ROUND(TQA.QUIZ_ATTEMPT_SCORE / TQA.QUIZ_ATTEMPT_TOTAL_COUNT * 100)
+                         END AS accuracy,
+                     CAST(TQA.QUIZ_ATTEMPT_CREATE_AT AS TIMESTAMP) AS quizAttemptCreateAt,
+                     'QUIZ' AS resultType,
+                     CASE
+                         WHEN TQ.ID = 1 THEN '/study/chapter/sign-history/result'
+                         WHEN TQ.ID = 2 THEN '/study/chapter/sos/result'
+                         WHEN TQ.ID = 3 THEN '/study/chapter/morse/result'
+                         ELSE '/study/chapter'
+                         END AS resultPath
+                 FROM TBL_QUIZ_ATTEMPT TQA
+                          JOIN TBL_QUIZ TQ
+                               ON TQA.QUIZ_ID = TQ.ID
+                 WHERE TQA.USER_ID = #{userId}
+             ) RESULT
         ORDER BY RESULT.quizAttemptCreateAt DESC, RESULT.quizAttemptId DESC
     </select>
 
-
-    <!-- 마이페이지 학습요약 조회: 학습 완료 기록과 챕터 퀴즈 응시 기록을 함께 집계 -->
+    <!-- 마이페이지 학습요약 조회: 완료된 학습/퀴즈 결과 기준 -->
     <select id="selectLearningSummaryByUserId" parameterType="Long" resultType="MyPageLearningSummaryResponseDTO">
         SELECT
             CASE
-                WHEN SUM(SUMMARY_DATA.totalCount) = 0 THEN 0
+                WHEN NVL(SUM(SUMMARY_DATA.totalCount), 0) = 0 THEN 0
                 ELSE ROUND(
-                        SUM(SUMMARY_DATA.correctCount)
-                        / SUM(SUMMARY_DATA.totalCount) * 100
-                )
-            END AS totalAccuracy,
+                        NVL(SUM(SUMMARY_DATA.correctCount), 0)
+                            / SUM(SUMMARY_DATA.totalCount) * 100
+                     )
+                END AS totalAccuracy,
             NVL(SUM(SUMMARY_DATA.correctCount), 0) AS totalQuestionCount,
             NVL(SUM(SUMMARY_DATA.spentTime), 0) AS totalStudyTime
         FROM (
-             SELECT
-                 COUNT(DISTINCT CASE WHEN TWS.WORD_STUDY_IS_COMPLETED = 1 THEN TEWM.ID END) AS correctCount,
-                 5 AS totalCount,
-                 NVL(
-                    ROUND(
-                        (
-                            CAST(NVL(MAX(TWS.WORD_STUDY_UPDATE_AT), SYSDATE) AS DATE)
-                            - CAST(TES.EDU_START_AT AS DATE)
-                        ) * 24 * 60 * 60
-                    ),
-                    0
-                 ) AS spentTime
-             FROM TBL_EDU_START TES
-                      JOIN TBL_EDU TE
-                           ON TES.EDU_ID = TE.ID
-                      JOIN TBL_EDU_WORD_MAP TEWM
-                           ON TE.ID = TEWM.EDU_ID
-                      LEFT JOIN TBL_WORD_STUDY TWS
-                                ON TEWM.ID = TWS.EDU_WORD_MAP_ID
-                                    AND TWS.USER_ID = TES.USER_ID
-             WHERE TES.USER_ID = #{userId}
-               AND TE.EDU_IS_DELETED = 0
-               AND TES.EDU_START_IS_COMPLETED = 1
-             GROUP BY TES.ID, TES.EDU_ID, TES.EDU_START_AT
+                 SELECT
+                     TES.EDU_START_CORRECT_COUNT AS correctCount,
+                     TES.EDU_START_TOTAL_COUNT AS totalCount,
+                     TES.EDU_START_TIME AS spentTime
+                 FROM TBL_EDU_START TES
+                          JOIN TBL_EDU TE
+                               ON TES.EDU_ID = TE.ID
+                 WHERE TES.USER_ID = #{userId}
+                   AND TE.EDU_IS_DELETED = 0
+                   AND TES.EDU_START_IS_COMPLETED = 1
 
-             UNION ALL
+                 UNION ALL
 
-             SELECT
-                 TQA.QUIZ_ATTEMPT_SCORE AS correctCount,
-                 TQA.QUIZ_ATTEMPT_TOTAL_COUNT AS totalCount,
-                 TQA.QUIZ_ATTEMPT_TIME AS spentTime
-             FROM TBL_QUIZ_ATTEMPT TQA
-             WHERE TQA.USER_ID = #{userId}
-    ) SUMMARY_DATA
+                 SELECT
+                     TQA.QUIZ_ATTEMPT_SCORE AS correctCount,
+                     TQA.QUIZ_ATTEMPT_TOTAL_COUNT AS totalCount,
+                     TQA.QUIZ_ATTEMPT_TIME AS spentTime
+                 FROM TBL_QUIZ_ATTEMPT TQA
+                 WHERE TQA.USER_ID = #{userId}
+             ) SUMMARY_DATA
+    </select>
+
+    <!-- AI 학습 분석 문제별 정답 매핑 -->
+    <resultMap id="learningAnalysisAnswerMap" type="LearningAnalysisAnswerResponseDTO">
+        <result property="questionNumber" column="QUESTION_NUMBER"/>
+        <result property="isCorrect" column="IS_CORRECT"/>
+    </resultMap>
+
+    <!-- AI 학습 분석 문제별 정답 조회 -->
+    <select id="selectLearningAnalysisAnswerListByAttemptId" parameterType="Long" resultMap="learningAnalysisAnswerMap">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY TQAD.ID ASC) AS QUESTION_NUMBER,
+            CASE
+                WHEN TQAD.QUIZ_ATTEMPT_DETAIL_IS_CORRECT = 1 THEN 1
+                ELSE 0
+                END AS IS_CORRECT
+        FROM TBL_QUIZ_ATTEMPT_DETAIL TQAD
+        WHERE TQAD.QUIZ_ATTEMPT_ID = #{quizAttemptId}
+        ORDER BY TQAD.ID ASC
+    </select>
+
+    <!-- AI 학습 분석 학습 문제별 정답 조회 -->
+    <select id="selectLearningAnalysisEduAnswerListByEduStartId" parameterType="Long" resultMap="learningAnalysisAnswerMap">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY TESD.ID ASC) AS QUESTION_NUMBER,
+            CASE
+                WHEN TESD.EDU_START_DETAIL_IS_CORRECT = 1 THEN 1
+                ELSE 0
+                END AS IS_CORRECT
+        FROM TBL_EDU_START_DETAIL TESD
+        WHERE TESD.EDU_START_ID = #{eduStartId}
+        ORDER BY TESD.ID ASC
     </select>
 
 </mapper>

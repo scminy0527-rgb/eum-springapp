@@ -23,6 +23,14 @@ public class EduVideoServiceImpl implements EduVideoService {
         return eduVideoDAO.findVideoById(id).orElseThrow(() -> new EduException("수어 영상 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
     }
 
+    // 동화 영상 랜덤 조회
+    @Override
+    @Transactional(readOnly = true)
+    public EduVideoResponseDTO getRandomFairyTaleVideo() {
+        return eduVideoDAO.findRandomFairyTaleVideo()
+                .orElseThrow(() -> new EduException("동화 영상 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+    }
+
     // 관리자
     // 수어 영상 등록
     @Override

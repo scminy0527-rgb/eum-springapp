@@ -19,6 +19,9 @@ public class MyPageLearningStatusResponseDTO {
     @Schema(description = "학습 진행률", example = "70", required = true)
     private Long progress;
 
+    @Schema(description = "현재 학습 세션에서 완료한 문제 수", example = "2")
+    private Long completedCount;
+
     @Schema(description = "학습 시간(초)", example = "7200", required = true)
     private Long studyTime;
 
@@ -27,4 +30,7 @@ public class MyPageLearningStatusResponseDTO {
 
     @Schema(description = "학습 구분", example = "LEARN")
     private String learningType;
+
+    @Schema(description = "학습 재진입 기본 경로", example = "/study/chapter/morse")
+    private String studyPath;
 }

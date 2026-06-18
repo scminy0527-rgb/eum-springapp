@@ -19,6 +19,8 @@ public class EduVideoDTO {
     private String eduVideoType;
     @Schema(description = "영상 URL", example = "https://example.com/video.mp4")
     private String eduVideoUrl;
+    @Schema(description = "영상 썸네일 URL", example = "/assets/image/fairy-tale/story01.jpg")
+    private String eduVideoThumbnailUrl;
     @Schema(description = "영상 업로드 일시", example = "2024-01-01T00:00:00")
     private LocalDateTime eduVideoCreateAt;
 }

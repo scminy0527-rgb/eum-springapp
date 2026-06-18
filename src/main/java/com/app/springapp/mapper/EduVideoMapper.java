@@ -10,6 +10,9 @@ public interface EduVideoMapper {
     // 수어 영상 상세 조회
     public EduVideoResponseDTO select(Long id);
 
+    // 동화 영상 랜덤 조회
+    public EduVideoResponseDTO selectRandomFairyTaleVideo();
+
     // 관리자용
     // 수어 영상 등록
     public void insert(EduVideoVO eduVideoVO);

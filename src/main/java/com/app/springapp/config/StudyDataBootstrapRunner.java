@@ -38,11 +38,16 @@ public class StudyDataBootstrapRunner implements ApplicationRunner {
         if (signWordCount == 0) {
             int totalSavedCount = 0;
 
-            totalSavedCount += signWordService.syncSignWords(1, 3617);
+            try {
+                totalSavedCount += signWordService.syncSignWords(1, 3617);
+            } catch (Exception e) {
+                log.warn("study bootstrap skipped: OpenAPI sync failed.", e);
+                return;
+            }
+
             log.info("sign word saved count = {}", totalSavedCount);
 
             int afterSyncCount = signWordDAO.countAll();
-//            log.info("sign word count after sync = {}", afterSyncCount);
 
             if (afterSyncCount == 0) {
 //                log.warn("study bootstrap stopped: OpenAPI sync result is empty.");
@@ -86,7 +91,7 @@ public class StudyDataBootstrapRunner implements ApplicationRunner {
             if (e.getHttpStatus() == HttpStatus.CONFLICT) {
                 return;
             }
-            // 데이터 일부 누락된 채 실행되는 것 < 서버 시작 실패로 바로 원인 드러나는 것
+            // 일부 데이터 등록 실패는 로그를 남기고 서버 시작 실패 원인을 확인할 수 있게 처리합니다.
             log.warn(
                     "study bootstrap edu word skipped. eduId={}, signWordId={}, reason={}",
                     eduId, signWordId, e.getMessage()

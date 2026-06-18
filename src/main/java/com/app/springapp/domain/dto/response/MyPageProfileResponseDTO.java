@@ -69,4 +69,7 @@ public class MyPageProfileResponseDTO {
 
     @Schema(description = "소셜 로그인 제공자", example = "GOOGLE", required = false)
     private String socialMemberProvider;
+
+    @Schema(description = "마지막 이메일 변경일", example = "2026-06-16T10:00:00", required = false)
+    private LocalDateTime userEmailChangedAt;
 }

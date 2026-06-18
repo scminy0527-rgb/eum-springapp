@@ -4,7 +4,7 @@
 
     <!-- 퀴즈 시작 기록 조회 -->
     <select id="selectByUserIdAndQuizId" resultType="QuizStartVO">
-        SELECT ID, QUIZ_START_AT, USER_ID, QUIZ_ID
+        SELECT ID, QUIZ_START_AT, USER_ID, QUIZ_ID, QUIZ_START_COMPLETED_COUNT, QUIZ_START_CORRECT_COUNT
         FROM TBL_QUIZ_START
         WHERE USER_ID = #{userId}
           AND QUIZ_ID = #{quizId}
@@ -19,12 +19,24 @@
         VALUES(#{id}, #{userId}, #{quizId})
     </insert>
 
-    <!-- 퀴즈 시작 시간 갱신: 다시 퀴즈를 시작하면 진행중 상태로 갱신 -->
+    <!-- 퀴즈 시작 시간 갱신: 다시 시작하면 진행 문제 수도 초기화 -->
     <update id="updateStartAt">
         UPDATE TBL_QUIZ_START
-        SET QUIZ_START_AT = CURRENT_TIMESTAMP
+        SET QUIZ_START_AT = CURRENT_TIMESTAMP,
+            QUIZ_START_COMPLETED_COUNT = 0,
+            QUIZ_START_CORRECT_COUNT = 0
         WHERE USER_ID = #{userId}
           AND QUIZ_ID = #{quizId}
+    </update>
+
+    <!-- 퀴즈 진행 문제 수 증가 -->
+    <update id="updateProgress">
+        UPDATE TBL_QUIZ_START
+        SET QUIZ_START_COMPLETED_COUNT = QUIZ_START_COMPLETED_COUNT + 1,
+            QUIZ_START_CORRECT_COUNT = QUIZ_START_CORRECT_COUNT + #{isCorrect}
+        WHERE USER_ID = #{userId}
+          AND QUIZ_ID = #{quizId}
+          AND QUIZ_START_COMPLETED_COUNT &lt; #{totalCount}
     </update>
 
 </mapper>

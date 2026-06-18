@@ -5,6 +5,7 @@ import com.app.springapp.domain.dto.request.MyPageWithdrawRequestDTO;
 import com.app.springapp.domain.dto.response.MyPageFollowResponseDTO;
 import com.app.springapp.domain.dto.response.MyPagePostResponseDTO;
 import com.app.springapp.domain.dto.response.MyPageStudyStatusResponseDTO;
+import com.app.springapp.exception.MyPageException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
+import com.app.springapp.exception.MyPageException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.concurrent.TimeUnit;
 
@@ -318,4 +324,114 @@ public class MyPageServiceTest {
         log.info("소셜 회원 탈퇴 사유 저장 여부: {}", withdrawCount > 0);
     }
 
+    // 정보수정 테스트용 일반 회원 생성
+    private Long createMyPageEditTestUser() {
+        Long userId = jdbcTemplate.queryForObject("SELECT SEQ_USER.NEXTVAL FROM DUAL", Long.class);
+        String suffix = String.valueOf(userId);
+
+        jdbcTemplate.update(
+                "INSERT INTO TBL_USER " +
+                        "(ID, USER_NAME, USER_NICKNAME, USER_EMAIL, USER_PHONE_NUM, USER_PASSWORD, USER_EXP, USER_PROFILE, USER_ROLE, USER_EMAIL_CHANGED_AT) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                userId,
+                "수정전이름",
+                "edit_test_" + suffix,
+                "edit_test_" + suffix + "@email.com",
+                "01012345678",
+                "test1234",
+                0,
+                "default.jpg",
+                "USER",
+                null
+        );
+
+        return userId;
+    }
+
+    // 기본 프로필 수정 시 이름까지 변경되는지 테스트
+    @Test
+    public void updateUserBasicInfoNameTest() {
+        Long userId = createMyPageEditTestUser();
+
+        MyPageEditRequestDTO requestDTO = new MyPageEditRequestDTO();
+        requestDTO.setUserName("수정후이름");
+        requestDTO.setUserNickname("edit_name_update_" + userId);
+        requestDTO.setUserIntro("이름 변경 테스트입니다.");
+        requestDTO.setUserJob("직장인");
+        requestDTO.setUserAddress("수도권");
+
+        myPageService.updateUserBasicInfo(requestDTO, userId);
+
+        String changedName = jdbcTemplate.queryForObject(
+                "SELECT USER_NAME FROM TBL_USER WHERE ID = ?",
+                String.class,
+                userId
+        );
+
+        assertEquals("수정후이름", changedName);
+
+        jdbcTemplate.update("DELETE FROM TBL_USER WHERE ID = ?", userId);
+    }
+
+    // 이메일 변경 성공 테스트
+    @Test
+    public void updateUserAccountInfoEmailSuccessTest() {
+        Long userId = createMyPageEditTestUser();
+
+        String newEmail = "edit_email_success_" + userId + "@email.com";
+        String emailCode = "123456";
+        String redisKey = "email:" + newEmail + ":" + emailCode;
+
+        redisTemplate.opsForValue().set(redisKey, emailCode, 3, TimeUnit.MINUTES);
+
+        MyPageEditRequestDTO requestDTO = new MyPageEditRequestDTO();
+        requestDTO.setUserEmail(newEmail);
+        requestDTO.setUserPhoneNum("01012345678");
+        requestDTO.setEmailCode(emailCode);
+
+        myPageService.updateUserAccountInfo(requestDTO, userId);
+
+        String changedEmail = jdbcTemplate.queryForObject(
+                "SELECT USER_EMAIL FROM TBL_USER WHERE ID = ?",
+                String.class,
+                userId
+        );
+
+        Object changedAt = jdbcTemplate.queryForObject(
+                "SELECT USER_EMAIL_CHANGED_AT FROM TBL_USER WHERE ID = ?",
+                Object.class,
+                userId
+        );
+
+        assertEquals(newEmail, changedEmail);
+        assertNotNull(changedAt);
+
+        redisTemplate.delete(redisKey);
+        jdbcTemplate.update("DELETE FROM TBL_USER WHERE ID = ?", userId);
+    }
+
+    // 이메일 변경 1개월 제한 테스트
+    @Test
+    public void updateUserAccountInfoEmailLimitTest() {
+        Long userId = createMyPageEditTestUser();
+
+        jdbcTemplate.update(
+                "UPDATE TBL_USER SET USER_EMAIL_CHANGED_AT = SYSDATE WHERE ID = ?",
+                userId
+        );
+
+        MyPageEditRequestDTO requestDTO = new MyPageEditRequestDTO();
+        requestDTO.setUserEmail("edit_email_limit_" + userId + "@email.com");
+        requestDTO.setUserPhoneNum("01012345678");
+        requestDTO.setEmailCode("123456");
+
+        MyPageException exception = assertThrows(
+                MyPageException.class,
+                () -> myPageService.updateUserAccountInfo(requestDTO, userId)
+        );
+
+        assertEquals("이메일은 1개월에 1번만 변경할 수 있습니다.", exception.getMessage());
+
+        jdbcTemplate.update("DELETE FROM TBL_USER WHERE ID = ?", userId);
+    }
 }

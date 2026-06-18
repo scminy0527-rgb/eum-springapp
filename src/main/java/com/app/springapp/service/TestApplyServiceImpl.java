@@ -31,7 +31,13 @@ public class TestApplyServiceImpl implements TestApplyService {
     // 접수 취소
     @Override
     public void cancel(Long id, Long userId) {
-        testApplyDAO.deleteById(id, userId);
+        if (testApplyDAO.hasResult(id)) {
+            throw new UserException("이미 시험이 진행된 접수는 취소할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+        int deleted = testApplyDAO.deleteById(id, userId);
+        if (deleted == 0) {
+            throw new UserException("해당 접수를 찾을 수 없거나 취소 권한이 없습니다.", HttpStatus.NOT_FOUND);
+        }
     }
 
     // 내 접수 목록 조회

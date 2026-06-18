@@ -17,4 +17,16 @@ public class EduStartDTO {
     private Long userId;
     @Schema(description = "학습 번호", example = "1")
     private Long eduId;
+    @Schema(description = "학습 완료 여부", example = "0")
+    private int eduStartIsCompleted;
+    @Schema(description = "학습 세션 전체 문제 수", example = "5")
+    private int eduStartTotalCount;
+    @Schema(description = "현재 학습 세션에서 푼 문제 수", example = "2")
+    private int eduStartCompletedCount;
+    @Schema(description = "현재 학습 세션에서 맞힌 문제 수", example = "2")
+    private int eduStartCorrectCount;
+    @Schema(description = "학습 세션 소요 시간: 초 단위", example = "140")
+    private int eduStartTime;
+    @Schema(description = "학습 완료 일시", example = "2026-06-16T15:06:48")
+    private LocalDateTime eduStartCompletedAt;
 }

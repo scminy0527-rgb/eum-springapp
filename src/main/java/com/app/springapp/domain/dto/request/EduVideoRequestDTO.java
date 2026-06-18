@@ -16,4 +16,6 @@ public class EduVideoRequestDTO {
     private String eduVideoType;
     @Schema(description = "영상 URL", example = "https://example.com/video.mp4", required = true)
     private String eduVideoUrl;
+    @Schema(description = "영상 썸네일 URL", example = "/assets/image/fairy-tale/story01.jpg")
+    private String eduVideoThumbnailUrl;
 }

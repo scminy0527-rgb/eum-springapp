@@ -27,5 +27,10 @@ public class QuizStartDAO {
         quizStartMapper.updateStartAt(userId, quizId);
     }
 
+    // 퀴즈 진행 문제 수 증가
+    public void updateProgress(Long userId, Long quizId, int totalCount, int isCorrect) {
+        quizStartMapper.updateProgress(userId, quizId, totalCount, isCorrect);
+    }
+
 
 }

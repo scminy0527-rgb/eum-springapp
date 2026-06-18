@@ -61,6 +61,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponseDTO.of(false, e.getMessage()));
     }
 
+    @ExceptionHandler(LearningAnalysisException.class)
+    public ResponseEntity<ApiResponseDTO> handleLearningAnalysisException(LearningAnalysisException e) {
+        HttpStatus status = e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status)
+                .body(ApiResponseDTO.of(false, e.getMessage()));
+    }
+
     @ExceptionHandler(JwtTokenException.class)
     public ResponseEntity<ApiResponseDTO> handleJwtTokenException(JwtTokenException e) {
         HttpStatus status = e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.UNAUTHORIZED;
